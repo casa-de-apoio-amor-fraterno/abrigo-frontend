@@ -1,0 +1,76 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav class="shell__sidenav" mode="side" opened>
+    <div class="shell__brand">
+      <img src="logo-casa-de-apoio.png" alt="Casa de Apoio Amor Fraterno" />
+      <span class="shell__badge">Setor Abrigo</span>
+    </div>
+
+    <mat-nav-list class="shell__nav">
+      @for (item of navItems; track item.rota) {
+        <a
+          mat-list-item
+          [routerLink]="item.rota"
+          routerLinkActive="shell__nav-item--ativo"
+          class="shell__nav-item"
+        >
+          <mat-icon matListItemIcon>{{ item.icone }}</mat-icon>
+          <span matListItemTitle>{{ item.rotulo }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell__content">
+    <mat-toolbar class="shell__toolbar">
+      <span class="shell__toolbar-title">Abrigo</span>
+      <span class="shell__spacer"></span>
+
+      <button mat-icon-button [matMenuTriggerFor]="menuUsuario" aria-label="Menu do usuário">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #menuUsuario="matMenu">
+        <div class="shell__usuario-nome" mat-menu-item disabled>
+          {{ sessao()?.nome ?? 'Usuário' }}
+        </div>
+        <button mat-menu-item (click)="sair()">
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <main class="shell__main">
+      <router-outlet />
+    </main>
+
+    <nav class="shell__bottom-nav">
+      @for (item of navItensPrincipais; track item.rota) {
+        <a [routerLink]="item.rota" routerLinkActive="shell__bottom-item--ativo" class="shell__bottom-item">
+          <mat-icon>{{ item.icone }}</mat-icon>
+          <span>{{ item.rotulo }}</span>
+        </a>
+      }
+
+      <button
+        class="shell__bottom-item"
+        [matMenuTriggerFor]="menuMais"
+        [class.shell__bottom-item--ativo]="false"
+      >
+        <mat-icon>more_horiz</mat-icon>
+        <span>Mais</span>
+      </button>
+      <mat-menu #menuMais="matMenu" xPosition="before">
+        @for (item of navItensSecundarios; track item.rota) {
+          <a mat-menu-item [routerLink]="item.rota">
+            <mat-icon>{{ item.icone }}</mat-icon>
+            <span>{{ item.rotulo }}</span>
+          </a>
+        }
+        <button mat-menu-item (click)="sair()">
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </mat-menu>
+    </nav>
+  </mat-sidenav-content>
+</mat-sidenav-container>

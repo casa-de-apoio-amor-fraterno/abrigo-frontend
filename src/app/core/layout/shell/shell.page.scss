@@ -1,0 +1,140 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.shell {
+  height: 100%;
+
+  &__sidenav {
+    width: 260px;
+    border-right: none;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 900px) {
+      display: none;
+    }
+  }
+
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 16px 20px;
+
+    img {
+      max-width: 150px;
+    }
+  }
+
+  &__badge {
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: rgba(57, 185, 176, 0.12);
+    border: 1px solid rgba(57, 185, 176, 0.4);
+    color: var(--abrigo-primary-dark);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  &__nav {
+    padding-top: 8px;
+  }
+
+  &__nav-item {
+    color: rgba(0, 0, 0, 0.7);
+
+    &--ativo {
+      background: rgba(57, 185, 176, 0.1);
+      color: var(--abrigo-primary-dark);
+
+      mat-icon {
+        color: var(--abrigo-primary-dark);
+      }
+    }
+  }
+
+  &__content {
+    background: #f3f6f6;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__toolbar {
+    background: #fff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  &__toolbar-title {
+    font-weight: 600;
+    color: var(--abrigo-ink);
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  &__usuario-nome {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--abrigo-ink);
+    opacity: 1 !important;
+  }
+
+  &__main {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+
+    @media (max-width: 900px) {
+      padding: 16px;
+      padding-bottom: 84px;
+    }
+  }
+
+  &__bottom-nav {
+    display: none;
+
+    @media (max-width: 900px) {
+      display: flex;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+      z-index: 10;
+    }
+  }
+
+  &__bottom-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 0 10px;
+    border: none;
+    background: none;
+    color: rgba(0, 0, 0, 0.55);
+    text-decoration: none;
+    font-size: 11px;
+
+    mat-icon {
+      font-size: 22px;
+      height: 22px;
+      width: 22px;
+    }
+
+    &--ativo {
+      color: var(--abrigo-primary-dark);
+    }
+  }
+}
