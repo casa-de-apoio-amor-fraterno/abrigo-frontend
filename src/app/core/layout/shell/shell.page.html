@@ -1,14 +1,5 @@
 <div class="shell">
   <header class="shell__topbar">
-    <button
-      mat-icon-button
-      class="shell__topbar-toggle"
-      (click)="alternarSidenav()"
-      [attr.aria-label]="expandido() ? 'Recolher menu' : 'Expandir menu'"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
-
     <div class="shell__brand">
       <img class="shell__brand-icon" src="favicon.png" alt="CAAF" />
       <span class="shell__brand-text">CAAF</span>
@@ -49,12 +40,7 @@
   </header>
 
   <mat-sidenav-container class="shell__body">
-    <mat-sidenav
-      class="shell__sidenav"
-      [class.shell__sidenav--recolhido]="!expandido()"
-      mode="side"
-      opened
-    >
+    <mat-sidenav class="shell__sidenav" mode="side" opened>
       <nav class="shell__nav">
         @for (item of navItems; track item.rota) {
           <a [routerLink]="item.rota" routerLinkActive="shell__nav-item--ativo" class="shell__nav-item">

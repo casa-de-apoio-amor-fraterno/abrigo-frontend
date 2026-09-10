@@ -20,12 +20,6 @@
     z-index: 30;
   }
 
-  &__topbar-toggle {
-    @media (max-width: 900px) {
-      display: none;
-    }
-  }
-
   &__brand {
     display: flex;
     align-items: center;
@@ -138,15 +132,8 @@
   &__sidenav {
     width: 260px;
     border-right: none;
+    border-radius: 0 !important;
     background: var(--abrigo-sidenav-bg);
-    display: flex;
-    flex-direction: column;
-    transition: width 0.18s ease;
-    overflow-x: hidden;
-
-    &--recolhido {
-      width: 88px;
-    }
 
     @media (max-width: 900px) {
       display: none;
@@ -158,11 +145,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-  }
-
-  &__sidenav--recolhido &__nav {
-    padding-left: 0;
-    padding-right: 0;
   }
 
   &__nav-item {
@@ -199,19 +181,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  &__sidenav--recolhido &__nav-item {
-    flex-direction: column;
-    gap: 2px;
-    padding: 10px 2px;
-    text-align: center;
-    border-radius: 0;
-  }
-
-  &__sidenav--recolhido &__nav-item-label {
-    font-size: 10px;
-    line-height: 1.2;
   }
 
   &__content {
