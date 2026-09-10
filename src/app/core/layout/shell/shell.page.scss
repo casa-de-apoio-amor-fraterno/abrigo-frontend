@@ -130,7 +130,7 @@
   }
 
   &__sidenav {
-    width: 260px;
+    width: 88px;
     border-right: none;
     border-radius: 0 !important;
     background: var(--abrigo-sidenav-bg);
@@ -141,7 +141,7 @@
   }
 
   &__nav {
-    padding: 12px;
+    padding: 12px 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -149,13 +149,17 @@
 
   &__nav-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 14px;
-    padding: 10px 14px;
-    border-radius: 12px;
+    gap: 2px;
+    padding: 10px 2px;
+    border-radius: 0;
     background: transparent;
     color: rgba(0, 0, 0, 0.7);
     text-decoration: none;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.2;
     transition: background-color 0.15s ease;
 
     &:hover {
@@ -181,6 +185,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   &__content {
