@@ -3,11 +3,15 @@
 html {
   @include mat.theme(
     (
-      color: mat.$violet-palette,
+      color: mat.$cyan-palette,
       typography: Roboto,
       density: 0
     )
   );
+
+  --abrigo-primary: #39b9b0;
+  --abrigo-primary-dark: #278f89;
+  --abrigo-ink: #2b2b2b;
 }
 
 html,

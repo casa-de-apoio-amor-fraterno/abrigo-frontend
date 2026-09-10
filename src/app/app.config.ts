@@ -1,4 +1,5 @@
 import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
@@ -14,6 +15,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'pt-BR' },
     provideBrowserGlobalErrorListeners(),
+    provideAnimationsAsync(),
     provideHttpClient(withInterceptors([apiErrorInterceptor])),
     provideRouter(routes)
   ]
