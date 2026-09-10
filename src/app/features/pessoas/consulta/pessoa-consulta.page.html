@@ -1,0 +1,73 @@
+<div class="consulta">
+  <div class="consulta__cabecalho">
+    <h1>Pessoas</h1>
+    <p class="consulta__subtitulo">Consulta de pessoas cadastradas no Abrigo.</p>
+  </div>
+
+  <form class="consulta__busca" (ngSubmit)="buscar()">
+    <input
+      type="search"
+      placeholder="Buscar por nome ou CPF..."
+      [value]="termoBusca()"
+      (input)="termoBusca.set($any($event.target).value)"
+    />
+    <button mat-flat-button type="submit" class="consulta__busca-btn">Buscar</button>
+  </form>
+
+  @if (carregando()) {
+    <div class="consulta__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <div class="consulta__estado consulta__estado--erro">{{ erro() }}</div>
+  } @else if (itens().length === 0) {
+    <div class="consulta__estado">Nenhuma pessoa encontrada.</div>
+  } @else {
+    <div class="consulta__tabela-wrapper">
+      <table class="consulta__tabela">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>
+              CPF
+              <mat-icon
+                class="consulta__ajuda-cpf"
+                matTooltip="CPF parcialmente oculto por exigência da LGPD — o número completo só é exibido na tela de edição da pessoa."
+                aria-label="Por que o CPF está parcialmente oculto"
+              >help_outline</mat-icon>
+            </th>
+            <th>Telefone</th>
+            <th>Nascimento</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pessoa of itens(); track pessoa.id) {
+            <tr>
+              <td>{{ pessoa.nome }}</td>
+              <td>{{ pessoa.cpf ? mascararCpf(pessoa.cpf) : '—' }}</td>
+              <td>{{ pessoa.telefone || '—' }}</td>
+              <td>{{ pessoa.data_nascimento ? (pessoa.data_nascimento | date: 'dd/MM/yyyy') : '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="consulta__paginacao">
+      <span>{{ total() }} pessoa(s)</span>
+      <div class="consulta__paginacao-botoes">
+        <button mat-icon-button (click)="paginaAnterior()" [disabled]="pagina() === 0" aria-label="Página anterior">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          (click)="proximaPagina()"
+          [disabled]="(pagina() + 1) * 20 >= total()"
+          aria-label="Próxima página"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</div>

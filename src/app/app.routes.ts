@@ -20,8 +20,7 @@ export const routes: Routes = [
       {
         path: 'pessoas',
         loadComponent: () =>
-          import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
-        data: { titulo: 'Pessoas' }
+          import('./features/pessoas/consulta/pessoa-consulta.page').then((m) => m.PessoaConsultaPage)
       },
       {
         path: 'estadias',
