@@ -67,9 +67,20 @@
   &__form-area {
     flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 32px;
+  }
+
+  &__mobile-logo {
+    display: none;
+    max-width: 220px;
+    margin-bottom: 28px;
+
+    @media (max-width: 900px) {
+      display: block;
+    }
   }
 
   &__card {
