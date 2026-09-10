@@ -189,12 +189,35 @@
   }
 
   &__content {
+    position: relative;
     background: #f3f6f6;
     display: flex;
     flex-direction: column;
   }
 
+  &__watermark {
+    position: fixed;
+    right: -60px;
+    bottom: -60px;
+    width: 420px;
+    height: 420px;
+    opacity: 0.06;
+    filter: blur(3px) grayscale(1);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+
+    @media (max-width: 900px) {
+      width: 260px;
+      height: 260px;
+      right: -50px;
+      bottom: 60px;
+    }
+  }
+
   &__main {
+    position: relative;
+    z-index: 1;
     flex: 1;
     padding: 24px;
     overflow-y: auto;
