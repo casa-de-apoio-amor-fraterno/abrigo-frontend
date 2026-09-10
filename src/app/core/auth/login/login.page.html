@@ -5,20 +5,24 @@
 
     <div class="login__brand-content">
       <img class="login__logo" src="logo-casa-de-apoio.png" alt="Casa de Apoio Amor Fraterno" />
-      <h1>Bem-vindo(a)</h1>
+      <span class="login__badge">Setor Abrigo</span>
+      <h1>Bem-vindo(a) ao Abrigo</h1>
       <p>
-        Sistema de gestão da Casa de Apoio Amor Fraterno — controle de
-        atendimentos, estadias, voluntários e materiais em um só lugar.
+        Sistema de gestão do <strong>Abrigo</strong> da Casa de Apoio Amor
+        Fraterno — controle de atendimentos, estadias, voluntários e
+        materiais. Este acesso é específico do Abrigo, não do Bazar nem da
+        Central de Doações.
       </p>
     </div>
   </section>
 
   <section class="login__form-area">
     <img class="login__mobile-logo" src="logo-casa-de-apoio.png" alt="Casa de Apoio Amor Fraterno" />
+    <span class="login__badge login__badge--mobile">Setor Abrigo</span>
 
     <form class="login__card" [formGroup]="form" (ngSubmit)="entrar()">
       <h2>Entrar</h2>
-      <p class="login__subtitle">Acesse com seu usuário e senha.</p>
+      <p class="login__subtitle">Acesse o sistema do Abrigo com seu usuário e senha.</p>
 
       <mat-form-field appearance="outline" class="login__field">
         <mat-label>Usuário</mat-label>

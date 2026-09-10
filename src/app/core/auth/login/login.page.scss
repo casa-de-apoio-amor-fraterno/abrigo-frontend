@@ -48,8 +48,32 @@
 
   &__logo {
     max-width: 260px;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
     filter: brightness(0) invert(1);
+  }
+
+  &__badge {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+
+    &--mobile {
+      display: none;
+      background: rgba(57, 185, 176, 0.12);
+      border: 1px solid rgba(57, 185, 176, 0.4);
+      color: var(--abrigo-primary-dark);
+
+      @media (max-width: 900px) {
+        display: inline-block;
+      }
+    }
   }
 
   &__brand-content h1 {
