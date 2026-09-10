@@ -12,22 +12,48 @@
     background: var(--abrigo-sidenav-bg);
     display: flex;
     flex-direction: column;
+    transition: width 0.18s ease;
+    overflow-x: hidden;
+
+    &--recolhido {
+      width: 88px;
+    }
 
     @media (max-width: 900px) {
       display: none;
     }
   }
 
+  &__sidenav-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 8px 4px;
+
+    .shell__sidenav--recolhido & {
+      justify-content: center;
+    }
+  }
+
+  &__brand-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  &__brand-text {
+    font-family: 'Playfair Display', 'Times New Roman', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--abrigo-ink);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
   &__brand {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 28px 16px 20px;
-
-    img {
-      max-width: 150px;
-    }
+    justify-content: center;
+    padding: 4px 16px 16px;
   }
 
   &__badge {
@@ -40,6 +66,7 @@
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   &__nav {
@@ -50,11 +77,15 @@
   }
 
   &__nav-item {
-    --mdc-list-list-item-container-shape: 12px;
-    color: rgba(0, 0, 0, 0.7);
-    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
     border-radius: 12px;
+    background: #fff;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    color: rgba(0, 0, 0, 0.7);
+    text-decoration: none;
 
     &--ativo {
       background: var(--abrigo-pill-ativo-bg);
@@ -67,6 +98,24 @@
     }
   }
 
+  &__nav-item-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__sidenav--recolhido &__nav-item {
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 2px;
+    text-align: center;
+  }
+
+  &__sidenav--recolhido &__nav-item-label {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
   &__content {
     background: #f3f6f6;
     display: flex;
@@ -76,11 +125,9 @@
   &__toolbar {
     background: #fff !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  }
-
-  &__toolbar-title {
-    font-weight: 600;
-    color: var(--abrigo-ink);
+    height: 52px;
+    min-height: 52px;
+    padding: 0 12px;
   }
 
   &__spacer {
