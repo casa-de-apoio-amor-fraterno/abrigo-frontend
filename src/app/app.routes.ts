@@ -46,6 +46,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
         data: { titulo: 'Materiais' }
+      },
+      {
+        path: 'busca',
+        loadComponent: () =>
+          import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
+        data: { titulo: 'Busca' }
       }
     ]
   }

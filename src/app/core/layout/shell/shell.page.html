@@ -1,92 +1,104 @@
-<mat-sidenav-container class="shell">
-  <mat-sidenav
-    class="shell__sidenav"
-    [class.shell__sidenav--recolhido]="!expandido()"
-    mode="side"
-    opened
-  >
-    <div class="shell__sidenav-header">
-      <button
-        mat-icon-button
-        (click)="alternarSidenav()"
-        [attr.aria-label]="expandido() ? 'Recolher menu' : 'Expandir menu'"
-      >
-        <mat-icon>menu</mat-icon>
-      </button>
+<div class="shell">
+  <header class="shell__topbar">
+    <button
+      mat-icon-button
+      class="shell__topbar-toggle"
+      (click)="alternarSidenav()"
+      [attr.aria-label]="expandido() ? 'Recolher menu' : 'Expandir menu'"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
 
+    <div class="shell__brand">
       <img class="shell__brand-icon" src="favicon.png" alt="CAAF" />
-
-      @if (expandido()) {
-        <span class="shell__brand-text">CAAF</span>
-      }
+      <span class="shell__brand-text">CAAF</span>
+      <span class="shell__badge">Setor Abrigo</span>
     </div>
 
-    @if (expandido()) {
-      <div class="shell__brand">
-        <span class="shell__badge">Setor Abrigo</span>
+    <form class="shell__search" (ngSubmit)="buscar()">
+      <input
+        type="search"
+        placeholder="Pesquisar pessoas, estadias, materiais..."
+        [value]="termoBusca()"
+        (input)="termoBusca.set($any($event.target).value)"
+      />
+      <button type="submit" class="shell__search-btn" aria-label="Buscar">
+        <mat-icon>search</mat-icon>
+      </button>
+    </form>
+
+    <span class="shell__spacer"></span>
+
+    <button
+      mat-icon-button
+      class="shell__perfil-btn"
+      [matMenuTriggerFor]="menuUsuario"
+      aria-label="Menu do usuário"
+    >
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #menuUsuario="matMenu">
+      <div class="shell__usuario-nome" mat-menu-item disabled>
+        {{ sessao()?.nome ?? 'Usuário' }}
       </div>
-    }
-
-    <nav class="shell__nav">
-      @for (item of navItems; track item.rota) {
-        <a [routerLink]="item.rota" routerLinkActive="shell__nav-item--ativo" class="shell__nav-item">
-          <mat-icon>{{ item.icone }}</mat-icon>
-          <span class="shell__nav-item-label">{{ item.rotulo }}</span>
-        </a>
-      }
-    </nav>
-  </mat-sidenav>
-
-  <mat-sidenav-content class="shell__content">
-    <mat-toolbar class="shell__toolbar">
-      <span class="shell__spacer"></span>
-
-      <button mat-icon-button [matMenuTriggerFor]="menuUsuario" aria-label="Menu do usuário">
-        <mat-icon>account_circle</mat-icon>
+      <button mat-menu-item (click)="sair()">
+        <mat-icon>logout</mat-icon>
+        <span>Sair</span>
       </button>
-      <mat-menu #menuUsuario="matMenu">
-        <div class="shell__usuario-nome" mat-menu-item disabled>
-          {{ sessao()?.nome ?? 'Usuário' }}
-        </div>
-        <button mat-menu-item (click)="sair()">
-          <mat-icon>logout</mat-icon>
-          <span>Sair</span>
-        </button>
-      </mat-menu>
-    </mat-toolbar>
+    </mat-menu>
+  </header>
 
-    <main class="shell__main">
-      <router-outlet />
-    </main>
+  <mat-sidenav-container class="shell__body">
+    <mat-sidenav
+      class="shell__sidenav"
+      [class.shell__sidenav--recolhido]="!expandido()"
+      mode="side"
+      opened
+    >
+      <nav class="shell__nav">
+        @for (item of navItems; track item.rota) {
+          <a [routerLink]="item.rota" routerLinkActive="shell__nav-item--ativo" class="shell__nav-item">
+            <mat-icon>{{ item.icone }}</mat-icon>
+            <span class="shell__nav-item-label">{{ item.rotulo }}</span>
+          </a>
+        }
+      </nav>
+    </mat-sidenav>
 
-    <nav class="shell__bottom-nav">
-      @for (item of navItensPrincipais; track item.rota) {
-        <a [routerLink]="item.rota" routerLinkActive="shell__bottom-item--ativo" class="shell__bottom-item">
-          <mat-icon>{{ item.icone }}</mat-icon>
-          <span>{{ item.rotulo }}</span>
-        </a>
-      }
+    <mat-sidenav-content class="shell__content">
+      <main class="shell__main">
+        <router-outlet />
+      </main>
 
-      <button
-        class="shell__bottom-item"
-        [matMenuTriggerFor]="menuMais"
-        [class.shell__bottom-item--ativo]="false"
-      >
-        <mat-icon>more_horiz</mat-icon>
-        <span>Mais</span>
-      </button>
-      <mat-menu #menuMais="matMenu" xPosition="before">
-        @for (item of navItensSecundarios; track item.rota) {
-          <a mat-menu-item [routerLink]="item.rota">
+      <nav class="shell__bottom-nav">
+        @for (item of navItensPrincipais; track item.rota) {
+          <a [routerLink]="item.rota" routerLinkActive="shell__bottom-item--ativo" class="shell__bottom-item">
             <mat-icon>{{ item.icone }}</mat-icon>
             <span>{{ item.rotulo }}</span>
           </a>
         }
-        <button mat-menu-item (click)="sair()">
-          <mat-icon>logout</mat-icon>
-          <span>Sair</span>
+
+        <button
+          class="shell__bottom-item"
+          [matMenuTriggerFor]="menuMais"
+          [class.shell__bottom-item--ativo]="false"
+        >
+          <mat-icon>more_horiz</mat-icon>
+          <span>Mais</span>
         </button>
-      </mat-menu>
-    </nav>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+        <mat-menu #menuMais="matMenu" xPosition="before">
+          @for (item of navItensSecundarios; track item.rota) {
+            <a mat-menu-item [routerLink]="item.rota">
+              <mat-icon>{{ item.icone }}</mat-icon>
+              <span>{{ item.rotulo }}</span>
+            </a>
+          }
+          <button mat-menu-item (click)="sair()">
+            <mat-icon>logout</mat-icon>
+            <span>Sair</span>
+          </button>
+        </mat-menu>
+      </nav>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
