@@ -99,19 +99,41 @@ pessoa.legacy.md
 - `core` não depende de `features`; `shared` não contém regra de negócio;
   chamadas HTTP ficam em `services`, nunca em componentes.
 
-## Desenvolvimento
+## Instalação e execução local
+
+### Pré-requisitos
+
+- **Node.js 20+** (o projeto foi criado com Angular CLI 21, que exige
+  Node.js 20.19+ ou 22.12+) e **npm**
+- Git
+- O [`abrigo-backend`](https://github.com/casa-de-apoio-amor-fraterno/abrigo-backend)
+  rodando localmente em `http://localhost:8000` (siga o README de lá primeiro
+  — sem ele, a tela de login não consegue autenticar e as demais telas não
+  carregam dados)
+
+### Passo a passo
 
 ```bash
+git clone https://github.com/casa-de-apoio-amor-fraterno/abrigo-frontend.git
+cd abrigo-frontend
+
 npm install
 npm start
 ```
 
 A aplicação sobe em `http://localhost:4200` e proxya chamadas `/api` para o
-backend em `http://localhost:8000` (ver `proxy.conf.json`).
+backend em `http://localhost:8000` (ver `proxy.conf.json`) — não precisa
+configurar nada além de ter o backend rodando nessa porta.
+
+Abra `http://localhost:4200` no navegador. A tela de login pede usuário e
+senha de um usuário já criado no backend (ver a seção de instalação do
+`abrigo-backend` — `python -m app.scripts.criar_usuario`).
+
+### Testes e build
 
 ```bash
-npm run build   # build de produção
 npm test        # testes com Vitest
+npm run build   # build de produção (saída em dist/)
 ```
 
 ## Licença
