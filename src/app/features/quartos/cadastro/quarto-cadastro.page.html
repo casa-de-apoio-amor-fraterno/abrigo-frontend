@@ -1,0 +1,73 @@
+<div class="cadastro">
+  <div class="cadastro__cabecalho">
+    <a routerLink="/quartos" class="cadastro__voltar" aria-label="Voltar para a consulta">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <div>
+      <h1>{{ modoEdicao ? 'Editar quarto' : 'Novo quarto' }}</h1>
+      <p class="cadastro__subtitulo">Cadastro de quartos e leitos do Abrigo.</p>
+    </div>
+  </div>
+
+  @if (carregando()) {
+    <div class="cadastro__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else {
+    <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
+      @if (modoEdicao && !ativo()) {
+        <p class="cadastro__aviso">Este quarto está inativo — não aparece nas seleções de estadia.</p>
+      }
+
+      <div class="cadastro__grade">
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Número do quarto</mat-label>
+          <input matInput formControlName="numero" />
+          @if (form.controls.numero.touched && form.controls.numero.invalid) {
+            <mat-error>Informe o número do quarto</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Número de leitos</mat-label>
+          <input matInput formControlName="leito" />
+          @if (form.controls.leito.touched && form.controls.leito.invalid) {
+            <mat-error>Informe o(s) leito(s)</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+          <mat-label>Descrição</mat-label>
+          <input matInput formControlName="descricao" />
+        </mat-form-field>
+      </div>
+
+      @if (erro()) {
+        <p class="cadastro__erro">{{ erro() }}</p>
+      }
+
+      <div class="cadastro__acoes">
+        @if (modoEdicao && ativo()) {
+          <button
+            mat-button
+            type="button"
+            class="cadastro__inativar"
+            [disabled]="inativando()"
+            (click)="inativar()"
+          >
+            Inativar
+          </button>
+        }
+        <span class="cadastro__espaco"></span>
+        <a mat-button routerLink="/quartos">Cancelar</a>
+        <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvando()">
+          @if (salvando()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            Salvar
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>
