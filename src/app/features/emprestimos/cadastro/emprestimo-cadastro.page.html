@@ -1,0 +1,191 @@
+<div class="cadastro">
+  <div class="cadastro__cabecalho">
+    <a routerLink="/emprestimos" class="cadastro__voltar" aria-label="Voltar para a consulta">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <div>
+      <h1>{{ modoEdicao ? 'Editar empréstimo' : 'Novo empréstimo' }}</h1>
+      <p class="cadastro__subtitulo">Empréstimo de materiais e equipamentos do Abrigo.</p>
+    </div>
+  </div>
+
+  @if (carregando()) {
+    <div class="cadastro__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (modoEdicao) {
+    <mat-tab-group class="cadastro__abas" animationDuration="0ms">
+      <mat-tab label="Dados">
+        <ng-container *ngTemplateOutlet="formularioDados"></ng-container>
+      </mat-tab>
+      <mat-tab label="Itens do empréstimo">
+        <ng-template matTabContent>
+          <div class="cadastro__aba-conteudo">
+            <ng-container *ngTemplateOutlet="abaItens"></ng-container>
+          </div>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Histórico de alteração">
+        <ng-template matTabContent>
+          <div class="cadastro__aba-conteudo">
+            <ng-container *ngTemplateOutlet="abaHistorico"></ng-container>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  } @else {
+    <ng-container *ngTemplateOutlet="formularioDados"></ng-container>
+  }
+</div>
+
+<ng-template #formularioDados>
+  <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
+    <div class="cadastro__grade">
+      <div class="cadastro__campo cadastro__campo--largo">
+        <app-pessoa-autocomplete
+          label="Pessoa"
+          [valorInicial]="pessoaSelecionada()"
+          (selecionada)="selecionarPessoa($event)"
+        />
+      </div>
+
+      <mat-form-field appearance="outline" class="cadastro__campo">
+        <mat-label>Número do contrato</mat-label>
+        <input matInput formControlName="numeroContrato" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="cadastro__campo">
+        <mat-label>Situação</mat-label>
+        <input matInput formControlName="situacao" placeholder="ex.: Pendente, Devolvido" />
+        @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
+          <mat-error>Informe a situação</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+        <mat-label>Observação</mat-label>
+        <textarea matInput formControlName="observacao" rows="3"></textarea>
+      </mat-form-field>
+    </div>
+
+    @if (erro()) {
+      <p class="cadastro__erro">{{ erro() }}</p>
+    }
+
+    <div class="cadastro__acoes">
+      <a mat-button routerLink="/emprestimos">Cancelar</a>
+      <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvando()">
+        @if (salvando()) {
+          <mat-spinner diameter="20" />
+        } @else {
+          Salvar
+        }
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #abaItens>
+  @if (!formItemAberto()) {
+    <div class="cadastro__itens-cabecalho">
+      <p class="cadastro__subtitulo">Materiais emprestados dentro deste empréstimo.</p>
+      <button mat-flat-button type="button" class="cadastro__novo-item" (click)="novoItem()">
+        <mat-icon>add</mat-icon>
+        Novo item
+      </button>
+    </div>
+
+    @if (itens().length === 0) {
+      <p class="cadastro__vazio">Nenhum item registrado ainda.</p>
+    } @else {
+      <ul class="cadastro__lista-itens">
+        @for (item of itens(); track item.id) {
+          <li>
+            <div>
+              <strong>{{ descricoesMateriais()[item.idMaterial] || 'Carregando...' }}</strong>
+              <span>{{ item.situacao || 'Sem situação' }}{{ item.renovacao ? ' · ' + item.renovacao : '' }}</span>
+            </div>
+            <div class="cadastro__datas-item">
+              <span>{{ item.dataEmprestimo ? (item.dataEmprestimo | date: 'dd/MM/yyyy') : '-' }}</span>
+              <span>—</span>
+              <span>{{ item.dataDevolucao ? (item.dataDevolucao | date: 'dd/MM/yyyy') : '-' }}</span>
+              <button mat-icon-button type="button" aria-label="Editar item" (click)="editarItem(item)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    <form class="cadastro__form-item" [formGroup]="formItem" (ngSubmit)="salvarItem()">
+      <div class="cadastro__grade">
+        <div class="cadastro__campo cadastro__campo--largo">
+          <app-material-autocomplete
+            label="Material"
+            [valorInicial]="materialSelecionado()"
+            (selecionado)="selecionarMaterial($event)"
+          />
+        </div>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Data empréstimo</mat-label>
+          <input matInput type="date" formControlName="dataEmprestimo" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Data devolução</mat-label>
+          <input matInput type="date" formControlName="dataDevolucao" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Situação</mat-label>
+          <input matInput formControlName="situacao" placeholder="ex.: Emprestado, Devolvido" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Renovação</mat-label>
+          <input matInput formControlName="renovacao" />
+        </mat-form-field>
+      </div>
+
+      @if (erro()) {
+        <p class="cadastro__erro">{{ erro() }}</p>
+      }
+
+      <div class="cadastro__acoes">
+        <button mat-button type="button" (click)="cancelarItem()">Cancelar</button>
+        <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvandoItem()">
+          @if (salvandoItem()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            Salvar item
+          }
+        </button>
+      </div>
+    </form>
+  }
+</ng-template>
+
+<ng-template #abaHistorico>
+  @if (carregandoHistorico()) {
+    <div class="cadastro__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (historico().length === 0) {
+    <p class="cadastro__vazio">Nenhum histórico registrado ainda.</p>
+  } @else {
+    <ul class="cadastro__lista-historico">
+      @for (registro of historico(); track registro.id) {
+        <li>
+          <div class="cadastro__historico-cabecalho">
+            <span class="cadastro__historico-tipo">{{ registro.tipo }}</span>
+            <span class="cadastro__historico-data">{{ registro.dataCadastro | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <p>{{ registro.observacao }}</p>
+          <span class="cadastro__historico-usuario">{{ nomeUsuarioHistorico(registro.idUsuario) }}</span>
+        </li>
+      }
+    </ul>
+  }
+</ng-template>

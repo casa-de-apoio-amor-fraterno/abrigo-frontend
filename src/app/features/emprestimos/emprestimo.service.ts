@@ -6,14 +6,15 @@ import { environment } from '../../../environments/environment';
 import {
   EmprestimoCreateDto,
   EmprestimoDto,
+  EmprestimoHistoricoDto,
   EmprestimoItemCreateDto,
   EmprestimoItemDto,
   EmprestimoItemUpdateDto,
   EmprestimoUpdateDto,
   ListaEmprestimosDto
 } from './emprestimo.dto';
-import { paraItemModel, paraListaModel, paraModel } from './emprestimo.mapper';
-import { Emprestimo, EmprestimoItem, ListaEmprestimos } from './emprestimo.model';
+import { paraHistoricoModel, paraItemModel, paraListaModel, paraModel } from './emprestimo.mapper';
+import { Emprestimo, EmprestimoHistorico, EmprestimoItem, ListaEmprestimos } from './emprestimo.model';
 
 export interface ConsultaEmprestimosQuery {
   idPessoa?: number;
@@ -78,5 +79,11 @@ export class EmprestimoService {
     return this.http
       .put<EmprestimoItemDto>(`${this.resource}/${emprestimoId}/itens/${itemId}`, dados)
       .pipe(map(paraItemModel));
+  }
+
+  listarHistorico(emprestimoId: number): Observable<EmprestimoHistorico[]> {
+    return this.http
+      .get<EmprestimoHistoricoDto[]>(`${this.resource}/${emprestimoId}/historico`)
+      .pipe(map((itens) => itens.map(paraHistoricoModel)));
   }
 }

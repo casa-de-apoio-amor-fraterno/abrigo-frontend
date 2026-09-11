@@ -43,6 +43,9 @@ export interface EmprestimoItemDto {
 
 export interface EmprestimoItemCreateDto {
   id_material: number;
+  // Quem registrou a inclusão/edição — só usado pelo backend pra gravar
+  // `EmprestimoHistorico`, não é persistido no item em si.
+  id_usuario: number;
   data_emprestimo?: string | null;
   data_devolucao?: string | null;
   situacao?: string | null;
@@ -50,3 +53,12 @@ export interface EmprestimoItemCreateDto {
 }
 
 export type EmprestimoItemUpdateDto = EmprestimoItemCreateDto;
+
+export interface EmprestimoHistoricoDto {
+  id: number;
+  id_emprestimo: number;
+  id_usuario: number;
+  tipo: string;
+  observacao: string;
+  data_cadastro: string;
+}

@@ -1,10 +1,17 @@
 import {
   EmprestimoDto,
+  EmprestimoHistoricoDto,
   EmprestimoItemDto,
   EmprestimoResumoDto,
   ListaEmprestimosDto
 } from './emprestimo.dto';
-import { Emprestimo, EmprestimoItem, EmprestimoResumo, ListaEmprestimos } from './emprestimo.model';
+import {
+  Emprestimo,
+  EmprestimoHistorico,
+  EmprestimoItem,
+  EmprestimoResumo,
+  ListaEmprestimos
+} from './emprestimo.model';
 
 export function paraResumoModel(dto: EmprestimoResumoDto): EmprestimoResumo {
   return {
@@ -37,5 +44,16 @@ export function paraItemModel(dto: EmprestimoItemDto): EmprestimoItem {
     dataDevolucao: dto.data_devolucao,
     situacao: dto.situacao,
     renovacao: dto.renovacao
+  };
+}
+
+export function paraHistoricoModel(dto: EmprestimoHistoricoDto): EmprestimoHistorico {
+  return {
+    id: dto.id,
+    idEmprestimo: dto.id_emprestimo,
+    idUsuario: dto.id_usuario,
+    tipo: dto.tipo,
+    observacao: dto.observacao,
+    dataCadastro: dto.data_cadastro
   };
 }

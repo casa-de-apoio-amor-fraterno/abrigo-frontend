@@ -25,3 +25,12 @@ export interface EmprestimoItem {
   situacao: string | null;
   renovacao: string | null;
 }
+
+export interface EmprestimoHistorico {
+  id: number;
+  idEmprestimo: number;
+  idUsuario: number;
+  tipo: string;
+  observacao: string;
+  dataCadastro: string;
+}
