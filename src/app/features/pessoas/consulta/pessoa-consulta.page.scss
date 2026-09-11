@@ -1,11 +1,25 @@
 .consulta {
   &__cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 20px;
 
     h1 {
       margin: 0 0 4px;
       color: var(--abrigo-ink);
     }
+  }
+
+  &__nova-btn {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    text-decoration: none;
   }
 
   &__subtitulo {
@@ -98,6 +112,12 @@
 
   &__paginacao-botoes {
     display: flex;
+  }
+
+  &__coluna-acao {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
   }
 
   &__ajuda-cpf {

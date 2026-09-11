@@ -1,7 +1,13 @@
 <div class="consulta">
   <div class="consulta__cabecalho">
-    <h1>Pessoas</h1>
-    <p class="consulta__subtitulo">Consulta de pessoas cadastradas no Abrigo.</p>
+    <div>
+      <h1>Pessoas</h1>
+      <p class="consulta__subtitulo">Consulta de pessoas cadastradas no Abrigo.</p>
+    </div>
+    <a mat-flat-button routerLink="/pessoas/novo" class="consulta__nova-btn">
+      <mat-icon>add</mat-icon>
+      Nova pessoa
+    </a>
   </div>
 
   <form class="consulta__busca" (ngSubmit)="buscar()">
@@ -38,6 +44,7 @@
             </th>
             <th>Telefone</th>
             <th>Nascimento</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -47,6 +54,15 @@
               <td>{{ pessoa.cpf ? mascararCpf(pessoa.cpf) : '—' }}</td>
               <td>{{ pessoa.telefone || '—' }}</td>
               <td>{{ pessoa.data_nascimento ? (pessoa.data_nascimento | date: 'dd/MM/yyyy') : '—' }}</td>
+              <td class="consulta__coluna-acao">
+                <a
+                  mat-icon-button
+                  [routerLink]="['/pessoas', pessoa.id, 'editar']"
+                  aria-label="Editar pessoa"
+                >
+                  <mat-icon>edit</mat-icon>
+                </a>
+              </td>
             </tr>
           }
         </tbody>

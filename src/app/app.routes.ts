@@ -23,6 +23,16 @@ export const routes: Routes = [
           import('./features/pessoas/consulta/pessoa-consulta.page').then((m) => m.PessoaConsultaPage)
       },
       {
+        path: 'pessoas/novo',
+        loadComponent: () =>
+          import('./features/pessoas/cadastro/pessoa-cadastro.page').then((m) => m.PessoaCadastroPage)
+      },
+      {
+        path: 'pessoas/:id/editar',
+        loadComponent: () =>
+          import('./features/pessoas/cadastro/pessoa-cadastro.page').then((m) => m.PessoaCadastroPage)
+      },
+      {
         path: 'estadias',
         loadComponent: () =>
           import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),

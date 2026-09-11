@@ -3,9 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { ListaPessoasDto } from './pessoa.dto';
-import { paraListaModel } from './pessoa.mapper';
-import { ListaPessoas } from './pessoa.model';
+import { ListaPessoasDto, PessoaDto } from './pessoa.dto';
+import { paraEntradaDto, paraListaModel, paraPessoaModel } from './pessoa.mapper';
+import { ListaPessoas, Pessoa, PessoaFormulario } from './pessoa.model';
 
 export interface ConsultaPessoasQuery {
   busca?: string;
@@ -28,5 +28,21 @@ export class PessoaService {
     }
 
     return this.http.get<ListaPessoasDto>(this.resource, { params }).pipe(map(paraListaModel));
+  }
+
+  buscar(id: number): Observable<Pessoa> {
+    return this.http.get<PessoaDto>(`${this.resource}/${id}`).pipe(map(paraPessoaModel));
+  }
+
+  criar(formulario: PessoaFormulario): Observable<Pessoa> {
+    return this.http
+      .post<PessoaDto>(this.resource, paraEntradaDto(formulario))
+      .pipe(map(paraPessoaModel));
+  }
+
+  atualizar(id: number, formulario: PessoaFormulario): Observable<Pessoa> {
+    return this.http
+      .put<PessoaDto>(`${this.resource}/${id}`, paraEntradaDto(formulario))
+      .pipe(map(paraPessoaModel));
   }
 }
