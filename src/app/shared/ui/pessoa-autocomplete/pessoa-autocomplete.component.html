@@ -1,0 +1,9 @@
+<mat-form-field appearance="outline" class="pessoa-autocomplete">
+  <mat-label>{{ label() }}</mat-label>
+  <input matInput [formControl]="termo" [matAutocomplete]="auto" placeholder="Buscar por nome ou CPF..." />
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selecionar($event)">
+    @for (pessoa of opcoes(); track pessoa.id) {
+      <mat-option [value]="pessoa">{{ pessoa.nome }}</mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>
