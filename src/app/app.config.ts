@@ -8,6 +8,7 @@ import localePtExtra from '@angular/common/locales/extra/pt';
 
 import { routes } from './app.routes';
 import { apiErrorInterceptor } from './core/http/api-error.interceptor';
+import { authInterceptor } from './core/http/auth.interceptor';
 
 registerLocaleData(localePt, 'pt-BR', localePtExtra);
 
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'pt-BR' },
     provideBrowserGlobalErrorListeners(),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([apiErrorInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, apiErrorInterceptor])),
     provideRouter(routes)
   ]
 };

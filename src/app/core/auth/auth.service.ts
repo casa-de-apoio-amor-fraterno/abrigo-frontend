@@ -14,7 +14,7 @@ export interface LoginPayload {
   senha: string;
 }
 
-const CHAVE_TOKEN = 'abrigo.token';
+export const CHAVE_TOKEN = 'abrigo.token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
