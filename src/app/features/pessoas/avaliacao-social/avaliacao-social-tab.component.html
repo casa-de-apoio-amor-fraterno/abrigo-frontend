@@ -1,0 +1,183 @@
+<div class="avaliacoes">
+  @if (carregando()) {
+    <div class="avaliacoes__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else {
+    @if (!formAberto()) {
+      <div class="avaliacoes__cabecalho">
+        <p class="avaliacoes__subtitulo">
+          Cada avaliação é um registro histórico — uma nova avaliação não substitui as anteriores.
+        </p>
+        <button mat-flat-button type="button" class="avaliacoes__nova" (click)="novaAvaliacao()">
+          <mat-icon>add</mat-icon>
+          Nova avaliação
+        </button>
+      </div>
+
+      @if (avaliacoes().length === 0) {
+        <p class="avaliacoes__vazio">Nenhuma avaliação social registrada ainda.</p>
+      } @else {
+        <ul class="avaliacoes__lista">
+          @for (avaliacao of avaliacoes(); track avaliacao.id) {
+            <li class="avaliacoes__item">
+              <div>
+                <strong>{{ avaliacao.dataMovimento ? (avaliacao.dataMovimento | date: 'dd/MM/yyyy') : 'Sem data' }}</strong>
+                <p>{{ avaliacao.diagnostico || 'Sem diagnóstico registrado.' }}</p>
+              </div>
+              <button mat-button type="button" (click)="editar(avaliacao)">
+                <mat-icon>edit</mat-icon>
+                Editar
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    } @else {
+      <form class="avaliacoes__form" [formGroup]="form" (ngSubmit)="salvar()">
+        <section class="avaliacoes__secao">
+          <h3>Moradia</h3>
+          <div class="avaliacoes__grade">
+            <mat-form-field appearance="outline" class="avaliacoes__campo">
+              <mat-label>Residência</mat-label>
+              <mat-select formControlName="residencia">
+                <mat-option [value]="''">—</mat-option>
+                @for (opcao of opcoesResidencia; track opcao) {
+                  <mat-option [value]="opcao">{{ opcao }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo">
+              <mat-label>Tipo de construção</mat-label>
+              <mat-select formControlName="tipoConstrucao">
+                <mat-option [value]="''">—</mat-option>
+                @for (opcao of opcoesTipoConstrucao; track opcao) {
+                  <mat-option [value]="opcao">{{ opcao }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <div class="avaliacoes__campo avaliacoes__radio">
+              <span class="avaliacoes__radio-label">Energia elétrica</span>
+              <mat-radio-group formControlName="energiaEletrica">
+                <mat-radio-button [value]="true">Sim</mat-radio-button>
+                <mat-radio-button [value]="false">Não</mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <div class="avaliacoes__campo avaliacoes__radio">
+              <span class="avaliacoes__radio-label">Água encanada</span>
+              <mat-radio-group formControlName="aguaEncanada">
+                <mat-radio-button [value]="true">Sim</mat-radio-button>
+                <mat-radio-button [value]="false">Não</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+        </section>
+
+        <section class="avaliacoes__secao">
+          <h3>Renda</h3>
+          <div class="avaliacoes__grade">
+            <mat-form-field appearance="outline" class="avaliacoes__campo">
+              <mat-label>Renda mensal familiar na faixa de</mat-label>
+              <input matInput formControlName="rendaMensalFamiliar" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo">
+              <mat-label>Nº pessoas que contribuem para formação de renda</mat-label>
+              <input matInput formControlName="quantasPessoasContribuemFormacaoRenda" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo avaliacoes__campo--largo">
+              <mat-label>Alguém recebe benefício previdenciário do governo</mat-label>
+              <input matInput formControlName="alguemRecebeBeneficioPrevidenciarioGoverno" />
+            </mat-form-field>
+          </div>
+        </section>
+
+        <section class="avaliacoes__secao">
+          <h3>Saúde</h3>
+          <div class="avaliacoes__grade">
+            <div class="avaliacoes__campo avaliacoes__radio">
+              <span class="avaliacoes__radio-label">Fumante</span>
+              <mat-radio-group formControlName="fumante">
+                <mat-radio-button [value]="true">Sim</mat-radio-button>
+                <mat-radio-button [value]="false">Não</mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <div class="avaliacoes__campo avaliacoes__radio">
+              <span class="avaliacoes__radio-label">Casos de câncer na família</span>
+              <mat-radio-group formControlName="casosCancerFamilia">
+                <mat-radio-button value="Sim">Sim</mat-radio-button>
+                <mat-radio-button value="Não">Não</mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo avaliacoes__campo--largo">
+              <mat-label>Diagnóstico</mat-label>
+              <textarea matInput formControlName="diagnostico" rows="2"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo avaliacoes__campo--largo">
+              <mat-label>Tratamento realizado</mat-label>
+              <textarea matInput formControlName="tratamentoRealizado" rows="2"></textarea>
+            </mat-form-field>
+
+            <div class="avaliacoes__campo avaliacoes__radio">
+              <span class="avaliacoes__radio-label">Necessita medicamento de uso contínuo</span>
+              <mat-radio-group formControlName="necessitaMedicamentoUsoContinuo">
+                <mat-radio-button [value]="true">Sim</mat-radio-button>
+                <mat-radio-button [value]="false">Não</mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <div class="avaliacoes__campo avaliacoes__radio">
+              <span class="avaliacoes__radio-label">Medicamento disponibilizado pelo SUS</span>
+              <mat-radio-group formControlName="medicamentoDisponibilizadoSus">
+                <mat-radio-button [value]="true">Sim</mat-radio-button>
+                <mat-radio-button [value]="false">Não</mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo">
+              <mat-label>Custo mensal medicamento</mat-label>
+              <input matInput formControlName="custoMensalMedicamento" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo avaliacoes__campo--largo">
+              <mat-label>Alimentação específica</mat-label>
+              <textarea matInput formControlName="alimentacaoEspecifica" rows="2"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo avaliacoes__campo--largo">
+              <mat-label>Equipamento para locomoção</mat-label>
+              <textarea matInput formControlName="equipamentoParaLocomocao" rows="2"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="avaliacoes__campo">
+              <mat-label>Data movimento</mat-label>
+              <input matInput type="date" formControlName="dataMovimento" />
+            </mat-form-field>
+          </div>
+        </section>
+
+        @if (erro()) {
+          <p class="avaliacoes__erro">{{ erro() }}</p>
+        }
+
+        <div class="avaliacoes__acoes">
+          <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+          <button mat-flat-button type="submit" class="avaliacoes__salvar" [disabled]="salvando()">
+            @if (salvando()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Salvar avaliação
+            }
+          </button>
+        </div>
+      </form>
+    }
+  }
+</div>

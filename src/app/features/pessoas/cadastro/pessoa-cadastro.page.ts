@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -7,8 +8,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 
+import { AuthService } from '../../../core/auth/auth.service';
 import { descreverErroHttp } from '../../../core/http/api-error';
+import { AvaliacaoSocialTabComponent } from '../avaliacao-social/avaliacao-social-tab.component';
+import { ComposicaoFamiliarTabComponent } from '../composicao-familiar/composicao-familiar-tab.component';
 import { EstadoService } from '../../estados/estado.service';
 import { Estado } from '../../estados/estado.model';
 import { HospitalService } from '../../hospitais/hospital.service';
@@ -20,14 +25,18 @@ import { PessoaService } from '../pessoa.service';
 @Component({
   selector: 'app-pessoa-cadastro-page',
   imports: [
+    NgTemplateOutlet,
     ReactiveFormsModule,
     RouterLink,
+    AvaliacaoSocialTabComponent,
+    ComposicaoFamiliarTabComponent,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTabsModule
   ],
   templateUrl: './pessoa-cadastro.page.html',
   styleUrl: './pessoa-cadastro.page.scss'
@@ -38,6 +47,7 @@ export class PessoaCadastroPage {
   private readonly estadoService = inject(EstadoService);
   private readonly municipioService = inject(MunicipioService);
   private readonly hospitalService = inject(HospitalService);
+  private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -45,6 +55,15 @@ export class PessoaCadastroPage {
     ? Number(this.route.snapshot.paramMap.get('id'))
     : null;
   protected readonly modoEdicao = this.pessoaId !== null;
+
+  // Avaliação Social/Composição Familiar são dados sensíveis (ver
+  // `avaliacao_social.legacy.md`) — o backend já restringe os endpoints a
+  // `Usuario.perfil == 'Assistente Social'` (`exigir_perfil`); aqui só
+  // escondemos as abas de quem não tem esse perfil, pra não mostrar uma UI
+  // que resultaria em 403. Só fazem sentido em edição: são sub-recursos de
+  // uma pessoa que precisa existir antes.
+  protected readonly mostrarAbasAssistenteSocial =
+    this.modoEdicao && this.auth.temPerfil('Assistente Social');
 
   protected readonly carregando = signal(this.modoEdicao);
   protected readonly salvando = signal(false);
