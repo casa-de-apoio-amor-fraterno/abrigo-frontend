@@ -2,7 +2,7 @@
 export interface VoluntarioResumoDto {
   id: number;
   nome: string;
-  telefone: string;
+  telefone_principal: string | null;
   setor: string | null;
 }
 
@@ -14,7 +14,7 @@ export interface ListaVoluntariosDto {
 export interface VoluntarioDto {
   id: number;
   nome: string;
-  telefone: string;
+  telefone_principal: string | null;
   setor: string | null;
   data_nascimento: string | null;
   estado_civil: string | null;
@@ -27,7 +27,6 @@ export interface VoluntarioDto {
 
 export interface VoluntarioCreateDto {
   nome: string;
-  telefone: string;
   setor?: string | null;
   data_nascimento?: string | null;
   estado_civil?: string | null;

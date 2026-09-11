@@ -315,6 +315,48 @@ coisa primeiro.
    exportação de CSV verificada lendo o `Blob` gerado (não só disparando o
    download) — conteúdo, cabeçalhos e mascaramento de CPF confirmados.
 
+## Pós-conclusão: Foto e Contatos de Pessoa (2026-09-11)
+
+Duas features novas, fora do backlog original — gaps identificados
+revisitando o legado depois que o backlog de telas (itens 1-9) já estava
+concluído.
+
+- **Foto de Pessoa**: o legado (`untFrmManutencaoPessoa.pas`) capturava a
+  foto pela webcam (componente DevExpress) e salvava como arquivo `.bmp`
+  em disco, fora do banco — sem dado real pra migrar. Implementado do
+  zero: `shared/ui/captura-foto/` (captura via `getUserMedia`, sem
+  dependência de componente de terceiros), backend guarda a imagem como
+  BLOB no Postgres. Só disponível em edição (like Avaliação Social).
+- **Contatos (normalização de telefone)**: `pessoa.telefone`/
+  `voluntario.telefone` eram texto livre sem estrutura — dado real
+  misturava múltiplos números, nome de quem atende e observações no
+  mesmo campo. Normalizado em tabelas `pessoa_contato`/
+  `voluntario_contato` (ver `abrigo-backend/app/features/pessoas/
+  pessoa.legacy.md`, seção Contatos, pro raciocínio completo e a
+  heurística de migração automática). `shared/ui/contatos-tab/` — lista
+  editável reaproveitada nas duas entidades (mesmo shape dos dois
+  lados), com aviso visual (⚠) nos contatos que o parser da migração não
+  conseguiu separar automaticamente, sinalizando revisão manual sem
+  perder o dado original. Campo `telefone` solto removido das telas de
+  cadastro (Pessoa e Voluntário) — Voluntário não exige mais telefone
+  na criação (contatos são adicionados depois, como sub-recurso).
+
+  **Achado técnico (mesma causa do NG0950 já documentado no item 3 do
+  backlog acima):** `ContatosTabComponent` inicialmente usava
+  `input.required<string>()` pro `recursoBase` e chamava o carregamento
+  inicial direto no construtor — as duas coisas quebram no mesmo cenário
+  de `*ngTemplateOutlet`/content projection (usado em pessoa-cadastro/
+  voluntario-cadastro): o construtor roda antes do Angular aplicar o
+  valor do input nesse cenário específico. Corrigido com `input<string>('')`
+  (não obrigatório) e um `effect()` reativo pro carregamento inicial, em
+  vez de chamada direta no construtor — dessa vez a causa raiz ficou mais
+  clara: não é só sobre `input.required`, é sobre depender de qualquer
+  valor de input dentro do construtor nesse padrão de projeção.
+
+  Testado de ponta a ponta contra o backend real e os dados reais
+  migrados (~5.850 contatos): consulta, cadastro/edição/remoção de
+  contato, e o aviso visual num caso real não reconhecido pelo parser.
+
 ## Referências
 
 - Inventário de tabelas/FKs do banco real: `abrigo-backend/docs/atividades.md`

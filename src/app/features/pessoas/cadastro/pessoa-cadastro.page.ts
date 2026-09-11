@@ -21,6 +21,7 @@ import { PessoaService } from '../pessoa.service';
 import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 import { CapturaFotoComponent } from '../../../shared/ui/captura-foto/captura-foto.component';
+import { ContatosTabComponent } from '../../../shared/ui/contatos-tab/contatos-tab.component';
 
 @Component({
   selector: 'app-pessoa-cadastro-page',
@@ -30,6 +31,7 @@ import { CapturaFotoComponent } from '../../../shared/ui/captura-foto/captura-fo
     AvaliacaoSocialTabComponent,
     ComposicaoFamiliarTabComponent,
     CapturaFotoComponent,
+    ContatosTabComponent,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -89,7 +91,6 @@ export class PessoaCadastroPage {
     idMunicipio: this.fb.control<number | null>(null),
     endereco: [''],
     pontoReferencia: [''],
-    telefone: [''],
     idHospital: this.fb.control<number | null>(null),
     observacao: ['']
   });
@@ -126,7 +127,6 @@ export class PessoaCadastroPage {
             idMunicipio: pessoa.id_municipio,
             endereco: pessoa.endereco ?? '',
             pontoReferencia: pessoa.ponto_referencia ?? '',
-            telefone: pessoa.telefone ?? '',
             idHospital: pessoa.id_hospital,
             observacao: pessoa.observacao ?? ''
           });
@@ -157,7 +157,6 @@ export class PessoaCadastroPage {
       cartao_sus: valores.cartaoSus || null,
       endereco: valores.endereco || null,
       ponto_referencia: valores.pontoReferencia || null,
-      telefone: valores.telefone || null,
       id_hospital: valores.idHospital,
       id_municipio: valores.idMunicipio,
       id_estado: valores.idEstado,
@@ -181,6 +180,10 @@ export class PessoaCadastroPage {
         this.erro.set(descreverErroHttp(error.error));
       }
     });
+  }
+
+  protected get contatosUrl(): string | null {
+    return this.pessoaId === null ? null : this.pessoaService.contatosUrl(this.pessoaId);
   }
 
   protected get fotoUrlAtual(): string | null {

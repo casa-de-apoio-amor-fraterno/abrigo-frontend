@@ -41,7 +41,7 @@ export class VoluntarioConsultaPage {
         exportarCsv(
           'voluntarios.csv',
           ['Nome', 'Telefone', 'Setor'],
-          resultado.items.map((v) => [v.nome, v.telefone, v.setor])
+          resultado.items.map((v) => [v.nome, v.telefonePrincipal, v.setor])
         );
         this.exportando.set(false);
       },

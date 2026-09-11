@@ -1,7 +1,7 @@
 export interface VoluntarioResumo {
   id: number;
   nome: string;
-  telefone: string;
+  telefonePrincipal: string | null;
   setor: string | null;
 }
 

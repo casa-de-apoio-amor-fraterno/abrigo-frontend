@@ -1,0 +1,107 @@
+.contatos {
+  &__estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+  }
+
+  &__cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  &__subtitulo {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 13px;
+  }
+
+  &__novo {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__vazio {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+  }
+
+  &__tabela {
+    width: 100%;
+  }
+
+  &__aviso {
+    margin-left: 4px;
+    cursor: help;
+  }
+
+  &__badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(38, 166, 91, 0.12);
+    color: #1e7e42;
+  }
+
+  &__acoes-celula {
+    display: flex;
+    justify-content: flex-end;
+    white-space: nowrap;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__grade {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 16px;
+
+    @media (max-width: 700px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__campo {
+    width: 100%;
+
+    &--largo {
+      grid-column: span 2;
+
+      @media (max-width: 700px) {
+        grid-column: span 1;
+      }
+    }
+  }
+
+  &__erro {
+    color: #c62828;
+    font-size: 13px;
+    margin: 0;
+  }
+
+  &__acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  &__salvar {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    min-width: 140px;
+  }
+}

@@ -61,4 +61,9 @@ export class PessoaService {
   removerFoto(id: number): Observable<void> {
     return this.http.delete<void>(`${this.resource}/${id}/foto`);
   }
+
+  /** URL do sub-recurso de contatos — ver shared/ui/contatos-tab. */
+  contatosUrl(id: number): string {
+    return `${this.resource}/${id}/contatos`;
+  }
 }

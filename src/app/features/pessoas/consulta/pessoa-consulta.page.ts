@@ -50,7 +50,12 @@ export class PessoaConsultaPage {
             ['Nome', 'CPF', 'Telefone', 'Data de nascimento'],
             // CPF mascarado — mesma regra de minimização da tela de consulta
             // (LGPD), o CSV é mais fácil de compartilhar/perder que a tela.
-            resultado.items.map((p) => [p.nome, p.cpf ? mascararCpf(p.cpf) : null, p.telefone, p.data_nascimento])
+            resultado.items.map((p) => [
+              p.nome,
+              p.cpf ? mascararCpf(p.cpf) : null,
+              p.telefone_principal,
+              p.data_nascimento
+            ])
           );
           this.exportando.set(false);
         },

@@ -2,7 +2,7 @@ import { ListaVoluntariosDto, VoluntarioDto, VoluntarioResumoDto } from './volun
 import { ListaVoluntarios, Voluntario, VoluntarioResumo } from './voluntario.model';
 
 export function paraResumoModel(dto: VoluntarioResumoDto): VoluntarioResumo {
-  return { id: dto.id, nome: dto.nome, telefone: dto.telefone, setor: dto.setor };
+  return { id: dto.id, nome: dto.nome, telefonePrincipal: dto.telefone_principal, setor: dto.setor };
 }
 
 export function paraListaModel(dto: ListaVoluntariosDto): ListaVoluntarios {

@@ -2,7 +2,7 @@ export interface PessoaResumo {
   id: number;
   nome: string;
   cpf: string | null;
-  telefone: string | null;
+  telefone_principal: string | null;
   data_nascimento: string | null;
   tem_foto: boolean;
 }
@@ -21,7 +21,6 @@ export interface PessoaFormulario {
   cartao_sus: string | null;
   endereco: string | null;
   ponto_referencia: string | null;
-  telefone: string | null;
   id_hospital: number | null;
   id_municipio: number | null;
   id_estado: number | null;
@@ -33,4 +32,5 @@ export interface Pessoa extends PessoaFormulario {
   ativo: boolean;
   data_cadastro: string | null;
   tem_foto: boolean;
+  telefone_principal: string | null;
 }

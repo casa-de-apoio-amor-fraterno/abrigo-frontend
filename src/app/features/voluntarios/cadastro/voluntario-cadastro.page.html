@@ -19,14 +19,6 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Telefone</mat-label>
-        <input matInput formControlName="telefone" />
-        @if (form.controls.telefone.touched && form.controls.telefone.invalid) {
-          <mat-error>Informe o telefone</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
         <mat-label>Setor</mat-label>
         <input matInput formControlName="setor" />
       </mat-form-field>
@@ -81,4 +73,11 @@
       }
     </app-cadastro-acoes>
   </form>
+
+  @if (modoEdicao && contatosUrl) {
+    <section class="cadastro__secao cadastro__subsecao">
+      <h2>Contatos</h2>
+      <app-contatos-tab [recursoBase]="contatosUrl" />
+    </section>
+  }
 </app-pagina-cadastro>

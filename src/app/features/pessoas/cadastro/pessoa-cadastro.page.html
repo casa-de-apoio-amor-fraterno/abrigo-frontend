@@ -118,11 +118,6 @@
           <mat-label>Ponto de referência</mat-label>
           <input matInput formControlName="pontoReferencia" />
         </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Telefone</mat-label>
-          <input matInput formControlName="telefone" />
-        </mat-form-field>
       </div>
     </section>
 
@@ -152,4 +147,11 @@
 
     <app-cadastro-acoes voltarPara="/pessoas" [salvando]="salvando()" />
   </form>
+
+  @if (modoEdicao && contatosUrl) {
+    <section class="cadastro__secao cadastro__subsecao">
+      <h2>Contatos</h2>
+      <app-contatos-tab [recursoBase]="contatosUrl" />
+    </section>
+  }
 </ng-template>

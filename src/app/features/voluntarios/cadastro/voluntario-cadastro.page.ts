@@ -9,6 +9,7 @@ import { descreverErroHttp } from '../../../core/http/api-error';
 import { VoluntarioService } from '../voluntario.service';
 import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
+import { ContatosTabComponent } from '../../../shared/ui/contatos-tab/contatos-tab.component';
 
 @Component({
   selector: 'app-voluntario-cadastro-page',
@@ -17,6 +18,7 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    ContatosTabComponent,
     PaginaCadastroComponent,
     CadastroAcoesComponent
   ],
@@ -41,7 +43,6 @@ export class VoluntarioCadastroPage {
 
   protected readonly form = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
-    telefone: ['', [Validators.required]],
     setor: [''],
     dataNascimento: [''],
     estadoCivil: [''],
@@ -57,7 +58,6 @@ export class VoluntarioCadastroPage {
         next: (voluntario) => {
           this.form.patchValue({
             nome: voluntario.nome,
-            telefone: voluntario.telefone,
             setor: voluntario.setor ?? '',
             dataNascimento: voluntario.dataNascimento ?? '',
             estadoCivil: voluntario.estadoCivil ?? '',
@@ -86,7 +86,6 @@ export class VoluntarioCadastroPage {
     const valores = this.form.getRawValue();
     const dados = {
       nome: valores.nome,
-      telefone: valores.telefone,
       setor: valores.setor || null,
       data_nascimento: valores.dataNascimento || null,
       estado_civil: valores.estadoCivil || null,
@@ -113,6 +112,10 @@ export class VoluntarioCadastroPage {
         this.erro.set(descreverErroHttp(error.error));
       }
     });
+  }
+
+  protected get contatosUrl(): string | null {
+    return this.voluntarioId === null ? null : this.voluntarioService.contatosUrl(this.voluntarioId);
   }
 
   protected inativar(): void {

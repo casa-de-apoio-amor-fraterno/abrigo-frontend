@@ -33,7 +33,7 @@
                 <mat-icon>person</mat-icon>
                 <span>
                   <strong>{{ pessoa.nome }}</strong>
-                  <small>{{ pessoa.telefone || 'Sem telefone' }}</small>
+                  <small>{{ pessoa.telefone_principal || 'Sem telefone' }}</small>
                 </span>
               </a>
             </li>
@@ -96,7 +96,7 @@
                 <mat-icon>volunteer_activism</mat-icon>
                 <span>
                   <strong>{{ voluntario.nome }}</strong>
-                  <small>{{ voluntario.telefone }}</small>
+                  <small>{{ voluntario.telefonePrincipal || 'Sem telefone' }}</small>
                 </span>
               </a>
             </li>
