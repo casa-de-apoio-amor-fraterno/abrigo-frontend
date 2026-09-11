@@ -1,0 +1,108 @@
+<div class="busca">
+  <div class="busca__cabecalho">
+    <h1>Busca</h1>
+    <p class="busca__subtitulo">Busca em pessoas, estadias, materiais e voluntários do Abrigo.</p>
+  </div>
+
+  <form class="busca__form" (ngSubmit)="buscar()">
+    <input
+      type="search"
+      placeholder="Buscar por nome, CPF ou descrição..."
+      [value]="termo()"
+      (input)="termo.set($any($event.target).value)"
+    />
+    <button mat-flat-button type="submit" class="busca__botao">Buscar</button>
+  </form>
+
+  @if (buscando()) {
+    <div class="busca__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (!buscou()) {
+    <div class="busca__estado">Digite um termo e clique em Buscar.</div>
+  } @else {
+    <section class="busca__secao">
+      <h2>Pessoas</h2>
+      @if (pessoas().length === 0) {
+        <p class="busca__vazio">Nenhuma pessoa encontrada.</p>
+      } @else {
+        <ul class="busca__lista">
+          @for (pessoa of pessoas(); track pessoa.id) {
+            <li>
+              <a [routerLink]="['/pessoas', pessoa.id, 'editar']">
+                <mat-icon>person</mat-icon>
+                <span>
+                  <strong>{{ pessoa.nome }}</strong>
+                  <small>{{ pessoa.telefone || 'Sem telefone' }}</small>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="busca__secao">
+      <h2>Estadias</h2>
+      @if (estadias().length === 0) {
+        <p class="busca__vazio">Nenhuma estadia encontrada para as pessoas localizadas.</p>
+      } @else {
+        <ul class="busca__lista">
+          @for (estadia of estadias(); track estadia.id) {
+            <li>
+              <a [routerLink]="['/estadias', estadia.id, 'editar']">
+                <mat-icon>hotel</mat-icon>
+                <span>
+                  <strong>{{ estadia.nomePessoa }}</strong>
+                  <small>{{ estadia.tipoPessoa }} · {{ estadia.situacao }}</small>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="busca__secao">
+      <h2>Materiais</h2>
+      @if (materiais().length === 0) {
+        <p class="busca__vazio">Nenhum material encontrado.</p>
+      } @else {
+        <ul class="busca__lista">
+          @for (material of materiais(); track material.id) {
+            <li>
+              <a [routerLink]="['/materiais', material.id, 'editar']">
+                <mat-icon>category</mat-icon>
+                <span>
+                  <strong>{{ material.descricao }}</strong>
+                  <small>{{ material.situacao }}</small>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="busca__secao">
+      <h2>Voluntários</h2>
+      @if (voluntarios().length === 0) {
+        <p class="busca__vazio">Nenhum voluntário encontrado.</p>
+      } @else {
+        <ul class="busca__lista">
+          @for (voluntario of voluntarios(); track voluntario.id) {
+            <li>
+              <a [routerLink]="['/voluntarios', voluntario.id, 'editar']">
+                <mat-icon>volunteer_activism</mat-icon>
+                <span>
+                  <strong>{{ voluntario.nome }}</strong>
+                  <small>{{ voluntario.telefone }}</small>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</div>

@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PessoaService } from '../pessoa.service';
 import { PessoaResumo } from '../pessoa.model';
 import { mascararCpf } from '../../../shared/util/cpf';
+import { exportarCsv } from '../../../shared/util/csv';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -39,9 +40,29 @@ export class PessoaConsultaPage {
   protected readonly itens = signal<PessoaResumo[]>([]);
   protected readonly total = signal(0);
   protected readonly pagina = signal(0);
+  protected readonly exportando = signal(false);
 
   constructor() {
     this.consultar();
+  }
+
+  protected exportarCsv(): void {
+    this.exportando.set(true);
+    this.pessoaService
+      .listar({ busca: this.termoBusca().trim() || undefined, take: 5000 })
+      .subscribe({
+        next: (resultado) => {
+          exportarCsv(
+            'pessoas.csv',
+            ['Nome', 'CPF', 'Telefone', 'Data de nascimento'],
+            // CPF mascarado — mesma regra de minimização da tela de consulta
+            // (LGPD), o CSV é mais fácil de compartilhar/perder que a tela.
+            resultado.items.map((p) => [p.nome, p.cpf ? mascararCpf(p.cpf) : null, p.telefone, p.data_nascimento])
+          );
+          this.exportando.set(false);
+        },
+        error: () => this.exportando.set(false)
+      });
   }
 
   protected buscar(): void {

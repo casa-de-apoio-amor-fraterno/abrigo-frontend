@@ -4,10 +4,16 @@
       <h1>Pessoas</h1>
       <p class="consulta__subtitulo">Consulta de pessoas cadastradas no Abrigo.</p>
     </div>
-    <a mat-flat-button routerLink="/pessoas/novo" class="consulta__nova-btn">
-      <mat-icon>add</mat-icon>
-      Nova pessoa
-    </a>
+    <div class="consulta__acoes-cabecalho">
+      <button mat-button type="button" [disabled]="exportando()" (click)="exportarCsv()">
+        <mat-icon>download</mat-icon>
+        Exportar CSV
+      </button>
+      <a mat-flat-button routerLink="/pessoas/novo" class="consulta__nova-btn">
+        <mat-icon>add</mat-icon>
+        Nova pessoa
+      </a>
+    </div>
   </div>
 
   <form class="consulta__busca" (ngSubmit)="buscar()">

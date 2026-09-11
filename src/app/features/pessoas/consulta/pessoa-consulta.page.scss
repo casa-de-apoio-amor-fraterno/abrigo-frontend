@@ -12,6 +12,13 @@
     }
   }
 
+  &__acoes-cabecalho {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
   &__nova-btn {
     background: var(--abrigo-primary) !important;
     color: #fff !important;
