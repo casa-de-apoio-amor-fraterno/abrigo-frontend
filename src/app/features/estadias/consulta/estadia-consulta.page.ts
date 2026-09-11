@@ -1,8 +1,9 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 
@@ -12,6 +13,7 @@ import { EstadiaService } from '../estadia.service';
 import { EstadiaResumo, SituacaoEstadia } from '../estadia.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
+import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -24,6 +26,7 @@ export class EstadiaConsultaPage {
   private readonly estadiaService = inject(EstadiaService);
   private readonly pessoaService = inject(PessoaService);
   private readonly quartoService = inject(QuartoService);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly situacao = signal<SituacaoEstadia | ''>('Em acompanhamento');
   protected readonly carregando = signal(false);
@@ -40,6 +43,24 @@ export class EstadiaConsultaPage {
 
   constructor() {
     this.consultar();
+  }
+
+  protected visualizar(estadia: EstadiaResumo): void {
+    this.dialog.open(DetalheDialogComponent, {
+      width: '420px',
+      data: {
+        titulo: this.nomesPessoas()[estadia.idPessoa] || `Pessoa #${estadia.idPessoa}`,
+        campos: [
+          { rotulo: 'Tipo', valor: estadia.tipoPessoa },
+          { rotulo: 'Quarto', valor: this.numerosQuartos()[estadia.idQuarto] || '—' },
+          { rotulo: 'Entrada', valor: formatDate(estadia.dataEntrada, 'dd/MM/yyyy', 'pt-BR') },
+          { rotulo: 'Saída', valor: estadia.dataSaida ? formatDate(estadia.dataSaida, 'dd/MM/yyyy', 'pt-BR') : '—' },
+          { rotulo: 'Situação', valor: estadia.situacao }
+        ],
+        linkEditar: ['/estadias', estadia.id, 'editar'],
+        labelEditar: 'Editar estadia'
+      }
+    });
   }
 
   protected exportarCsv(): void {

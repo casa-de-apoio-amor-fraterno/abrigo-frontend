@@ -2,12 +2,14 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 import { MaterialService } from '../material.service';
 import { MaterialResumo } from '../material.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
+import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -19,6 +21,7 @@ const ITENS_POR_PAGINA = 20;
 export class MaterialConsultaPage {
   private readonly materialService = inject(MaterialService);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly termoBusca = signal(this.route.snapshot.queryParamMap.get('q') ?? '');
   protected readonly carregando = signal(false);
@@ -32,6 +35,21 @@ export class MaterialConsultaPage {
 
   constructor() {
     this.consultar();
+  }
+
+  protected visualizar(material: MaterialResumo): void {
+    this.dialog.open(DetalheDialogComponent, {
+      width: '420px',
+      data: {
+        titulo: material.descricao,
+        campos: [
+          { rotulo: 'Situação', valor: material.situacao },
+          { rotulo: 'Disponível p/ empréstimo', valor: material.disponivelEmprestimo ? 'Sim' : 'Não' }
+        ],
+        linkEditar: ['/materiais', material.id, 'editar'],
+        labelEditar: 'Editar material'
+      }
+    });
   }
 
   protected exportarCsv(): void {

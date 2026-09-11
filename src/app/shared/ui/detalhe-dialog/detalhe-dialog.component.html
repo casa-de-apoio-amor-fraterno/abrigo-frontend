@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>{{ data.titulo }}</h2>
+
+<mat-dialog-content class="detalhe-dialog__conteudo">
+  <dl class="detalhe-dialog__lista">
+    @for (campo of data.campos; track campo.rotulo) {
+      <div class="detalhe-dialog__campo">
+        <dt>{{ campo.rotulo }}</dt>
+        <dd>{{ campo.valor || '—' }}</dd>
+      </div>
+    }
+  </dl>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  <a
+    mat-flat-button
+    class="detalhe-dialog__editar"
+    [routerLink]="data.linkEditar"
+    (click)="dialogRef.close()"
+  >
+    <mat-icon>edit</mat-icon>
+    {{ data.labelEditar || 'Editar' }}
+  </a>
+</mat-dialog-actions>

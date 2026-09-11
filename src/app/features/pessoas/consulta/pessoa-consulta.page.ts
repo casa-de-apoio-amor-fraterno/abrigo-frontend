@@ -1,8 +1,9 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -11,6 +12,7 @@ import { PessoaResumo } from '../pessoa.model';
 import { mascararCpf } from '../../../shared/util/cpf';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
+import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -24,6 +26,7 @@ export class PessoaConsultaPage {
 
   private readonly pessoaService = inject(PessoaService);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly termoBusca = signal(this.route.snapshot.queryParamMap.get('q') ?? '');
   protected readonly carregando = signal(false);
@@ -37,6 +40,25 @@ export class PessoaConsultaPage {
 
   constructor() {
     this.consultar();
+  }
+
+  protected visualizar(pessoa: PessoaResumo): void {
+    this.dialog.open(DetalheDialogComponent, {
+      width: '420px',
+      data: {
+        titulo: pessoa.nome,
+        campos: [
+          { rotulo: 'CPF', valor: pessoa.cpf ? mascararCpf(pessoa.cpf) : '—' },
+          { rotulo: 'Telefone', valor: pessoa.telefone_principal || '—' },
+          {
+            rotulo: 'Nascimento',
+            valor: pessoa.data_nascimento ? formatDate(pessoa.data_nascimento, 'dd/MM/yyyy', 'pt-BR') : '—'
+          }
+        ],
+        linkEditar: ['/pessoas', pessoa.id, 'editar'],
+        labelEditar: 'Editar pessoa'
+      }
+    });
   }
 
   protected exportarCsv(): void {

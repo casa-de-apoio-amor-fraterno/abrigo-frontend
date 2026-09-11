@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
@@ -8,6 +9,7 @@ import { QuartoService } from '../quarto.service';
 import { Quarto } from '../quarto.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
+import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 
 @Component({
   selector: 'app-quarto-consulta-page',
@@ -17,6 +19,7 @@ import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagi
 })
 export class QuartoConsultaPage {
   private readonly quartoService = inject(QuartoService);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly termoBusca = signal('');
   protected readonly mostrarInativos = signal(false);
@@ -39,6 +42,22 @@ export class QuartoConsultaPage {
 
   constructor() {
     this.consultar();
+  }
+
+  protected visualizar(quarto: Quarto): void {
+    this.dialog.open(DetalheDialogComponent, {
+      width: '420px',
+      data: {
+        titulo: quarto.numero,
+        campos: [
+          { rotulo: 'Leito(s)', valor: quarto.leito },
+          { rotulo: 'Descrição', valor: quarto.descricao || '—' },
+          { rotulo: 'Status', valor: quarto.ativo ? 'Ativo' : 'Inativo' }
+        ],
+        linkEditar: ['/quartos', quarto.id, 'editar'],
+        labelEditar: 'Editar quarto'
+      }
+    });
   }
 
   protected alternarMostrarInativos(): void {

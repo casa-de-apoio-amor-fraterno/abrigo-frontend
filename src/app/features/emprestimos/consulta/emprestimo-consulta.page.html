@@ -13,7 +13,7 @@
   (paginaProxima)="proximaPagina()"
 >
   <ng-container acoes>
-    <button mat-button type="button" [disabled]="exportando()" (click)="exportarCsv()">
+    <button mat-button type="button" class="consulta__exportar-btn" [disabled]="exportando()" (click)="exportarCsv()">
       <mat-icon>download</mat-icon>
       Exportar CSV
     </button>
@@ -46,7 +46,7 @@
     <tbody>
       @for (emprestimo of itens(); track emprestimo.id) {
         <tr>
-          <td>{{ nomesPessoas()[emprestimo.idPessoa] || '—' }}</td>
+          <td class="consulta__coluna-principal">{{ nomesPessoas()[emprestimo.idPessoa] || '—' }}</td>
           <td>{{ emprestimo.numeroContrato || '—' }}</td>
           <td>
             <span class="consulta__badge" [class.consulta__badge--neutro]="emprestimo.situacao === 'Devolvido'">
@@ -54,7 +54,21 @@
             </span>
           </td>
           <td class="consulta__coluna-acao">
-            <a mat-icon-button [routerLink]="['/emprestimos', emprestimo.id, 'editar']" aria-label="Editar empréstimo">
+            <button
+              mat-icon-button
+              type="button"
+              class="consulta__botao-visualizar"
+              aria-label="Visualizar empréstimo"
+              (click)="visualizar(emprestimo)"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <a
+              mat-icon-button
+              [routerLink]="['/emprestimos', emprestimo.id, 'editar']"
+              class="consulta__botao-editar"
+              aria-label="Editar empréstimo"
+            >
               <mat-icon>edit</mat-icon>
             </a>
           </td>

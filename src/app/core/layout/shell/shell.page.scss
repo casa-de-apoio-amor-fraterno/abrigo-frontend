@@ -225,6 +225,10 @@
 
     @media (max-width: 900px) {
       padding: 16px 16px 84px;
+      // Nada nessa área deveria rolar na horizontal — trava aqui pra
+      // qualquer estouro lateral (de um componente filho mal comportado)
+      // ficar invisível em vez de deslocar a tela ou virar scroll lateral.
+      overflow-x: hidden;
     }
   }
 

@@ -10,6 +10,15 @@
       margin: 0 0 4px;
       color: var(--abrigo-ink);
     }
+
+    // Título + botões de ação (ex.: "Exportar CSV" + "Nova pessoa") numa
+    // linha só não cabem em telas estreitas — o texto dos botões não
+    // encolhe, então a linha inteira (e a página) estourava a largura da
+    // tela. Empilhando, cada bloco fica livre pra usar a largura toda.
+    @media (max-width: 680px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
   }
 
   &__acoes-cabecalho {
@@ -17,6 +26,18 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+
+    // Um botão por linha — lado a lado ("Exportar CSV" + "Nova pessoa")
+    // ainda estourava a largura em telas bem estreitas.
+    @media (max-width: 680px) {
+      flex-direction: column;
+      align-items: stretch;
+
+      a,
+      button {
+        justify-content: center;
+      }
+    }
   }
 
   &__subtitulo {
@@ -50,6 +71,19 @@
     border-radius: 12px;
     overflow-x: auto;
     box-shadow: 0 1px 2px var(--abrigo-sombra);
+
+    // No mobile a tabela vira lista (ver .consulta__tabela em styles.scss)
+    // e cada linha já tem seu próprio fundo/zebra — o wrapper com cantos
+    // arredondados e sombra por cima disso só criava uma borda visual
+    // sobrando nas pontas. A margem negativa cancela o padding lateral de
+    // 16px do shell (ver shell.page.scss, &__main) pra lista encostar nas
+    // bordas da tela — cada linha compensa com o mesmo padding de volta.
+    @media (max-width: 680px) {
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0 -16px;
+    }
   }
 
   &__paginacao {

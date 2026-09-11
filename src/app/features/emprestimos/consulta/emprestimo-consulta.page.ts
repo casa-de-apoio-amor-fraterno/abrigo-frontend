@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 
@@ -10,6 +11,7 @@ import { EmprestimoService } from '../emprestimo.service';
 import { EmprestimoResumo } from '../emprestimo.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
+import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -21,6 +23,7 @@ const ITENS_POR_PAGINA = 20;
 export class EmprestimoConsultaPage {
   private readonly emprestimoService = inject(EmprestimoService);
   private readonly pessoaService = inject(PessoaService);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly situacao = signal('Pendente');
   protected readonly carregando = signal(false);
@@ -36,6 +39,21 @@ export class EmprestimoConsultaPage {
 
   constructor() {
     this.consultar();
+  }
+
+  protected visualizar(emprestimo: EmprestimoResumo): void {
+    this.dialog.open(DetalheDialogComponent, {
+      width: '420px',
+      data: {
+        titulo: this.nomesPessoas()[emprestimo.idPessoa] || `Pessoa #${emprestimo.idPessoa}`,
+        campos: [
+          { rotulo: 'Nº contrato', valor: emprestimo.numeroContrato || '—' },
+          { rotulo: 'Situação', valor: emprestimo.situacao }
+        ],
+        linkEditar: ['/emprestimos', emprestimo.id, 'editar'],
+        labelEditar: 'Editar empréstimo'
+      }
+    });
   }
 
   protected exportarCsv(): void {

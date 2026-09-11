@@ -148,8 +148,99 @@ body {
     text-align: right;
   }
 
+  // Botão "Visualizar" só existe pro popup de detalhes no mobile — no
+  // desktop a tabela já mostra tudo, então o ícone de editar direto basta.
+  &__botao-visualizar {
+    display: none;
+  }
+
+  // Exportar CSV é uma ação de desktop (baixa arquivo, usa junto de
+  // planilha) — sem uso real no celular e só disputava espaço no
+  // cabeçalho.
+  &__exportar-btn {
+    @media (max-width: 680px) {
+      display: none;
+    }
+  }
+
   &__linha--inativa td {
     color: var(--abrigo-texto-terciario);
+  }
+
+  // Abaixo de 680px a tabela vira uma lista enxuta: só a coluna principal
+  // (autorada no template de cada página via .consulta__coluna-principal)
+  // e as ações ficam visíveis — o resto dos detalhes vai pro popup aberto
+  // pelo botão "Visualizar" (ver shared/ui/detalhe-dialog). Linhas com
+  // fundo zebrado e um filete entre elas, sem card arredondado por linha.
+  @media (max-width: 680px) {
+    &__tabela {
+      display: block;
+
+      thead {
+        display: none;
+      }
+
+      tbody,
+      tr {
+        display: block;
+        width: 100%;
+      }
+
+      tr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 4px 16px;
+        // Sem isso o padding soma ao width:100% (box-sizing padrão do
+        // navegador é content-box) e a linha fica 32px mais larga que a
+        // tela — foi exatamente esse estouro que cortava o ícone/texto.
+        box-sizing: border-box;
+        border-bottom: 1px solid var(--abrigo-border);
+        background: var(--abrigo-surface);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:nth-child(even) {
+          background: var(--abrigo-surface-alt);
+        }
+      }
+
+      td {
+        display: none;
+        padding: 0;
+        border-bottom: none;
+
+        &::before {
+          content: none;
+        }
+      }
+    }
+
+    &__coluna-principal {
+      display: block !important;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__coluna-acao {
+      display: flex !important;
+      width: auto;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    // !important porque os estilos do próprio mat-icon-button (mais
+    // específicos que uma classe simples) vencem um display:none normal.
+    &__botao-editar {
+      display: none !important;
+    }
   }
 
   // Badge genérico de status/situação — cor "positiva" por padrão, use

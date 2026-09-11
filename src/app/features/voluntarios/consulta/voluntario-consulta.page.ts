@@ -2,12 +2,14 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 import { VoluntarioService } from '../voluntario.service';
 import { VoluntarioResumo } from '../voluntario.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
+import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -19,6 +21,7 @@ const ITENS_POR_PAGINA = 20;
 export class VoluntarioConsultaPage {
   private readonly voluntarioService = inject(VoluntarioService);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly termoBusca = signal(this.route.snapshot.queryParamMap.get('q') ?? '');
   protected readonly carregando = signal(false);
@@ -32,6 +35,21 @@ export class VoluntarioConsultaPage {
 
   constructor() {
     this.consultar();
+  }
+
+  protected visualizar(voluntario: VoluntarioResumo): void {
+    this.dialog.open(DetalheDialogComponent, {
+      width: '420px',
+      data: {
+        titulo: voluntario.nome,
+        campos: [
+          { rotulo: 'Telefone', valor: voluntario.telefonePrincipal || '—' },
+          { rotulo: 'Setor', valor: voluntario.setor || '—' }
+        ],
+        linkEditar: ['/voluntarios', voluntario.id, 'editar'],
+        labelEditar: 'Editar voluntário'
+      }
+    });
   }
 
   protected exportarCsv(): void {

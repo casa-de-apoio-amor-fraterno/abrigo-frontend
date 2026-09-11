@@ -1,0 +1,34 @@
+.detalhe-dialog {
+  &__lista {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__campo {
+    dt {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--abrigo-texto-secundario);
+      margin: 0 0 2px;
+    }
+
+    dd {
+      margin: 0;
+      color: var(--abrigo-ink);
+      font-size: 15px;
+    }
+  }
+
+  &__editar {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+}
