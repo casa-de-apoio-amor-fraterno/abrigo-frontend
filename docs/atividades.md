@@ -11,7 +11,7 @@ que falta aqui é só de UI.
 
 | Entidade | Telas no legado | Frontend hoje |
 | --- | --- | --- |
-| `Pessoa` | Consulta, Manutenção (com sub-abas: Avaliação Social, Composição Familiar, Observações, Histórico de alteração), Relatório | ✅ Consulta (`features/pessoas/consulta/`). ❌ Manutenção (cadastro/edição) e sub-abas. ❌ Relatório |
+| `Pessoa` | Consulta, Manutenção (com sub-abas: Avaliação Social, Composição Familiar, Observações, Histórico de alteração), Relatório | ✅ Consulta (`features/pessoas/consulta/`). ✅ Manutenção — cadastro/edição (`features/pessoas/cadastro/`), sem as sub-abas ainda (dependem da guarda de perfil, gap 1). ❌ Relatório |
 | `Usuario` | Login, Manutenção, Alterar Senha, Consulta | ✅ Login. ❌ Manutenção (decisão: gestão de usuário fica por CLI — `app/scripts/criar_usuario.py` no backend — não por UI, ver `abrigo-backend/README.md`) |
 | `Estado`/`Municipio`/`Hospital` | Sem tela própria no legado (só usados como combo em `Pessoa`) | ❌ Sem UI própria — vão aparecer como `<select>` no formulário de `Pessoa` quando ele existir. Serviços de apoio já existem (`features/estados/`, `.../municipios/`, `.../hospitais/`) |
 | `Quarto` | Consulta, Manutenção | ❌ Nenhuma tela ainda. Serviço de apoio já existe (`features/quartos/`) — usado tanto numa tela própria de cadastro quanto como combo/grid de "leitos disponíveis" dentro de `Estadia` |
@@ -57,10 +57,16 @@ que falta aqui é só de UI.
 Segue a mesma lógica de dependência do backend: o que desbloqueia mais
 coisa primeiro.
 
-1. **Cadastro/edição de Pessoa** — maior entidade do sistema, e
+1. ✅ **Cadastro/edição de Pessoa** — maior entidade do sistema, e
    pré-requisito pra Avaliação Social/Composição Familiar (que são abas
-   dela, não telas independentes). Extrair aqui os componentes
-   reutilizáveis de formulário (gap 2).
+   dela, não telas independentes). **Implementado (2026-09-11):**
+   `features/pessoas/cadastro/pessoa-cadastro.page` cobre criação e edição
+   num formulário só, com combo Estado → Município em cascata (reaproveita
+   os serviços de apoio de `estados`/`municipios`/`hospitais`). Testado de
+   ponta a ponta contra o backend real. O gap 2 (componente de formulário
+   reutilizável) **não foi extraído ainda** — o formulário de Pessoa ficou
+   direto na página; extrair antes de replicar o padrão nas próximas telas
+   de Manutenção.
 2. **Guarda de perfil no frontend** (gap 1) — antes de expor Avaliação
    Social/Composição Familiar.
 3. **Avaliação Social + Composição Familiar** — abas dentro da tela de
