@@ -22,6 +22,15 @@
 
     <button
       mat-icon-button
+      class="shell__tema-btn"
+      (click)="theme.alternar()"
+      [attr.aria-label]="theme.tema() === 'escuro' ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
+    >
+      <mat-icon>{{ theme.tema() === 'escuro' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
       class="shell__perfil-btn"
       [matMenuTriggerFor]="menuUsuario"
       aria-label="Menu do usuário"
@@ -32,6 +41,10 @@
       <div class="shell__usuario-nome" mat-menu-item disabled>
         {{ sessao()?.nome ?? 'Usuário' }}
       </div>
+      <button mat-menu-item (click)="theme.alternar()">
+        <mat-icon>{{ theme.tema() === 'escuro' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        <span>{{ theme.tema() === 'escuro' ? 'Tema claro' : 'Tema escuro' }}</span>
+      </button>
       <button mat-menu-item (click)="sair()">
         <mat-icon>logout</mat-icon>
         <span>Sair</span>
@@ -81,6 +94,10 @@
               <span>{{ item.rotulo }}</span>
             </a>
           }
+          <button mat-menu-item (click)="theme.alternar()">
+            <mat-icon>{{ theme.tema() === 'escuro' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            <span>{{ theme.tema() === 'escuro' ? 'Tema claro' : 'Tema escuro' }}</span>
+          </button>
           <button mat-menu-item (click)="sair()">
             <mat-icon>logout</mat-icon>
             <span>Sair</span>

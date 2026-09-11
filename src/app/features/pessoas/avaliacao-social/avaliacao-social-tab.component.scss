@@ -16,7 +16,7 @@
 
   &__subtitulo {
     margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     font-size: 13px;
   }
 
@@ -30,7 +30,7 @@
   }
 
   &__vazio {
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     font-size: 14px;
   }
 
@@ -49,13 +49,13 @@
     justify-content: space-between;
     gap: 16px;
     padding: 12px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--abrigo-border);
     border-radius: 8px;
 
     p {
       margin: 4px 0 0;
       font-size: 13px;
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--abrigo-texto-secundario);
     }
   }
 
@@ -105,7 +105,7 @@
 
   &__radio-label {
     font-size: 12px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
   }
 
   &__erro {

@@ -21,7 +21,7 @@
 
   &__subtitulo {
     margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     font-size: 14px;
   }
 
@@ -38,7 +38,7 @@
     align-items: center;
     justify-content: center;
     padding: 48px 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
 
     &--erro {
       color: #c62828;
@@ -46,10 +46,10 @@
   }
 
   &__tabela-wrapper {
-    background: #fff;
+    background: var(--abrigo-surface);
     border-radius: 12px;
     overflow-x: auto;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 2px var(--abrigo-sombra);
   }
 
   &__paginacao {
@@ -58,7 +58,7 @@
     justify-content: space-between;
     margin-top: 12px;
     font-size: 13px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
   }
 
   &__paginacao-botoes {

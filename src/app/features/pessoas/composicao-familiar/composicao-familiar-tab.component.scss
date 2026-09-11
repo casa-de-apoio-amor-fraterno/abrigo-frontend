@@ -16,7 +16,7 @@
 
   &__subtitulo {
     margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     font-size: 13px;
   }
 
@@ -30,7 +30,7 @@
   }
 
   &__vazio {
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     font-size: 14px;
   }
 

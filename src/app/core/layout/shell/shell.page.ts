@@ -7,6 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { AuthService } from '../../auth/auth.service';
+import { ThemeService } from '../../theme/theme.service';
 import { NAV_ITEMS, NAV_ITEMS_MOBILE_PRINCIPAIS } from '../../navigation/nav-items';
 
 @Component({
@@ -27,6 +28,7 @@ import { NAV_ITEMS, NAV_ITEMS_MOBILE_PRINCIPAIS } from '../../navigation/nav-ite
 export class ShellPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly theme = inject(ThemeService);
 
   protected readonly navItems = NAV_ITEMS;
   protected readonly navItensPrincipais = NAV_ITEMS.slice(0, NAV_ITEMS_MOBILE_PRINCIPAIS);

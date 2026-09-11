@@ -1,5 +1,10 @@
 @use '@angular/material' as mat;
 
+// Tema claro/escuro por usuário logado (2026-09-11, ver
+// core/theme/theme.service.ts) — alternado via o atributo
+// `data-theme="dark"|"light"` na tag <html>. Tokens semânticos (não nomes
+// de cor: "surface", não "branco") pra que o resto do CSS do app não
+// precise saber qual tema está ativo, só usar as variáveis.
 html {
   @include mat.theme(
     (
@@ -14,6 +19,34 @@ html {
   --abrigo-ink: #2b2b2b;
   --abrigo-sidenav-bg: #e4f3f2;
   --abrigo-pill-ativo-bg: #cdeae7;
+
+  --abrigo-bg: #f3f6f6;
+  --abrigo-surface: #fff;
+  --abrigo-surface-alt: #f1f4f4;
+  --abrigo-border: rgba(0, 0, 0, 0.08);
+  --abrigo-border-forte: rgba(0, 0, 0, 0.15);
+  --abrigo-texto-secundario: rgba(0, 0, 0, 0.6);
+  --abrigo-texto-terciario: rgba(0, 0, 0, 0.4);
+  --abrigo-sombra: rgba(0, 0, 0, 0.06);
+}
+
+html[data-theme='dark'] {
+  --abrigo-primary: #4fd1c5;
+  --abrigo-primary-dark: #7fe3d9;
+  --abrigo-ink: #e8ecec;
+  --abrigo-sidenav-bg: #16302e;
+  --abrigo-pill-ativo-bg: rgba(79, 209, 197, 0.22);
+
+  --abrigo-bg: #14181a;
+  --abrigo-surface: #1e2426;
+  --abrigo-surface-alt: #262d30;
+  --abrigo-border: rgba(255, 255, 255, 0.08);
+  --abrigo-border-forte: rgba(255, 255, 255, 0.18);
+  --abrigo-texto-secundario: rgba(255, 255, 255, 0.65);
+  --abrigo-texto-terciario: rgba(255, 255, 255, 0.45);
+  --abrigo-sombra: rgba(0, 0, 0, 0.4);
+
+  color-scheme: dark;
 }
 
 html,
@@ -21,6 +54,7 @@ body {
   height: 100%;
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--abrigo-bg);
 }
 
 // "Mobília" compartilhada das páginas de Consulta e Cadastro (ver
@@ -51,7 +85,7 @@ body {
       height: 40px;
       padding: 0 14px;
       border-radius: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--abrigo-border-forte);
       font-size: 14px;
       outline: none;
 
@@ -68,10 +102,10 @@ body {
 
   &__select-situacao {
     max-width: 260px;
-    background: #fff;
+    background: var(--abrigo-surface);
     border-radius: 8px;
     padding: 6px 12px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--abrigo-border-forte);
   }
 
   &__tabela {
@@ -82,18 +116,18 @@ body {
     th {
       text-align: left;
       padding: 12px 16px;
-      color: rgba(0, 0, 0, 0.55);
+      color: var(--abrigo-texto-secundario);
       font-weight: 600;
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.4px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      border-bottom: 1px solid var(--abrigo-border);
       white-space: nowrap;
     }
 
     td {
       padding: 12px 16px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      border-bottom: 1px solid var(--abrigo-border);
       color: var(--abrigo-ink);
     }
 
@@ -109,7 +143,7 @@ body {
   }
 
   &__linha--inativa td {
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--abrigo-texto-terciario);
   }
 
   // Badge genérico de status/situação — cor "positiva" por padrão, use
@@ -124,8 +158,8 @@ body {
     color: #1e7e42;
 
     &--neutro {
-      background: rgba(0, 0, 0, 0.08);
-      color: rgba(0, 0, 0, 0.5);
+      background: var(--abrigo-border);
+      color: var(--abrigo-texto-terciario);
     }
   }
 
@@ -135,7 +169,7 @@ body {
     height: 15px;
     vertical-align: middle;
     margin-left: 2px;
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--abrigo-texto-terciario);
     cursor: help;
   }
 }
@@ -146,7 +180,7 @@ body {
   // Empréstimos).
   &__subtitulo {
     margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     font-size: 14px;
   }
 
@@ -162,19 +196,19 @@ body {
 
   &__form,
   &__form-secundario {
-    background: #fff;
+    background: var(--abrigo-surface);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 2px var(--abrigo-sombra);
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
   &__abas {
-    background: #fff;
+    background: var(--abrigo-surface);
     border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 2px var(--abrigo-sombra);
     overflow: hidden;
   }
 
@@ -186,8 +220,8 @@ body {
     margin: 0;
     padding: 10px 14px;
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.05);
-    color: rgba(0, 0, 0, 0.65);
+    background: var(--abrigo-surface-alt);
+    color: var(--abrigo-texto-secundario);
     font-size: 13px;
   }
 
@@ -236,7 +270,7 @@ body {
 
   &__radio-label {
     font-size: 12px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
   }
 
   &__erro {
@@ -246,7 +280,7 @@ body {
   }
 
   &__vazio {
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     font-size: 14px;
     margin: 0;
   }
@@ -255,10 +289,10 @@ body {
   // Empréstimo): caixa branca + cabeçalho com título e botão de ação.
   &__subsecao {
     margin-top: 24px;
-    background: #fff;
+    background: var(--abrigo-surface);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 2px var(--abrigo-sombra);
   }
 
   &__subsecao-cabecalho {
@@ -299,7 +333,7 @@ body {
       justify-content: space-between;
       gap: 16px;
       padding: 12px 16px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--abrigo-border);
       border-radius: 8px;
 
       div:first-child {
@@ -309,7 +343,7 @@ body {
 
         span {
           font-size: 13px;
-          color: rgba(0, 0, 0, 0.6);
+          color: var(--abrigo-texto-secundario);
         }
       }
     }
@@ -320,7 +354,7 @@ body {
     align-items: center;
     gap: 6px;
     font-size: 13px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--abrigo-texto-secundario);
     white-space: nowrap;
   }
 
