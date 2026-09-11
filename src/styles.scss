@@ -31,8 +31,14 @@ html {
 }
 
 html[data-theme='dark'] {
-  --abrigo-primary: #4fd1c5;
-  --abrigo-primary-dark: #7fe3d9;
+  // --abrigo-primary é o fundo sólido dos botões principais (com texto
+  // branco) — mantido igual ao claro, não mais claro: um teal mais claro
+  // aqui vira "neon" demais contra o fundo escuro. --abrigo-primary-dark é
+  // só cor de texto/ícone/borda (nunca fundo sólido), por isso pode — e
+  // precisa — ser mais claro que no tema claro, pra ter contraste lendo
+  // direto sobre o fundo escuro.
+  --abrigo-primary: #39b9b0;
+  --abrigo-primary-dark: #6be0d4;
   --abrigo-ink: #e8ecec;
   --abrigo-sidenav-bg: #16302e;
   --abrigo-pill-ativo-bg: rgba(79, 209, 197, 0.22);
