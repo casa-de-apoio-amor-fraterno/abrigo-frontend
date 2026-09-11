@@ -33,34 +33,83 @@ export const routes: Routes = [
           import('./features/pessoas/cadastro/pessoa-cadastro.page').then((m) => m.PessoaCadastroPage)
       },
       {
+        path: 'quartos',
+        loadComponent: () =>
+          import('./features/quartos/consulta/quarto-consulta.page').then((m) => m.QuartoConsultaPage)
+      },
+      {
+        path: 'quartos/novo',
+        loadComponent: () =>
+          import('./features/quartos/cadastro/quarto-cadastro.page').then((m) => m.QuartoCadastroPage)
+      },
+      {
+        path: 'quartos/:id/editar',
+        loadComponent: () =>
+          import('./features/quartos/cadastro/quarto-cadastro.page').then((m) => m.QuartoCadastroPage)
+      },
+      {
         path: 'estadias',
         loadComponent: () =>
-          import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
-        data: { titulo: 'Estadias' }
+          import('./features/estadias/consulta/estadia-consulta.page').then((m) => m.EstadiaConsultaPage)
+      },
+      {
+        path: 'estadias/novo',
+        loadComponent: () =>
+          import('./features/estadias/cadastro/estadia-cadastro.page').then((m) => m.EstadiaCadastroPage)
+      },
+      {
+        path: 'estadias/:id/editar',
+        loadComponent: () =>
+          import('./features/estadias/cadastro/estadia-cadastro.page').then((m) => m.EstadiaCadastroPage)
       },
       {
         path: 'voluntarios',
         loadComponent: () =>
-          import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
-        data: { titulo: 'Voluntários' }
+          import('./features/voluntarios/consulta/voluntario-consulta.page').then((m) => m.VoluntarioConsultaPage)
+      },
+      {
+        path: 'voluntarios/novo',
+        loadComponent: () =>
+          import('./features/voluntarios/cadastro/voluntario-cadastro.page').then((m) => m.VoluntarioCadastroPage)
+      },
+      {
+        path: 'voluntarios/:id/editar',
+        loadComponent: () =>
+          import('./features/voluntarios/cadastro/voluntario-cadastro.page').then((m) => m.VoluntarioCadastroPage)
       },
       {
         path: 'emprestimos',
         loadComponent: () =>
-          import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
-        data: { titulo: 'Empréstimos' }
+          import('./features/emprestimos/consulta/emprestimo-consulta.page').then((m) => m.EmprestimoConsultaPage)
+      },
+      {
+        path: 'emprestimos/novo',
+        loadComponent: () =>
+          import('./features/emprestimos/cadastro/emprestimo-cadastro.page').then((m) => m.EmprestimoCadastroPage)
+      },
+      {
+        path: 'emprestimos/:id/editar',
+        loadComponent: () =>
+          import('./features/emprestimos/cadastro/emprestimo-cadastro.page').then((m) => m.EmprestimoCadastroPage)
       },
       {
         path: 'materiais',
         loadComponent: () =>
-          import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
-        data: { titulo: 'Materiais' }
+          import('./features/materiais/consulta/material-consulta.page').then((m) => m.MaterialConsultaPage)
+      },
+      {
+        path: 'materiais/novo',
+        loadComponent: () =>
+          import('./features/materiais/cadastro/material-cadastro.page').then((m) => m.MaterialCadastroPage)
+      },
+      {
+        path: 'materiais/:id/editar',
+        loadComponent: () =>
+          import('./features/materiais/cadastro/material-cadastro.page').then((m) => m.MaterialCadastroPage)
       },
       {
         path: 'busca',
-        loadComponent: () =>
-          import('./shared/ui/placeholder-page/placeholder-page.component').then((m) => m.PlaceholderPageComponent),
-        data: { titulo: 'Busca' }
+        loadComponent: () => import('./features/busca/busca.page').then((m) => m.BuscaPage)
       }
     ]
   }
