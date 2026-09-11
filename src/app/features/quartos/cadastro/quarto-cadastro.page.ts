@@ -1,28 +1,26 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { QuartoService } from '../quarto.service';
+import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
   selector: 'app-quarto-cadastro-page',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     MatButtonModule,
     MatFormFieldModule,
-    MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    PaginaCadastroComponent,
+    CadastroAcoesComponent
   ],
-  templateUrl: './quarto-cadastro.page.html',
-  styleUrl: './quarto-cadastro.page.scss'
+  templateUrl: './quarto-cadastro.page.html'
 })
 export class QuartoCadastroPage {
   private readonly fb = inject(FormBuilder);

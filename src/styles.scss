@@ -22,3 +22,327 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+// "Mobília" compartilhada das páginas de Consulta e Cadastro (ver
+// shared/ui/pagina-consulta e shared/ui/pagina-cadastro). Fica global, não
+// no .scss de cada componente, porque grande parte do markup que usa essas
+// classes (formulário, tabela, badges) é autorado pela própria página de
+// cada entidade e só fica visualmente dentro do shell via content
+// projection — CSS de um componente Angular não estiliza conteúdo
+// projetado de outro componente.
+.consulta {
+  &__nova-btn {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  &__busca {
+    display: flex;
+    gap: 8px;
+    max-width: 480px;
+
+    input {
+      flex: 1;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      font-size: 14px;
+      outline: none;
+
+      &:focus {
+        border-color: var(--abrigo-primary);
+      }
+    }
+  }
+
+  &__busca-btn {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+  }
+
+  &__select-situacao {
+    max-width: 260px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  &__tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      color: rgba(0, 0, 0, 0.55);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      color: var(--abrigo-ink);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  &__coluna-acao {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  &__linha--inativa td {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  // Badge genérico de status/situação — cor "positiva" por padrão, use
+  // &--neutro pro estado inativo/finalizado/devolvido.
+  &__badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(38, 166, 91, 0.12);
+    color: #1e7e42;
+
+    &--neutro {
+      background: rgba(0, 0, 0, 0.08);
+      color: rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  &__ajuda-cpf {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    vertical-align: middle;
+    margin-left: 2px;
+    color: rgba(0, 0, 0, 0.4);
+    cursor: help;
+  }
+}
+
+.cadastro {
+  // Reaproveitado pelo subtítulo do cabeçalho (shell) e por texto
+  // explicativo que a própria página autora (ex.: aba de Itens em
+  // Empréstimos).
+  &__subtitulo {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+  }
+
+  // Reaproveitado tanto pelo estado de carregando do shell (ver
+  // shared/ui/pagina-cadastro) quanto por sub-seções que a própria página
+  // autora (ex.: aba de Histórico em Empréstimos).
+  &__estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+  }
+
+  &__form,
+  &__form-secundario {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__abas {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  &__aba-conteudo {
+    padding: 24px;
+  }
+
+  &__aviso {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 13px;
+  }
+
+  &__secao {
+    h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--abrigo-ink);
+    }
+  }
+
+  &__grade {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 16px;
+
+    @media (max-width: 700px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__campo {
+    width: 100%;
+
+    &--largo {
+      grid-column: span 2;
+
+      @media (max-width: 700px) {
+        grid-column: span 1;
+      }
+    }
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: center;
+  }
+
+  &__radio {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px 0;
+  }
+
+  &__radio-label {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__erro {
+    color: #c62828;
+    font-size: 13px;
+    margin: 0;
+  }
+
+  &__vazio {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  // Sub-seção com listagem própria (acompanhantes de Estadia, itens de
+  // Empréstimo): caixa branca + cabeçalho com título e botão de ação.
+  &__subsecao {
+    margin-top: 24px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+
+  &__subsecao-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--abrigo-ink);
+    }
+  }
+
+  &__novo-item-btn {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 16px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+
+      div:first-child {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        span {
+          font-size: 13px;
+          color: rgba(0, 0, 0, 0.6);
+        }
+      }
+    }
+  }
+
+  &__lista-datas {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+  }
+
+  // Ações do rodapé do formulário (ver shared/ui/cadastro-acoes).
+  &__acoes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  &__espaco {
+    flex: 1;
+  }
+
+  &__acao-perigo {
+    color: #c62828 !important;
+  }
+
+  &__salvar {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    min-width: 100px;
+  }
+}

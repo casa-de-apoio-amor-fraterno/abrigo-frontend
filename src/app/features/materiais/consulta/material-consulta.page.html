@@ -1,22 +1,29 @@
-<div class="consulta">
-  <div class="consulta__cabecalho">
-    <div>
-      <h1>Materiais</h1>
-      <p class="consulta__subtitulo">Consulta de materiais e equipamentos do Abrigo.</p>
-    </div>
-    <div class="consulta__acoes-cabecalho">
-      <button mat-button type="button" [disabled]="exportando()" (click)="exportarCsv()">
-        <mat-icon>download</mat-icon>
-        Exportar CSV
-      </button>
-      <a mat-flat-button routerLink="/materiais/novo" class="consulta__nova-btn">
-        <mat-icon>add</mat-icon>
-        Novo material
-      </a>
-    </div>
-  </div>
+<app-pagina-consulta
+  titulo="Materiais"
+  subtitulo="Consulta de materiais e equipamentos do Abrigo."
+  [carregando]="carregando()"
+  [erro]="erro()"
+  [vazio]="itens().length === 0"
+  mensagemVazio="Nenhum material encontrado."
+  [total]="total()"
+  [pagina]="pagina()"
+  [itensPorPagina]="itensPorPagina"
+  rotuloItem="material(is)"
+  (paginaAnterior)="paginaAnterior()"
+  (paginaProxima)="proximaPagina()"
+>
+  <ng-container acoes>
+    <button mat-button type="button" [disabled]="exportando()" (click)="exportarCsv()">
+      <mat-icon>download</mat-icon>
+      Exportar CSV
+    </button>
+    <a mat-flat-button routerLink="/materiais/novo" class="consulta__nova-btn">
+      <mat-icon>add</mat-icon>
+      Novo material
+    </a>
+  </ng-container>
 
-  <form class="consulta__busca" (ngSubmit)="buscar()">
+  <form filtros class="consulta__busca" (ngSubmit)="buscar()">
     <input
       type="search"
       placeholder="Buscar por descrição..."
@@ -26,61 +33,28 @@
     <button mat-flat-button type="submit" class="consulta__busca-btn">Buscar</button>
   </form>
 
-  @if (carregando()) {
-    <div class="consulta__estado">
-      <mat-spinner diameter="32" />
-    </div>
-  } @else if (erro()) {
-    <div class="consulta__estado consulta__estado--erro">{{ erro() }}</div>
-  } @else if (itens().length === 0) {
-    <div class="consulta__estado">Nenhum material encontrado.</div>
-  } @else {
-    <div class="consulta__tabela-wrapper">
-      <table class="consulta__tabela">
-        <thead>
-          <tr>
-            <th>Descrição</th>
-            <th>Situação</th>
-            <th>Disponível p/ empréstimo</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (material of itens(); track material.id) {
-            <tr>
-              <td>{{ material.descricao }}</td>
-              <td>{{ material.situacao }}</td>
-              <td>{{ material.disponivelEmprestimo ? 'Sim' : 'Não' }}</td>
-              <td class="consulta__coluna-acao">
-                <a
-                  mat-icon-button
-                  [routerLink]="['/materiais', material.id, 'editar']"
-                  aria-label="Editar material"
-                >
-                  <mat-icon>edit</mat-icon>
-                </a>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="consulta__paginacao">
-      <span>{{ total() }} material(is)</span>
-      <div class="consulta__paginacao-botoes">
-        <button mat-icon-button (click)="paginaAnterior()" [disabled]="pagina() === 0" aria-label="Página anterior">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button
-          mat-icon-button
-          (click)="proximaPagina()"
-          [disabled]="(pagina() + 1) * 20 >= total()"
-          aria-label="Próxima página"
-        >
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-      </div>
-    </div>
-  }
-</div>
+  <table class="consulta__tabela">
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th>Situação</th>
+        <th>Disponível p/ empréstimo</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (material of itens(); track material.id) {
+        <tr>
+          <td>{{ material.descricao }}</td>
+          <td>{{ material.situacao }}</td>
+          <td>{{ material.disponivelEmprestimo ? 'Sim' : 'Não' }}</td>
+          <td class="consulta__coluna-acao">
+            <a mat-icon-button [routerLink]="['/materiais', material.id, 'editar']" aria-label="Editar material">
+              <mat-icon>edit</mat-icon>
+            </a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-pagina-consulta>

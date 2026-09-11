@@ -1,12 +1,9 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 
@@ -21,25 +18,24 @@ import { Hospital } from '../../hospitais/hospital.model';
 import { MunicipioService } from '../../municipios/municipio.service';
 import { Municipio } from '../../municipios/municipio.model';
 import { PessoaService } from '../pessoa.service';
+import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
   selector: 'app-pessoa-cadastro-page',
   imports: [
     NgTemplateOutlet,
     ReactiveFormsModule,
-    RouterLink,
     AvaliacaoSocialTabComponent,
     ComposicaoFamiliarTabComponent,
-    MatButtonModule,
     MatFormFieldModule,
-    MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule,
     MatSelectModule,
-    MatTabsModule
+    MatTabsModule,
+    PaginaCadastroComponent,
+    CadastroAcoesComponent
   ],
-  templateUrl: './pessoa-cadastro.page.html',
-  styleUrl: './pessoa-cadastro.page.scss'
+  templateUrl: './pessoa-cadastro.page.html'
 })
 export class PessoaCadastroPage {
   private readonly fb = inject(FormBuilder);

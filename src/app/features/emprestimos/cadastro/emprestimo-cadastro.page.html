@@ -1,19 +1,10 @@
-<div class="cadastro">
-  <div class="cadastro__cabecalho">
-    <a routerLink="/emprestimos" class="cadastro__voltar" aria-label="Voltar para a consulta">
-      <mat-icon>arrow_back</mat-icon>
-    </a>
-    <div>
-      <h1>{{ modoEdicao ? 'Editar empréstimo' : 'Novo empréstimo' }}</h1>
-      <p class="cadastro__subtitulo">Empréstimo de materiais e equipamentos do Abrigo.</p>
-    </div>
-  </div>
-
-  @if (carregando()) {
-    <div class="cadastro__estado">
-      <mat-spinner diameter="32" />
-    </div>
-  } @else if (modoEdicao) {
+<app-pagina-cadastro
+  [titulo]="modoEdicao ? 'Editar empréstimo' : 'Novo empréstimo'"
+  subtitulo="Empréstimo de materiais e equipamentos do Abrigo."
+  voltarPara="/emprestimos"
+  [carregando]="carregando()"
+>
+  @if (modoEdicao) {
     <mat-tab-group class="cadastro__abas" animationDuration="0ms">
       <mat-tab label="Dados">
         <ng-container *ngTemplateOutlet="formularioDados"></ng-container>
@@ -36,7 +27,7 @@
   } @else {
     <ng-container *ngTemplateOutlet="formularioDados"></ng-container>
   }
-</div>
+</app-pagina-cadastro>
 
 <ng-template #formularioDados>
   <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
@@ -72,24 +63,15 @@
       <p class="cadastro__erro">{{ erro() }}</p>
     }
 
-    <div class="cadastro__acoes">
-      <a mat-button routerLink="/emprestimos">Cancelar</a>
-      <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvando()">
-        @if (salvando()) {
-          <mat-spinner diameter="20" />
-        } @else {
-          Salvar
-        }
-      </button>
-    </div>
+    <app-cadastro-acoes voltarPara="/emprestimos" [salvando]="salvando()" />
   </form>
 </ng-template>
 
 <ng-template #abaItens>
   @if (!formItemAberto()) {
-    <div class="cadastro__itens-cabecalho">
+    <div class="cadastro__subsecao-cabecalho">
       <p class="cadastro__subtitulo">Materiais emprestados dentro deste empréstimo.</p>
-      <button mat-flat-button type="button" class="cadastro__novo-item" (click)="novoItem()">
+      <button mat-flat-button type="button" class="cadastro__novo-item-btn" (click)="novoItem()">
         <mat-icon>add</mat-icon>
         Novo item
       </button>
@@ -98,14 +80,14 @@
     @if (itens().length === 0) {
       <p class="cadastro__vazio">Nenhum item registrado ainda.</p>
     } @else {
-      <ul class="cadastro__lista-itens">
+      <ul class="cadastro__lista">
         @for (item of itens(); track item.id) {
           <li>
             <div>
               <strong>{{ descricoesMateriais()[item.idMaterial] || 'Carregando...' }}</strong>
               <span>{{ item.situacao || 'Sem situação' }}{{ item.renovacao ? ' · ' + item.renovacao : '' }}</span>
             </div>
-            <div class="cadastro__datas-item">
+            <div class="cadastro__lista-datas">
               <span>{{ item.dataEmprestimo ? (item.dataEmprestimo | date: 'dd/MM/yyyy') : '-' }}</span>
               <span>—</span>
               <span>{{ item.dataDevolucao ? (item.dataDevolucao | date: 'dd/MM/yyyy') : '-' }}</span>
@@ -118,7 +100,7 @@
       </ul>
     }
   } @else {
-    <form class="cadastro__form-item" [formGroup]="formItem" (ngSubmit)="salvarItem()">
+    <form class="cadastro__form-secundario" [formGroup]="formItem" (ngSubmit)="salvarItem()">
       <div class="cadastro__grade">
         <div class="cadastro__campo cadastro__campo--largo">
           <app-material-autocomplete
@@ -153,16 +135,7 @@
         <p class="cadastro__erro">{{ erro() }}</p>
       }
 
-      <div class="cadastro__acoes">
-        <button mat-button type="button" (click)="cancelarItem()">Cancelar</button>
-        <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvandoItem()">
-          @if (salvandoItem()) {
-            <mat-spinner diameter="20" />
-          } @else {
-            Salvar item
-          }
-        </button>
-      </div>
+      <app-cadastro-acoes [salvando]="salvandoItem()" textoSalvar="Salvar item" (cancelar)="cancelarItem()" />
     </form>
   }
 </ng-template>

@@ -1,0 +1,55 @@
+<div class="consulta">
+  <div class="consulta__cabecalho">
+    <div>
+      <h1>{{ titulo() }}</h1>
+      @if (subtitulo()) {
+        <p class="consulta__subtitulo">{{ subtitulo() }}</p>
+      }
+    </div>
+    <div class="consulta__acoes-cabecalho">
+      <ng-content select="[acoes]" />
+    </div>
+  </div>
+
+  <div class="consulta__filtros">
+    <ng-content select="[filtros]" />
+  </div>
+
+  @if (carregando()) {
+    <div class="consulta__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <div class="consulta__estado consulta__estado--erro">{{ erro() }}</div>
+  } @else if (vazio()) {
+    <div class="consulta__estado">{{ mensagemVazio() }}</div>
+  } @else {
+    <div class="consulta__tabela-wrapper">
+      <ng-content />
+    </div>
+
+    <div class="consulta__paginacao">
+      <span>{{ total() }} {{ rotuloItem() }}</span>
+      @if (paginado()) {
+        <div class="consulta__paginacao-botoes">
+          <button
+            mat-icon-button
+            (click)="paginaAnterior.emit()"
+            [disabled]="pagina() === 0"
+            aria-label="Página anterior"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            (click)="paginaProxima.emit()"
+            [disabled]="!temProximaPagina"
+            aria-label="Próxima página"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

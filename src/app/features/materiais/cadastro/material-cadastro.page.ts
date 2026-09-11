@@ -1,30 +1,28 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { MaterialService } from '../material.service';
+import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
   selector: 'app-material-cadastro-page',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
-    MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    PaginaCadastroComponent,
+    CadastroAcoesComponent
   ],
-  templateUrl: './material-cadastro.page.html',
-  styleUrl: './material-cadastro.page.scss'
+  templateUrl: './material-cadastro.page.html'
 })
 export class MaterialCadastroPage {
   private readonly fb = inject(FormBuilder);

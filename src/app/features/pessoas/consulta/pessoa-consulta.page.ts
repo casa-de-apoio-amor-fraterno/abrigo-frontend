@@ -4,29 +4,20 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { PessoaService } from '../pessoa.service';
 import { PessoaResumo } from '../pessoa.model';
 import { mascararCpf } from '../../../shared/util/cpf';
 import { exportarCsv } from '../../../shared/util/csv';
+import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 
 const ITENS_POR_PAGINA = 20;
 
 @Component({
   selector: 'app-pessoa-consulta-page',
-  imports: [
-    DatePipe,
-    FormsModule,
-    RouterLink,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatTooltipModule
-  ],
-  templateUrl: './pessoa-consulta.page.html',
-  styleUrl: './pessoa-consulta.page.scss'
+  imports: [DatePipe, FormsModule, RouterLink, MatButtonModule, MatIconModule, MatTooltipModule, PaginaConsultaComponent],
+  templateUrl: './pessoa-consulta.page.html'
 })
 export class PessoaConsultaPage {
   protected readonly mascararCpf = mascararCpf;
@@ -41,6 +32,8 @@ export class PessoaConsultaPage {
   protected readonly total = signal(0);
   protected readonly pagina = signal(0);
   protected readonly exportando = signal(false);
+
+  protected readonly itensPorPagina = ITENS_POR_PAGINA;
 
   constructor() {
     this.consultar();

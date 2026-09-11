@@ -1,24 +1,22 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { EmprestimoService } from '../emprestimo.service';
 import { EmprestimoResumo } from '../emprestimo.model';
 import { exportarCsv } from '../../../shared/util/csv';
+import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 
 const ITENS_POR_PAGINA = 20;
 
 @Component({
   selector: 'app-emprestimo-consulta-page',
-  imports: [FormsModule, RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatSelectModule],
-  templateUrl: './emprestimo-consulta.page.html',
-  styleUrl: './emprestimo-consulta.page.scss'
+  imports: [RouterLink, MatButtonModule, MatIconModule, MatSelectModule, PaginaConsultaComponent],
+  templateUrl: './emprestimo-consulta.page.html'
 })
 export class EmprestimoConsultaPage {
   private readonly emprestimoService = inject(EmprestimoService);
@@ -33,6 +31,8 @@ export class EmprestimoConsultaPage {
 
   protected readonly nomesPessoas = signal<Record<number, string>>({});
   protected readonly exportando = signal(false);
+
+  protected readonly itensPorPagina = ITENS_POR_PAGINA;
 
   constructor() {
     this.consultar();

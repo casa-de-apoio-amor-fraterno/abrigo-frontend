@@ -1,0 +1,16 @@
+<div class="cadastro__acoes">
+  <ng-content select="[extra]" />
+  <span class="cadastro__espaco"></span>
+  @if (voltarPara()) {
+    <a mat-button [routerLink]="voltarPara()">{{ textoCancelar() }}</a>
+  } @else {
+    <button mat-button type="button" (click)="cancelar.emit()">{{ textoCancelar() }}</button>
+  }
+  <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvando()">
+    @if (salvando()) {
+      <mat-spinner diameter="20" />
+    } @else {
+      {{ textoSalvar() }}
+    }
+  </button>
+</div>

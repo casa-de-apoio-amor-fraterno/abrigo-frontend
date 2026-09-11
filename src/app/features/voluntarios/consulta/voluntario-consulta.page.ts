@@ -3,19 +3,18 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { VoluntarioService } from '../voluntario.service';
 import { VoluntarioResumo } from '../voluntario.model';
 import { exportarCsv } from '../../../shared/util/csv';
+import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 
 const ITENS_POR_PAGINA = 20;
 
 @Component({
   selector: 'app-voluntario-consulta-page',
-  imports: [FormsModule, RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
-  templateUrl: './voluntario-consulta.page.html',
-  styleUrl: './voluntario-consulta.page.scss'
+  imports: [FormsModule, RouterLink, MatButtonModule, MatIconModule, PaginaConsultaComponent],
+  templateUrl: './voluntario-consulta.page.html'
 })
 export class VoluntarioConsultaPage {
   private readonly voluntarioService = inject(VoluntarioService);
@@ -28,6 +27,8 @@ export class VoluntarioConsultaPage {
   protected readonly total = signal(0);
   protected readonly pagina = signal(0);
   protected readonly exportando = signal(false);
+
+  protected readonly itensPorPagina = ITENS_POR_PAGINA;
 
   constructor() {
     this.consultar();

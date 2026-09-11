@@ -1,95 +1,76 @@
-<div class="cadastro">
-  <div class="cadastro__cabecalho">
-    <a routerLink="/materiais" class="cadastro__voltar" aria-label="Voltar para a consulta">
-      <mat-icon>arrow_back</mat-icon>
-    </a>
-    <div>
-      <h1>{{ modoEdicao ? 'Editar material' : 'Novo material' }}</h1>
-      <p class="cadastro__subtitulo">Cadastro de materiais e equipamentos do Abrigo.</p>
-    </div>
-  </div>
+<app-pagina-cadastro
+  [titulo]="modoEdicao ? 'Editar material' : 'Novo material'"
+  subtitulo="Cadastro de materiais e equipamentos do Abrigo."
+  voltarPara="/materiais"
+  [carregando]="carregando()"
+>
+  <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
+    @if (modoEdicao && !ativo()) {
+      <p class="cadastro__aviso">Este material está inativo.</p>
+    }
 
-  @if (carregando()) {
-    <div class="cadastro__estado">
-      <mat-spinner diameter="32" />
-    </div>
-  } @else {
-    <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
-      @if (modoEdicao && !ativo()) {
-        <p class="cadastro__aviso">Este material está inativo.</p>
-      }
-
-      <div class="cadastro__grade">
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Descrição / Nome</mat-label>
-          <input matInput formControlName="descricao" />
-          @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
-            <mat-error>Informe a descrição</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Código identificação</mat-label>
-          <input matInput formControlName="codigoIdentificacao" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Local</mat-label>
-          <input matInput formControlName="local" placeholder="ex.: Casa, Empréstimo" />
-          @if (form.controls.local.touched && form.controls.local.invalid) {
-            <mat-error>Informe o local</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Situação</mat-label>
-          <input matInput formControlName="situacao" placeholder="ex.: Disponível, Emprestado" />
-          @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
-            <mat-error>Informe a situação</mat-error>
-          }
-        </mat-form-field>
-
-        <div class="cadastro__campo cadastro__checkbox">
-          <mat-checkbox formControlName="disponivelEmprestimo">Disponível para empréstimo</mat-checkbox>
-        </div>
-
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Observação</mat-label>
-          <textarea matInput formControlName="observacao" rows="3"></textarea>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Motivo baixa</mat-label>
-          <textarea matInput formControlName="motivoBaixa" rows="2"></textarea>
-        </mat-form-field>
-      </div>
-
-      @if (erro()) {
-        <p class="cadastro__erro">{{ erro() }}</p>
-      }
-
-      <div class="cadastro__acoes">
-        @if (modoEdicao && ativo()) {
-          <button
-            mat-button
-            type="button"
-            class="cadastro__inativar"
-            [disabled]="inativando()"
-            (click)="inativar()"
-          >
-            Inativar
-          </button>
+    <div class="cadastro__grade">
+      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+        <mat-label>Descrição / Nome</mat-label>
+        <input matInput formControlName="descricao" />
+        @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
+          <mat-error>Informe a descrição</mat-error>
         }
-        <span class="cadastro__espaco"></span>
-        <a mat-button routerLink="/materiais">Cancelar</a>
-        <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvando()">
-          @if (salvando()) {
-            <mat-spinner diameter="20" />
-          } @else {
-            Salvar
-          }
-        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="cadastro__campo">
+        <mat-label>Código identificação</mat-label>
+        <input matInput formControlName="codigoIdentificacao" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="cadastro__campo">
+        <mat-label>Local</mat-label>
+        <input matInput formControlName="local" placeholder="ex.: Casa, Empréstimo" />
+        @if (form.controls.local.touched && form.controls.local.invalid) {
+          <mat-error>Informe o local</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="cadastro__campo">
+        <mat-label>Situação</mat-label>
+        <input matInput formControlName="situacao" placeholder="ex.: Disponível, Emprestado" />
+        @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
+          <mat-error>Informe a situação</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="cadastro__campo cadastro__checkbox">
+        <mat-checkbox formControlName="disponivelEmprestimo">Disponível para empréstimo</mat-checkbox>
       </div>
-    </form>
-  }
-</div>
+
+      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+        <mat-label>Observação</mat-label>
+        <textarea matInput formControlName="observacao" rows="3"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+        <mat-label>Motivo baixa</mat-label>
+        <textarea matInput formControlName="motivoBaixa" rows="2"></textarea>
+      </mat-form-field>
+    </div>
+
+    @if (erro()) {
+      <p class="cadastro__erro">{{ erro() }}</p>
+    }
+
+    <app-cadastro-acoes voltarPara="/materiais" [salvando]="salvando()">
+      @if (modoEdicao && ativo()) {
+        <button
+          extra
+          mat-button
+          type="button"
+          class="cadastro__acao-perigo"
+          [disabled]="inativando()"
+          (click)="inativar()"
+        >
+          Inativar
+        </button>
+      }
+    </app-cadastro-acoes>
+  </form>
+</app-pagina-cadastro>

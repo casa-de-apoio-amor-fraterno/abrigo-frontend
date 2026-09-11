@@ -1,25 +1,17 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { QuartoService } from '../quarto.service';
 import { Quarto } from '../quarto.model';
 import { exportarCsv } from '../../../shared/util/csv';
+import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 
 @Component({
   selector: 'app-quarto-consulta-page',
-  imports: [
-    FormsModule,
-    RouterLink,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSlideToggleModule
-  ],
+  imports: [RouterLink, MatButtonModule, MatIconModule, MatSlideToggleModule, PaginaConsultaComponent],
   templateUrl: './quarto-consulta.page.html',
   styleUrl: './quarto-consulta.page.scss'
 })

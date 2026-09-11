@@ -1,98 +1,72 @@
-<div class="consulta">
-  <div class="consulta__cabecalho">
-    <div>
-      <h1>Estadias</h1>
-      <p class="consulta__subtitulo">Consulta de estadias no Abrigo.</p>
-    </div>
-    <div class="consulta__acoes-cabecalho">
-      <button mat-button type="button" [disabled]="exportando()" (click)="exportarCsv()">
-        <mat-icon>download</mat-icon>
-        Exportar CSV
-      </button>
-      <a mat-flat-button routerLink="/estadias/novo" class="consulta__nova-btn">
-        <mat-icon>add</mat-icon>
-        Nova estadia
-      </a>
-    </div>
-  </div>
+<app-pagina-consulta
+  titulo="Estadias"
+  subtitulo="Consulta de estadias no Abrigo."
+  [carregando]="carregando()"
+  [erro]="erro()"
+  [vazio]="itens().length === 0"
+  mensagemVazio="Nenhuma estadia encontrada."
+  [total]="total()"
+  [pagina]="pagina()"
+  [itensPorPagina]="itensPorPagina"
+  rotuloItem="estadia(s)"
+  (paginaAnterior)="paginaAnterior()"
+  (paginaProxima)="proximaPagina()"
+>
+  <ng-container acoes>
+    <button mat-button type="button" [disabled]="exportando()" (click)="exportarCsv()">
+      <mat-icon>download</mat-icon>
+      Exportar CSV
+    </button>
+    <a mat-flat-button routerLink="/estadias/novo" class="consulta__nova-btn">
+      <mat-icon>add</mat-icon>
+      Nova estadia
+    </a>
+  </ng-container>
 
-  <div class="consulta__filtros">
-    <mat-select
-      class="consulta__select-situacao"
-      [value]="situacao()"
-      (selectionChange)="filtrarPorSituacao($event.value)"
-    >
-      <mat-option value="">Todas as situações</mat-option>
-      <mat-option value="Em acompanhamento">Em acompanhamento</mat-option>
-      <mat-option value="Aguardando retorno">Aguardando retorno</mat-option>
-      <mat-option value="Finalizada">Finalizada</mat-option>
-    </mat-select>
-  </div>
+  <mat-select
+    filtros
+    class="consulta__select-situacao"
+    [value]="situacao()"
+    (selectionChange)="filtrarPorSituacao($event.value)"
+  >
+    <mat-option value="">Todas as situações</mat-option>
+    <mat-option value="Em acompanhamento">Em acompanhamento</mat-option>
+    <mat-option value="Aguardando retorno">Aguardando retorno</mat-option>
+    <mat-option value="Finalizada">Finalizada</mat-option>
+  </mat-select>
 
-  @if (carregando()) {
-    <div class="consulta__estado">
-      <mat-spinner diameter="32" />
-    </div>
-  } @else if (erro()) {
-    <div class="consulta__estado consulta__estado--erro">{{ erro() }}</div>
-  } @else if (itens().length === 0) {
-    <div class="consulta__estado">Nenhuma estadia encontrada.</div>
-  } @else {
-    <div class="consulta__tabela-wrapper">
-      <table class="consulta__tabela">
-        <thead>
-          <tr>
-            <th>Pessoa</th>
-            <th>Tipo</th>
-            <th>Quarto</th>
-            <th>Entrada</th>
-            <th>Saída</th>
-            <th>Situação</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (estadia of itens(); track estadia.id) {
-            <tr>
-              <td>{{ nomesPessoas()[estadia.idPessoa] || '—' }}</td>
-              <td>{{ estadia.tipoPessoa }}</td>
-              <td>{{ numerosQuartos()[estadia.idQuarto] || '—' }}</td>
-              <td>{{ estadia.dataEntrada | date: 'dd/MM/yyyy' }}</td>
-              <td>{{ estadia.dataSaida ? (estadia.dataSaida | date: 'dd/MM/yyyy') : '—' }}</td>
-              <td>
-                <span
-                  class="consulta__situacao"
-                  [class.consulta__situacao--finalizada]="estadia.situacao === 'Finalizada'"
-                >
-                  {{ estadia.situacao }}
-                </span>
-              </td>
-              <td class="consulta__coluna-acao">
-                <a mat-icon-button [routerLink]="['/estadias', estadia.id, 'editar']" aria-label="Editar estadia">
-                  <mat-icon>edit</mat-icon>
-                </a>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="consulta__paginacao">
-      <span>{{ total() }} estadia(s)</span>
-      <div class="consulta__paginacao-botoes">
-        <button mat-icon-button (click)="paginaAnterior()" [disabled]="pagina() === 0" aria-label="Página anterior">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button
-          mat-icon-button
-          (click)="proximaPagina()"
-          [disabled]="(pagina() + 1) * 20 >= total()"
-          aria-label="Próxima página"
-        >
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-      </div>
-    </div>
-  }
-</div>
+  <table class="consulta__tabela">
+    <thead>
+      <tr>
+        <th>Pessoa</th>
+        <th>Tipo</th>
+        <th>Quarto</th>
+        <th>Entrada</th>
+        <th>Saída</th>
+        <th>Situação</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (estadia of itens(); track estadia.id) {
+        <tr>
+          <td>{{ nomesPessoas()[estadia.idPessoa] || '—' }}</td>
+          <td>{{ estadia.tipoPessoa }}</td>
+          <td>{{ numerosQuartos()[estadia.idQuarto] || '—' }}</td>
+          <td>{{ estadia.dataEntrada | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ estadia.dataSaida ? (estadia.dataSaida | date: 'dd/MM/yyyy') : '—' }}</td>
+          <td>
+            <span class="consulta__badge" [class.consulta__badge--neutro]="estadia.situacao === 'Finalizada'">
+              {{ estadia.situacao }}
+            </span>
+          </td>
+          <td class="consulta__coluna-acao">
+            <a mat-icon-button [routerLink]="['/estadias', estadia.id, 'editar']" aria-label="Editar estadia">
+              <mat-icon>edit</mat-icon>
+            </a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-pagina-consulta>

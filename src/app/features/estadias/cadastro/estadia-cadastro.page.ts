@@ -1,12 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 
@@ -18,24 +17,25 @@ import { QuartoService } from '../../quartos/quarto.service';
 import { Quarto } from '../../quartos/quarto.model';
 import { EstadiaService } from '../estadia.service';
 import { EstadiaAcompanhante, SituacaoEstadia, TipoPessoaEstadia } from '../estadia.model';
+import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
   selector: 'app-estadia-cadastro-page',
   imports: [
     DatePipe,
     ReactiveFormsModule,
-    RouterLink,
     PessoaAutocompleteComponent,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule,
     MatRadioModule,
-    MatSelectModule
+    MatSelectModule,
+    PaginaCadastroComponent,
+    CadastroAcoesComponent
   ],
-  templateUrl: './estadia-cadastro.page.html',
-  styleUrl: './estadia-cadastro.page.scss'
+  templateUrl: './estadia-cadastro.page.html'
 })
 export class EstadiaCadastroPage {
   private readonly fb = inject(FormBuilder);

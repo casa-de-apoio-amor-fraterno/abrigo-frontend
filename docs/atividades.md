@@ -41,15 +41,40 @@ Procedimento — ver tabela abaixo).
    na resposta de login — hoje `SessaoResponse` só tem `nome`/`token`; ver
    `abrigo-backend/app/features/auth/schemas.py`) e usar isso pra
    esconder/mostrar a aba e redirecionar em caso de 403.
-2. **Sem componente de formulário reutilizável ainda.** Todas as telas de
-   Manutenção que faltam construir têm formulários parecidos (campos +
-   validação + salvar/cancelar). Vale extrair um padrão comum
-   (`shared/ui/`) antes de replicar a mesma estrutura 6+ vezes.
-3. **Sem componente de tabela/grid reutilizável.** A tela de consulta de
-   `Pessoa` (`pessoa-consulta.page.ts`) tem uma tabela HTML simples com
-   paginação manual, escrita direto na página — vale extrair antes de
-   copiar esse padrão para `Estadia`, `Voluntario`, `Material`, `Emprestimo`
-   (todas vão precisar da mesma busca + tabela + paginação).
+2. ✅ **Resolvido (2026-09-11)** — `shared/ui/pagina-cadastro/` (cabeçalho
+   com voltar, título/subtítulo e estado de carregando) e
+   `shared/ui/cadastro-acoes/` (rodapé Cancelar/Salvar, com slot `[extra]`
+   pra ação perigosa específica — Inativar, Encerrar estadia). Usados nas 6
+   telas de Manutenção (Pessoa, Quarto, Voluntário, Material, Estadia,
+   Empréstimo). O `<form>` em si (campos/seções) continua em cada página —
+   variam demais entre entidades pra valer a pena forçar um componente
+   genérico — mas toda a moldura repetida (cabeçalho, loading, rodapé de
+   ações) agora vem de um só lugar.
+3. ✅ **Resolvido (2026-09-11)** — `shared/ui/pagina-consulta/` (cabeçalho,
+   área de filtros, estados de carregando/erro/vazio, wrapper da tabela e
+   paginação). Usado nas 6 telas de Consulta. A `<table>` em si fica em
+   cada página (colunas variam por entidade), projetada dentro do shell via
+   content projection.
+
+   **Achado ao extrair:** boa parte das classes BEM (`.consulta__tabela`,
+   `.cadastro__grade`, `.cadastro__acoes`, etc.) precisou ir pro
+   `src/styles.scss` **global**, não para o `.scss` dos componentes de
+   shell — o Angular escopa CSS pelo componente que *autora* o elemento no
+   próprio template, não por onde ele acaba renderizado via content
+   projection. Como o `<form>`/`<table>` de cada página continuam sendo
+   autorados pela própria página (só a moldura ao redor é do shell), o
+   CSS compartilhado desses elementos não tinha como viver só no `.scss`
+   dos componentes novos. Também foram unificados alguns pares de classes
+   antes duplicadas com nomes ligeiramente diferentes por entidade
+   (`consulta__status`/`consulta__situacao` → `consulta__badge`;
+   `cadastro__inativar`/`cadastro__encerrar` → `cadastro__acao-perigo`;
+   `cadastro__acompanhantes`/`cadastro__itens-cabecalho` →
+   `cadastro__subsecao`/`cadastro__subsecao-cabecalho`, etc.).
+
+   Build (`ng build`) e testes (`ng test`) passando; conferido visualmente
+   no navegador contra o backend real (consulta, cadastro simples, abas de
+   Pessoa e Empréstimo, subseção de acompanhantes de Estadia) sem
+   regressão visual.
 4. ✅ **Resolvido (item 9, 2026-09-11)** — botão "Exportar CSV" em todas
    as telas de Consulta, em vez de replicar os relatórios impressos do
    Delphi.

@@ -1,11 +1,9 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 
 import { PessoaService } from '../../pessoas/pessoa.service';
@@ -13,14 +11,14 @@ import { QuartoService } from '../../quartos/quarto.service';
 import { EstadiaService } from '../estadia.service';
 import { EstadiaResumo, SituacaoEstadia } from '../estadia.model';
 import { exportarCsv } from '../../../shared/util/csv';
+import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 
 const ITENS_POR_PAGINA = 20;
 
 @Component({
   selector: 'app-estadia-consulta-page',
-  imports: [DatePipe, FormsModule, RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatSelectModule],
-  templateUrl: './estadia-consulta.page.html',
-  styleUrl: './estadia-consulta.page.scss'
+  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatSelectModule, PaginaConsultaComponent],
+  templateUrl: './estadia-consulta.page.html'
 })
 export class EstadiaConsultaPage {
   private readonly estadiaService = inject(EstadiaService);
@@ -37,6 +35,8 @@ export class EstadiaConsultaPage {
   protected readonly nomesPessoas = signal<Record<number, string>>({});
   protected readonly numerosQuartos = signal<Record<number, string>>({});
   protected readonly exportando = signal(false);
+
+  protected readonly itensPorPagina = ITENS_POR_PAGINA;
 
   constructor() {
     this.consultar();

@@ -3,19 +3,18 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { MaterialService } from '../material.service';
 import { MaterialResumo } from '../material.model';
 import { exportarCsv } from '../../../shared/util/csv';
+import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 
 const ITENS_POR_PAGINA = 20;
 
 @Component({
   selector: 'app-material-consulta-page',
-  imports: [FormsModule, RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
-  templateUrl: './material-consulta.page.html',
-  styleUrl: './material-consulta.page.scss'
+  imports: [FormsModule, RouterLink, MatButtonModule, MatIconModule, PaginaConsultaComponent],
+  templateUrl: './material-consulta.page.html'
 })
 export class MaterialConsultaPage {
   private readonly materialService = inject(MaterialService);
@@ -28,6 +27,8 @@ export class MaterialConsultaPage {
   protected readonly total = signal(0);
   protected readonly pagina = signal(0);
   protected readonly exportando = signal(false);
+
+  protected readonly itensPorPagina = ITENS_POR_PAGINA;
 
   constructor() {
     this.consultar();

@@ -1,7 +1,7 @@
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +17,8 @@ import { PessoaService } from '../../pessoas/pessoa.service';
 import { MaterialService } from '../../materiais/material.service';
 import { EmprestimoService } from '../emprestimo.service';
 import { EmprestimoHistorico, EmprestimoItem } from '../emprestimo.model';
+import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
   selector: 'app-emprestimo-cadastro-page',
@@ -24,7 +26,6 @@ import { EmprestimoHistorico, EmprestimoItem } from '../emprestimo.model';
     DatePipe,
     NgTemplateOutlet,
     ReactiveFormsModule,
-    RouterLink,
     MaterialAutocompleteComponent,
     PessoaAutocompleteComponent,
     MatButtonModule,
@@ -32,7 +33,9 @@ import { EmprestimoHistorico, EmprestimoItem } from '../emprestimo.model';
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatTabsModule
+    MatTabsModule,
+    PaginaCadastroComponent,
+    CadastroAcoesComponent
   ],
   templateUrl: './emprestimo-cadastro.page.html',
   styleUrl: './emprestimo-cadastro.page.scss'

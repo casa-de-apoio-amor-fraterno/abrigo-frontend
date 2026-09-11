@@ -1,28 +1,26 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { VoluntarioService } from '../voluntario.service';
+import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
   selector: 'app-voluntario-cadastro-page',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     MatButtonModule,
     MatFormFieldModule,
-    MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    PaginaCadastroComponent,
+    CadastroAcoesComponent
   ],
-  templateUrl: './voluntario-cadastro.page.html',
-  styleUrl: './voluntario-cadastro.page.scss'
+  templateUrl: './voluntario-cadastro.page.html'
 })
 export class VoluntarioCadastroPage {
   private readonly fb = inject(FormBuilder);
