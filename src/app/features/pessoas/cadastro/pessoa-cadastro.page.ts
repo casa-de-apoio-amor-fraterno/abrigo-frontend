@@ -20,6 +20,7 @@ import { Municipio } from '../../municipios/municipio.model';
 import { PessoaService } from '../pessoa.service';
 import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
+import { CapturaFotoComponent } from '../../../shared/ui/captura-foto/captura-foto.component';
 
 @Component({
   selector: 'app-pessoa-cadastro-page',
@@ -28,6 +29,7 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     ReactiveFormsModule,
     AvaliacaoSocialTabComponent,
     ComposicaoFamiliarTabComponent,
+    CapturaFotoComponent,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -64,6 +66,13 @@ export class PessoaCadastroPage {
   protected readonly carregando = signal(this.modoEdicao);
   protected readonly salvando = signal(false);
   protected readonly erro = signal<string | null>(null);
+
+  // Foto (feature nova, 2026-09-11 — ver pessoa.legacy.md): só disponível em
+  // edição, como Avaliação Social/Composição Familiar — precisa de um
+  // `id_pessoa` já existente pra associar a foto no backend.
+  protected readonly temFoto = signal(false);
+  protected readonly fotoVersion = signal(0);
+  protected readonly erroFoto = signal<string | null>(null);
 
   protected readonly estados = signal<Estado[]>([]);
   protected readonly municipios = signal<Municipio[]>([]);
@@ -121,6 +130,7 @@ export class PessoaCadastroPage {
             idHospital: pessoa.id_hospital,
             observacao: pessoa.observacao ?? ''
           });
+          this.temFoto.set(pessoa.tem_foto);
           this.carregando.set(false);
         },
         error: () => {
@@ -170,6 +180,45 @@ export class PessoaCadastroPage {
         this.salvando.set(false);
         this.erro.set(descreverErroHttp(error.error));
       }
+    });
+  }
+
+  protected get fotoUrlAtual(): string | null {
+    if (this.pessoaId === null || !this.temFoto()) {
+      return null;
+    }
+    // cache-busting: sem isso, o navegador mostraria a foto antiga (mesma
+    // URL) depois de trocar/remover.
+    return `${this.pessoaService.fotoUrl(this.pessoaId)}?v=${this.fotoVersion()}`;
+  }
+
+  protected salvarFoto(arquivo: Blob): void {
+    if (this.pessoaId === null) {
+      return;
+    }
+
+    this.erroFoto.set(null);
+    this.pessoaService.salvarFoto(this.pessoaId, arquivo).subscribe({
+      next: () => {
+        this.temFoto.set(true);
+        this.fotoVersion.update((v) => v + 1);
+      },
+      error: (error) => this.erroFoto.set(descreverErroHttp(error.error))
+    });
+  }
+
+  protected removerFoto(): void {
+    if (this.pessoaId === null || !confirm('Remover a foto desta pessoa?')) {
+      return;
+    }
+
+    this.erroFoto.set(null);
+    this.pessoaService.removerFoto(this.pessoaId).subscribe({
+      next: () => {
+        this.temFoto.set(false);
+        this.fotoVersion.update((v) => v + 1);
+      },
+      error: (error) => this.erroFoto.set(descreverErroHttp(error.error))
     });
   }
 }

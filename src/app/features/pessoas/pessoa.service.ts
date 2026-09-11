@@ -45,4 +45,20 @@ export class PessoaService {
       .put<PessoaDto>(`${this.resource}/${id}`, paraEntradaDto(formulario))
       .pipe(map(paraPessoaModel));
   }
+
+  /** URL direta da imagem (GET /api/pessoas/{id}/foto) — sem endpoint próprio
+   * exigindo autenticação, então dá pra usar direto num `<img [src]>`. */
+  fotoUrl(id: number): string {
+    return `${this.resource}/${id}/foto`;
+  }
+
+  salvarFoto(id: number, arquivo: Blob): Observable<Pessoa> {
+    const formData = new FormData();
+    formData.append('arquivo', arquivo, 'foto.jpg');
+    return this.http.put<PessoaDto>(`${this.resource}/${id}/foto`, formData).pipe(map(paraPessoaModel));
+  }
+
+  removerFoto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.resource}/${id}/foto`);
+  }
 }

@@ -31,6 +31,20 @@
 
 <ng-template #formularioDados>
   <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
+    @if (modoEdicao) {
+      <section class="cadastro__secao">
+        <h2>Foto</h2>
+        <app-captura-foto
+          [fotoUrl]="fotoUrlAtual"
+          (capturada)="salvarFoto($event)"
+          (removida)="removerFoto()"
+        />
+        @if (erroFoto()) {
+          <p class="cadastro__erro">{{ erroFoto() }}</p>
+        }
+      </section>
+    }
+
     <section class="cadastro__secao">
       <h2>Dados pessoais</h2>
       <div class="cadastro__grade">

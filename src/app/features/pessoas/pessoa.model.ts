@@ -4,6 +4,7 @@ export interface PessoaResumo {
   cpf: string | null;
   telefone: string | null;
   data_nascimento: string | null;
+  tem_foto: boolean;
 }
 
 export interface ListaPessoas {
@@ -31,4 +32,5 @@ export interface Pessoa extends PessoaFormulario {
   id: number;
   ativo: boolean;
   data_cadastro: string | null;
+  tem_foto: boolean;
 }

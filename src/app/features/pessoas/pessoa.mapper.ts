@@ -7,7 +7,8 @@ export function paraModel(dto: PessoaResumoDto): PessoaResumo {
     nome: dto.nome,
     cpf: dto.cpf,
     telefone: dto.telefone,
-    data_nascimento: dto.data_nascimento
+    data_nascimento: dto.data_nascimento,
+    tem_foto: dto.tem_foto
   };
 }
 
@@ -35,7 +36,8 @@ export function paraPessoaModel(dto: PessoaDto): Pessoa {
     id_estado: dto.id_estado,
     observacao: dto.observacao,
     ativo: dto.ativo,
-    data_cadastro: dto.data_cadastro
+    data_cadastro: dto.data_cadastro,
+    tem_foto: dto.tem_foto
   };
 }
 

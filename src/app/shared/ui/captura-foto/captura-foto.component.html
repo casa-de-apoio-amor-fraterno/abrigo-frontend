@@ -1,0 +1,39 @@
+<div class="captura-foto">
+  @if (previaUrl()) {
+    <img class="captura-foto__imagem" [src]="previaUrl()" alt="Prévia da foto capturada" />
+    <div class="captura-foto__acoes">
+      <button mat-button type="button" (click)="tentarNovamente()">Tentar novamente</button>
+      <button mat-flat-button type="button" (click)="confirmar()">Usar esta foto</button>
+    </div>
+  } @else if (streamAtivo()) {
+    <video #video class="captura-foto__imagem" autoplay playsinline muted [srcObject]="streamAtivo()"></video>
+    <div class="captura-foto__acoes">
+      <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+      <button mat-flat-button type="button" (click)="capturar()">Capturar</button>
+    </div>
+  } @else {
+    @if (fotoUrl()) {
+      <img class="captura-foto__imagem" [src]="fotoUrl()" alt="Foto da pessoa" />
+    } @else {
+      <div class="captura-foto__placeholder">
+        <mat-icon>person</mat-icon>
+      </div>
+    }
+
+    @if (erro()) {
+      <p class="captura-foto__erro">{{ erro() }}</p>
+    }
+
+    <div class="captura-foto__acoes">
+      <button mat-button type="button" (click)="ativarCamera()">
+        <mat-icon>photo_camera</mat-icon>
+        {{ fotoUrl() ? 'Trocar foto' : 'Tirar foto' }}
+      </button>
+      @if (fotoUrl()) {
+        <button mat-button type="button" class="cadastro__acao-perigo" (click)="remover()">Remover foto</button>
+      }
+    </div>
+  }
+
+  <canvas #canvas hidden></canvas>
+</div>
