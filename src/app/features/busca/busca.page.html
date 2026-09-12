@@ -73,44 +73,25 @@
                   </button>
 
                   @if (estadiaFinalizarAberta() === estadia.id) {
-                    <div class="busca__popover" (click)="$event.stopPropagation()">
-                      <div class="busca__popover-cabecalho">
-                        <mat-icon>event_available</mat-icon>
-                        <div>
-                          <div class="busca__popover-titulo">Finalizar estadia</div>
-                          <div class="busca__popover-subtitulo">Informe a data de saída</div>
-                        </div>
-                      </div>
-
-                      <div class="busca__popover-conteudo">
-                        <mat-form-field appearance="outline" class="busca__popover-campo">
-                          <mat-label>Data de saída</mat-label>
-                          <input
-                            matInput
-                            type="date"
-                            [value]="dataSaidaFinalizar()"
-                            (input)="dataSaidaFinalizar.set($any($event.target).value)"
-                          />
-                        </mat-form-field>
-
-                        @if (erroFinalizar()) {
-                          <p class="busca__popover-erro">{{ erroFinalizar() }}</p>
-                        }
-
-                        <div class="busca__popover-acoes">
-                          <button mat-button type="button" (click)="fecharFinalizar()">Cancelar</button>
-                          <button
-                            mat-flat-button
-                            type="button"
-                            class="busca__popover-confirmar"
-                            [disabled]="finalizando()"
-                            (click)="confirmarFinalizar(estadia)"
-                          >
-                            Confirmar
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <app-acao-popover
+                      icone="event_available"
+                      titulo="Finalizar estadia"
+                      subtitulo="Informe a data de saída"
+                      [erro]="erroFinalizar()"
+                      [confirmando]="finalizando()"
+                      (cancelar)="fecharFinalizar()"
+                      (confirmar)="confirmarFinalizar(estadia)"
+                    >
+                      <mat-form-field appearance="outline">
+                        <mat-label>Data de saída</mat-label>
+                        <input
+                          matInput
+                          type="date"
+                          [value]="dataSaidaFinalizar()"
+                          (input)="dataSaidaFinalizar.set($any($event.target).value)"
+                        />
+                      </mat-form-field>
+                    </app-acao-popover>
                   }
                 </div>
               }
@@ -147,44 +128,25 @@
                   </button>
 
                   @if (emprestimoDevolverAberto() === emprestimo.id) {
-                    <div class="busca__popover" (click)="$event.stopPropagation()">
-                      <div class="busca__popover-cabecalho">
-                        <mat-icon>assignment_return</mat-icon>
-                        <div>
-                          <div class="busca__popover-titulo">Devolver empréstimo</div>
-                          <div class="busca__popover-subtitulo">Informe a data de devolução</div>
-                        </div>
-                      </div>
-
-                      <div class="busca__popover-conteudo">
-                        <mat-form-field appearance="outline" class="busca__popover-campo">
-                          <mat-label>Data de devolução</mat-label>
-                          <input
-                            matInput
-                            type="date"
-                            [value]="dataDevolucao()"
-                            (input)="dataDevolucao.set($any($event.target).value)"
-                          />
-                        </mat-form-field>
-
-                        @if (erroDevolver()) {
-                          <p class="busca__popover-erro">{{ erroDevolver() }}</p>
-                        }
-
-                        <div class="busca__popover-acoes">
-                          <button mat-button type="button" (click)="fecharDevolver()">Cancelar</button>
-                          <button
-                            mat-flat-button
-                            type="button"
-                            class="busca__popover-confirmar"
-                            [disabled]="devolvendo()"
-                            (click)="confirmarDevolver(emprestimo)"
-                          >
-                            Confirmar
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <app-acao-popover
+                      icone="assignment_return"
+                      titulo="Devolver empréstimo"
+                      subtitulo="Informe a data de devolução"
+                      [erro]="erroDevolver()"
+                      [confirmando]="devolvendo()"
+                      (cancelar)="fecharDevolver()"
+                      (confirmar)="confirmarDevolver(emprestimo)"
+                    >
+                      <mat-form-field appearance="outline">
+                        <mat-label>Data de devolução</mat-label>
+                        <input
+                          matInput
+                          type="date"
+                          [value]="dataDevolucao()"
+                          (input)="dataDevolucao.set($any($event.target).value)"
+                        />
+                      </mat-form-field>
+                    </app-acao-popover>
                   }
                 </div>
               }

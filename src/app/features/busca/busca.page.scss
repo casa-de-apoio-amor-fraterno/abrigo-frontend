@@ -119,76 +119,6 @@
     border-color: var(--abrigo-border-forte) !important;
   }
 
-  &__popover {
-    position: fixed;
-    right: 24px;
-    bottom: 24px;
-    z-index: 1000;
-    width: 320px;
-    max-width: calc(100vw - 32px);
-    background: var(--abrigo-surface);
-    border-radius: 12px;
-    box-shadow: 0 12px 32px var(--abrigo-sombra), 0 0 0 1px var(--abrigo-border);
-    overflow: hidden;
-    animation: busca-popover-entrada 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-    transform-origin: bottom right;
-
-    @media (max-width: 768px) {
-      right: 16px;
-      left: 16px;
-      bottom: 76px;
-      width: auto;
-      max-width: none;
-    }
-
-    &-cabecalho {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 14px 16px 0;
-
-      mat-icon {
-        color: var(--abrigo-primary);
-      }
-    }
-
-    &-titulo {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--abrigo-ink);
-    }
-
-    &-subtitulo {
-      font-size: 12px;
-      color: var(--abrigo-texto-secundario);
-    }
-
-    &-conteudo {
-      padding: 8px 16px 16px;
-    }
-
-    &-campo {
-      width: 100%;
-    }
-
-    &-erro {
-      margin: -4px 0 8px;
-      color: var(--abrigo-erro, #c62828);
-      font-size: 12px;
-    }
-
-    &-acoes {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    &-confirmar {
-      background: var(--abrigo-primary) !important;
-      color: #fff !important;
-    }
-  }
-
   &__lista {
     list-style: none;
     margin: 0;
@@ -239,16 +169,5 @@
         }
       }
     }
-  }
-}
-
-@keyframes busca-popover-entrada {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }

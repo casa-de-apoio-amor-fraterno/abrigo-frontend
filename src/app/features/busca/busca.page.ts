@@ -22,6 +22,7 @@ import { MaterialService } from '../materiais/material.service';
 import { MaterialResumo } from '../materiais/material.model';
 import { VoluntarioService } from '../voluntarios/voluntario.service';
 import { VoluntarioResumo } from '../voluntarios/voluntario.model';
+import { AcaoPopoverComponent } from '../../shared/ui/acao-popover/acao-popover.component';
 
 const LIMITE_RESULTADOS = 10;
 const LIMITE_PESSOAS_PARA_ESTADIAS = 5;
@@ -53,6 +54,7 @@ interface EmprestimoComPessoa extends EmprestimoResumo {
   imports: [
     FormsModule,
     RouterLink,
+    AcaoPopoverComponent,
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,

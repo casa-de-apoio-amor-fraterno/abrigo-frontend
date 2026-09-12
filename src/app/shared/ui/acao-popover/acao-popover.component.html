@@ -1,0 +1,32 @@
+<div class="acao-popover" (click)="$event.stopPropagation()">
+  <div class="acao-popover__cabecalho">
+    <mat-icon>{{ icone() }}</mat-icon>
+    <div>
+      <div class="acao-popover__titulo">{{ titulo() }}</div>
+      @if (subtitulo()) {
+        <div class="acao-popover__subtitulo">{{ subtitulo() }}</div>
+      }
+    </div>
+  </div>
+
+  <div class="acao-popover__conteudo">
+    <ng-content></ng-content>
+
+    @if (erro()) {
+      <p class="acao-popover__erro">{{ erro() }}</p>
+    }
+
+    <div class="acao-popover__acoes">
+      <button mat-button type="button" (click)="cancelar.emit()">Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        class="acao-popover__confirmar"
+        [disabled]="confirmando()"
+        (click)="confirmar.emit()"
+      >
+        {{ textoConfirmar() }}
+      </button>
+    </div>
+  </div>
+</div>
