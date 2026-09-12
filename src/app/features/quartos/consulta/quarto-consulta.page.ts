@@ -35,7 +35,7 @@ export class QuartoConsultaPage {
     return this.quartos().filter(
       (quarto) =>
         quarto.numero.toLowerCase().includes(termo) ||
-        quarto.leito.toLowerCase().includes(termo) ||
+        String(quarto.leito).includes(termo) ||
         (quarto.descricao ?? '').toLowerCase().includes(termo)
     );
   });
@@ -50,7 +50,7 @@ export class QuartoConsultaPage {
       data: {
         titulo: quarto.numero,
         campos: [
-          { rotulo: 'Leito(s)', valor: quarto.leito },
+          { rotulo: 'Leito(s)', valor: String(quarto.leito) },
           { rotulo: 'Descrição', valor: quarto.descricao || '—' },
           { rotulo: 'Status', valor: quarto.ativo ? 'Ativo' : 'Inativo' }
         ],

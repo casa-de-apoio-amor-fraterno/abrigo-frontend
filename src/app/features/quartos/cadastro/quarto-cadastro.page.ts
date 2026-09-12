@@ -41,7 +41,7 @@ export class QuartoCadastroPage {
 
   protected readonly form = this.fb.nonNullable.group({
     numero: ['', [Validators.required]],
-    leito: ['', [Validators.required]],
+    leito: [1, [Validators.required, Validators.min(1)]],
     descricao: ['']
   });
 

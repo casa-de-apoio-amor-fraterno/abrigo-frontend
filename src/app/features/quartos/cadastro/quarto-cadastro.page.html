@@ -19,9 +19,9 @@
 
       <mat-form-field appearance="outline" class="cadastro__campo">
         <mat-label>Número de leitos</mat-label>
-        <input matInput formControlName="leito" />
+        <input matInput type="number" min="1" formControlName="leito" />
         @if (form.controls.leito.touched && form.controls.leito.invalid) {
-          <mat-error>Informe o(s) leito(s)</mat-error>
+          <mat-error>Informe a quantidade de leitos</mat-error>
         }
       </mat-form-field>
 

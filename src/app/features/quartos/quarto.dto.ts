@@ -3,14 +3,14 @@ export interface QuartoDto {
   id: number;
   descricao: string | null;
   numero: string;
-  leito: string;
+  leito: number;
   ativo: boolean;
 }
 
 export interface QuartoCreateDto {
   descricao: string | null;
   numero: string;
-  leito: string;
+  leito: number;
 }
 
 export type QuartoUpdateDto = QuartoCreateDto;
