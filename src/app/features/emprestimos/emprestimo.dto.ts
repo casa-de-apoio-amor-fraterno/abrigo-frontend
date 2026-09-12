@@ -1,8 +1,20 @@
 /** Espelha os schemas de abrigo-backend, app/features/emprestimos/schemas.py. */
+
+/**
+ * Situação de empréstimo/item: combo fechado no legado — só 3 estados
+ * reais. `Emprestimo.situacao` (cabeçalho) não é digitada pelo usuário:
+ * é calculada pelo backend a partir dos itens (prioridade Renovado >
+ * Pendente > Devolvido, ver `_recalcular_situacao` em
+ * abrigo-backend/app/features/emprestimos/service.py) — por isso não
+ * aparece em `EmprestimoCreateDto`/`EmprestimoUpdateDto`, só nas
+ * respostas.
+ */
+export type SituacaoEmprestimo = 'Pendente' | 'Renovado' | 'Devolvido';
+
 export interface EmprestimoResumoDto {
   id: number;
   id_pessoa: number;
-  situacao: string;
+  situacao: SituacaoEmprestimo;
   numero_contrato: string | null;
 }
 
@@ -15,7 +27,7 @@ export interface EmprestimoDto {
   id: number;
   id_pessoa: number;
   id_usuario: number;
-  situacao: string;
+  situacao: SituacaoEmprestimo;
   numero_contrato: string | null;
   observacao: string | null;
   ativo: boolean;
@@ -24,7 +36,6 @@ export interface EmprestimoDto {
 export interface EmprestimoCreateDto {
   id_pessoa: number;
   id_usuario: number;
-  situacao: string;
   numero_contrato?: string | null;
   observacao?: string | null;
   // Itens aninhados: o empréstimo ainda não existe pra usar o sub-recurso
@@ -45,7 +56,7 @@ export interface EmprestimoItemDto {
   data_devolucao: string | null;
   /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
   data_devolucao_efetiva: string | null;
-  situacao: string | null;
+  situacao: SituacaoEmprestimo | null;
   renovacao: string | null;
 }
 
@@ -56,7 +67,7 @@ export interface EmprestimoItemCreateDto {
   id_usuario: number;
   data_emprestimo?: string | null;
   data_devolucao?: string | null;
-  situacao?: string | null;
+  situacao?: SituacaoEmprestimo | null;
   renovacao?: string | null;
 }
 

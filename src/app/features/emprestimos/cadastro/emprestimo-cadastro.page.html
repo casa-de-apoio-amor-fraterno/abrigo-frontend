@@ -21,13 +21,12 @@
           <input matInput formControlName="numeroContrato" />
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Situação</mat-label>
-          <input matInput formControlName="situacao" placeholder="ex.: Pendente, Devolvido" />
-          @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
-            <mat-error>Informe a situação</mat-error>
-          }
-        </mat-form-field>
+        @if (modoEdicao) {
+          <div class="cadastro__campo cadastro__radio">
+            <span class="cadastro__radio-label">Situação</span>
+            <span>{{ situacaoAtual() }}</span>
+          </div>
+        }
 
         <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
           <mat-label>Observação</mat-label>
@@ -99,7 +98,11 @@
 
           <mat-form-field appearance="outline" class="cadastro__campo">
             <mat-label>Situação</mat-label>
-            <input matInput formControlName="situacao" placeholder="ex.: Emprestado, Devolvido" />
+            <mat-select formControlName="situacao">
+              <mat-option value="Pendente">Pendente</mat-option>
+              <mat-option value="Renovado">Renovado</mat-option>
+              <mat-option value="Devolvido">Devolvido</mat-option>
+            </mat-select>
           </mat-form-field>
 
           @if (itemEmEdicaoDataDevolucaoEfetiva()) {

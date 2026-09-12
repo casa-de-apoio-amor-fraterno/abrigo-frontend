@@ -1,12 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { descreverErroHttp } from '../../../core/http/api-error';
@@ -16,7 +17,7 @@ import { PessoaService } from '../../pessoas/pessoa.service';
 import { MaterialService } from '../../materiais/material.service';
 import { EmprestimoItemCreateDto } from '../emprestimo.dto';
 import { EmprestimoService } from '../emprestimo.service';
-import { EmprestimoHistorico, EmprestimoItem } from '../emprestimo.model';
+import { EmprestimoHistorico, EmprestimoItem, SituacaoEmprestimo } from '../emprestimo.model';
 import {
   CadastroDialogAba,
   CadastroDialogShellComponent
@@ -35,6 +36,7 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
     CadastroDialogShellComponent,
     CadastroAcoesComponent
   ],
@@ -96,16 +98,20 @@ export class EmprestimoCadastroPage {
   protected readonly historico = signal<EmprestimoHistorico[]>([]);
   protected readonly carregandoHistorico = signal(false);
 
+  // Situação do cabeçalho não é digitada pelo usuário — calculada pelo
+  // backend a partir dos itens (ver emprestimo.legacy.md / service.py),
+  // só exibida (modo edição) em `situacaoAtual` abaixo.
+  protected readonly situacaoAtual = signal<string | null>(null);
+
   protected readonly form = this.fb.nonNullable.group({
     numeroContrato: [''],
-    situacao: ['Pendente', [Validators.required]],
     observacao: ['']
   });
 
   protected readonly formItem = this.fb.nonNullable.group({
     dataEmprestimo: [''],
     dataDevolucao: [''],
-    situacao: [''],
+    situacao: ['Pendente'],
     renovacao: ['']
   });
 
@@ -115,9 +121,9 @@ export class EmprestimoCadastroPage {
         next: (emprestimo) => {
           this.form.patchValue({
             numeroContrato: emprestimo.numeroContrato ?? '',
-            situacao: emprestimo.situacao,
             observacao: emprestimo.observacao ?? ''
           });
+          this.situacaoAtual.set(emprestimo.situacao);
           this.idUsuarioOriginal.set(emprestimo.idUsuario);
           this.carregando.set(false);
 
@@ -158,7 +164,6 @@ export class EmprestimoCadastroPage {
     const dados = {
       id_pessoa: this.pessoaSelecionada()!.id,
       id_usuario: idUsuario,
-      situacao: valores.situacao,
       numero_contrato: valores.numeroContrato || null,
       observacao: valores.observacao || null
     };
@@ -185,7 +190,7 @@ export class EmprestimoCadastroPage {
   protected novoItem(): void {
     this.itemEmEdicao.set(null);
     this.materialSelecionado.set(null);
-    this.formItem.reset({ dataEmprestimo: '', dataDevolucao: '', situacao: '', renovacao: '' });
+    this.formItem.reset({ dataEmprestimo: '', dataDevolucao: '', situacao: 'Pendente', renovacao: '' });
     this.erro.set(null);
     this.formItemAberto.set(true);
   }
@@ -197,7 +202,7 @@ export class EmprestimoCadastroPage {
     this.formItem.reset({
       dataEmprestimo: item.dataEmprestimo ?? '',
       dataDevolucao: item.dataDevolucao ?? '',
-      situacao: item.situacao ?? '',
+      situacao: item.situacao ?? 'Pendente',
       renovacao: item.renovacao ?? ''
     });
     this.erro.set(null);
@@ -221,7 +226,7 @@ export class EmprestimoCadastroPage {
       id_usuario: this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id,
       data_emprestimo: valores.dataEmprestimo || null,
       data_devolucao: valores.dataDevolucao || null,
-      situacao: valores.situacao || null,
+      situacao: valores.situacao as SituacaoEmprestimo,
       renovacao: valores.renovacao || null
     };
 
@@ -261,6 +266,11 @@ export class EmprestimoCadastroPage {
         this.formItemAberto.set(false);
         this.carregarItens();
         this.carregarHistorico();
+        // Situação do cabeçalho é recalculada pelo backend a cada item
+        // salvo (ver emprestimo.legacy.md) — busca de novo pra refletir.
+        this.emprestimoService.buscar(this.emprestimoId!).subscribe((emprestimo) => {
+          this.situacaoAtual.set(emprestimo.situacao);
+        });
       },
       error: (error) => {
         this.salvandoItem.set(false);

@@ -1,7 +1,15 @@
+/**
+ * Situação de empréstimo/item: combo fechado no legado — só 3 estados
+ * reais. `situacao` do cabeçalho (`Emprestimo`) não é digitada pelo
+ * usuário: é calculada pelo backend a partir dos itens (prioridade
+ * Renovado > Pendente > Devolvido) — o front só exibe.
+ */
+export type SituacaoEmprestimo = 'Pendente' | 'Renovado' | 'Devolvido';
+
 export interface EmprestimoResumo {
   id: number;
   idPessoa: number;
-  situacao: string;
+  situacao: SituacaoEmprestimo;
   numeroContrato: string | null;
 }
 
@@ -25,7 +33,7 @@ export interface EmprestimoItem {
   dataDevolucao: string | null;
   /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
   dataDevolucaoEfetiva: string | null;
-  situacao: string | null;
+  situacao: SituacaoEmprestimo | null;
   renovacao: string | null;
 }
 
