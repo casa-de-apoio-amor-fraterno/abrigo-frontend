@@ -44,7 +44,7 @@ export class PessoaConsultaPage {
 
   protected visualizar(pessoa: PessoaResumo): void {
     this.dialog.open(DetalheDialogComponent, {
-      width: '420px',
+      width: pessoa.tem_foto ? '480px' : '420px',
       data: {
         titulo: pessoa.nome,
         campos: [
@@ -56,7 +56,8 @@ export class PessoaConsultaPage {
           }
         ],
         linkEditar: ['/pessoas', pessoa.id, 'editar'],
-        labelEditar: 'Editar pessoa'
+        labelEditar: 'Editar pessoa',
+        fotoUrl: pessoa.tem_foto ? this.pessoaService.fotoUrl(pessoa.id) : null
       }
     });
   }

@@ -14,6 +14,8 @@ export interface DetalheDialogData {
   campos: DetalheDialogCampo[];
   linkEditar: unknown[];
   labelEditar?: string;
+  /** Exibida à direita dos campos, quando informada (ver Pessoa.tem_foto). */
+  fotoUrl?: string | null;
 }
 
 @Component({

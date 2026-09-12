@@ -1,9 +1,27 @@
 .detalhe-dialog {
+  &__corpo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
   &__lista {
     margin: 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__foto {
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--abrigo-fundo-secundario, #eee);
   }
 
   &__campo {

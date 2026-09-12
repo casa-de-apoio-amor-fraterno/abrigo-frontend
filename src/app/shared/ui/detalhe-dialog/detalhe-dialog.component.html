@@ -1,14 +1,20 @@
 <h2 mat-dialog-title>{{ data.titulo }}</h2>
 
 <mat-dialog-content class="detalhe-dialog__conteudo">
-  <dl class="detalhe-dialog__lista">
-    @for (campo of data.campos; track campo.rotulo) {
-      <div class="detalhe-dialog__campo">
-        <dt>{{ campo.rotulo }}</dt>
-        <dd>{{ campo.valor || '—' }}</dd>
-      </div>
+  <div class="detalhe-dialog__corpo">
+    <dl class="detalhe-dialog__lista">
+      @for (campo of data.campos; track campo.rotulo) {
+        <div class="detalhe-dialog__campo">
+          <dt>{{ campo.rotulo }}</dt>
+          <dd>{{ campo.valor || '—' }}</dd>
+        </div>
+      }
+    </dl>
+
+    @if (data.fotoUrl) {
+      <img class="detalhe-dialog__foto" [src]="data.fotoUrl" alt="" />
     }
-  </dl>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
