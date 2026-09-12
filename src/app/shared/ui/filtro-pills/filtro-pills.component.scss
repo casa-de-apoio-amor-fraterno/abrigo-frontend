@@ -1,0 +1,40 @@
+.filtro-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: var(--abrigo-surface-alt);
+  border: 1px solid var(--abrigo-border);
+  border-radius: 999px;
+
+  &__opcao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--abrigo-texto-secundario);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      color: var(--abrigo-ink);
+    }
+
+    &--ativa {
+      background: var(--abrigo-primary);
+      color: #fff;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+}

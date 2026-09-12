@@ -1,0 +1,14 @@
+<div class="filtro-pills" role="radiogroup">
+  @for (opcao of opcoes(); track opcao.valor) {
+    <button
+      type="button"
+      role="radio"
+      class="filtro-pills__opcao"
+      [class.filtro-pills__opcao--ativa]="valor() === opcao.valor"
+      [attr.aria-checked]="valor() === opcao.valor"
+      (click)="selecionar(opcao.valor)"
+    >
+      {{ opcao.rotulo }}
+    </button>
+  }
+</div>

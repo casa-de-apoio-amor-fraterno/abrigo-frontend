@@ -12,17 +12,12 @@
   (paginaAnterior)="paginaAnterior()"
   (paginaProxima)="proximaPagina()"
 >
-  <mat-select
+  <app-filtro-pills
     filtros
-    class="consulta__select-situacao"
-    [value]="situacao()"
-    (selectionChange)="filtrarPorSituacao($event.value)"
-  >
-    <mat-option value="">Todas as situações</mat-option>
-    <mat-option value="Pendente">Pendente</mat-option>
-    <mat-option value="Aprovada">Aprovada</mat-option>
-    <mat-option value="Revogada">Revogada</mat-option>
-  </mat-select>
+    [opcoes]="opcoesSituacao"
+    [valor]="situacao()"
+    (mudanca)="filtrarPorSituacao($any($event))"
+  />
 
   <table class="consulta__tabela">
     <thead>

@@ -3,14 +3,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
+import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
 import { SolicitacaoCadastro, SituacaoSolicitacaoCadastro } from '../solicitacao-cadastro.model';
 import { SolicitacaoCadastroService } from '../solicitacao-cadastro.service';
 
 const ITENS_POR_PAGINA = 20;
+
+const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
+  { valor: '', rotulo: 'Todas' },
+  { valor: 'Pendente', rotulo: 'Pendente' },
+  { valor: 'Aprovada', rotulo: 'Aprovada' },
+  { valor: 'Revogada', rotulo: 'Revogada' }
+];
 
 /**
  * Painel de aprovação do auto-cadastro público de paciente (feature nova,
@@ -19,7 +26,7 @@ const ITENS_POR_PAGINA = 20;
  */
 @Component({
   selector: 'app-solicitacao-cadastro-consulta-page',
-  imports: [MatButtonModule, MatIconModule, MatSelectModule, PaginaConsultaComponent],
+  imports: [MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
   templateUrl: './solicitacao-cadastro-consulta.page.html',
   styleUrl: './solicitacao-cadastro-consulta.page.scss'
 })
@@ -27,6 +34,7 @@ export class SolicitacaoCadastroConsultaPage {
   private readonly solicitacaoService = inject(SolicitacaoCadastroService);
   private readonly destroyRef = inject(DestroyRef);
 
+  protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly situacao = signal<SituacaoSolicitacaoCadastro | ''>('Pendente');
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);

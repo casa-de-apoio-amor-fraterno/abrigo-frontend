@@ -5,7 +5,6 @@ import { forkJoin, of } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
 
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { QuartoService } from '../../quartos/quarto.service';
@@ -14,12 +13,20 @@ import { EstadiaResumo, SituacaoEstadia } from '../estadia.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
 
 const ITENS_POR_PAGINA = 20;
 
+const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
+  { valor: '', rotulo: 'Todas' },
+  { valor: 'Em acompanhamento', rotulo: 'Em acompanhamento' },
+  { valor: 'Aguardando retorno', rotulo: 'Aguardando retorno' },
+  { valor: 'Finalizada', rotulo: 'Finalizada' }
+];
+
 @Component({
   selector: 'app-estadia-consulta-page',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatSelectModule, PaginaConsultaComponent],
+  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
   templateUrl: './estadia-consulta.page.html'
 })
 export class EstadiaConsultaPage {
@@ -28,6 +35,7 @@ export class EstadiaConsultaPage {
   private readonly quartoService = inject(QuartoService);
   private readonly dialog = inject(MatDialog);
 
+  protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly situacao = signal<SituacaoEstadia | ''>('Em acompanhamento');
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);

@@ -23,16 +23,7 @@
     </a>
   </ng-container>
 
-  <mat-select
-    filtros
-    class="consulta__select-situacao"
-    [value]="situacao()"
-    (selectionChange)="filtrarPorSituacao($event.value)"
-  >
-    <mat-option value="">Todas as situações</mat-option>
-    <mat-option value="Pendente">Pendente</mat-option>
-    <mat-option value="Devolvido">Devolvido</mat-option>
-  </mat-select>
+  <app-filtro-pills filtros [opcoes]="opcoesSituacao" [valor]="situacao()" (mudanca)="filtrarPorSituacao($event)" />
 
   <table class="consulta__tabela">
     <thead>

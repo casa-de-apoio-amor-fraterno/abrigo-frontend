@@ -4,7 +4,6 @@ import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
 
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { EmprestimoService } from '../emprestimo.service';
@@ -12,12 +11,19 @@ import { EmprestimoResumo } from '../emprestimo.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
 
 const ITENS_POR_PAGINA = 20;
 
+const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
+  { valor: '', rotulo: 'Todas' },
+  { valor: 'Pendente', rotulo: 'Pendente' },
+  { valor: 'Devolvido', rotulo: 'Devolvido' }
+];
+
 @Component({
   selector: 'app-emprestimo-consulta-page',
-  imports: [RouterLink, MatButtonModule, MatIconModule, MatSelectModule, PaginaConsultaComponent],
+  imports: [RouterLink, MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
   templateUrl: './emprestimo-consulta.page.html'
 })
 export class EmprestimoConsultaPage {
@@ -25,6 +31,7 @@ export class EmprestimoConsultaPage {
   private readonly pessoaService = inject(PessoaService);
   private readonly dialog = inject(MatDialog);
 
+  protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly situacao = signal('Pendente');
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);
