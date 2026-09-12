@@ -21,7 +21,10 @@ export interface EmprestimoItem {
   idEmprestimo: number;
   idMaterial: number;
   dataEmprestimo: string | null;
+  /** Prevista, não a data real da devolução — ver `dataDevolucaoEfetiva`. */
   dataDevolucao: string | null;
+  /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
+  dataDevolucaoEfetiva: string | null;
   situacao: string | null;
   renovacao: string | null;
 }

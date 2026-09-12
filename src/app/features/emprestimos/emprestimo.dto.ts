@@ -27,6 +27,11 @@ export interface EmprestimoCreateDto {
   situacao: string;
   numero_contrato?: string | null;
   observacao?: string | null;
+  // Itens aninhados: o empréstimo ainda não existe pra usar o sub-recurso
+  // próprio (POST /emprestimos/{id}/itens), então o front manda os itens
+  // junto na criação (ver EmprestimoCreate.itens em
+  // abrigo-backend/app/features/emprestimos/schemas.py).
+  itens?: EmprestimoItemCreateDto[];
 }
 
 export type EmprestimoUpdateDto = EmprestimoCreateDto;
@@ -36,7 +41,10 @@ export interface EmprestimoItemDto {
   id_emprestimo: number;
   id_material: number;
   data_emprestimo: string | null;
+  /** Prevista, não a data real da devolução — ver `data_devolucao_efetiva`. */
   data_devolucao: string | null;
+  /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
+  data_devolucao_efetiva: string | null;
   situacao: string | null;
   renovacao: string | null;
 }

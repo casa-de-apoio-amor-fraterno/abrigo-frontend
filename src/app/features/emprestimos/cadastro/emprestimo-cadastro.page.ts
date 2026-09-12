@@ -1,5 +1,5 @@
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTabsModule } from '@angular/material/tabs';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { descreverErroHttp } from '../../../core/http/api-error';
@@ -15,16 +14,19 @@ import { MaterialAutocompleteComponent } from '../../../shared/ui/material-autoc
 import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocomplete/pessoa-autocomplete.component';
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { MaterialService } from '../../materiais/material.service';
+import { EmprestimoItemCreateDto } from '../emprestimo.dto';
 import { EmprestimoService } from '../emprestimo.service';
 import { EmprestimoHistorico, EmprestimoItem } from '../emprestimo.model';
-import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import {
+  CadastroDialogAba,
+  CadastroDialogShellComponent
+} from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
   selector: 'app-emprestimo-cadastro-page',
   imports: [
     DatePipe,
-    NgTemplateOutlet,
     ReactiveFormsModule,
     MaterialAutocompleteComponent,
     PessoaAutocompleteComponent,
@@ -33,8 +35,7 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatTabsModule,
-    PaginaCadastroComponent,
+    CadastroDialogShellComponent,
     CadastroAcoesComponent
   ],
   templateUrl: './emprestimo-cadastro.page.html',
@@ -54,6 +55,18 @@ export class EmprestimoCadastroPage {
     : null;
   protected readonly modoEdicao = this.emprestimoId !== null;
 
+  // Itens do empréstimo já dão pra adicionar na criação (ver `itensLocais`
+  // abaixo e o DTO aninhado em `EmprestimoCreate`,
+  // abrigo-backend/app/features/emprestimos/schemas.py) — só Histórico
+  // continua exclusivo de edição (trilha de auditoria, só existe depois
+  // que o empréstimo já foi criado).
+  protected readonly abas: CadastroDialogAba[] = [
+    { id: 'dados', rotulo: 'Dados' },
+    { id: 'itens', rotulo: 'Itens do empréstimo' },
+    ...(this.modoEdicao ? [{ id: 'historico', rotulo: 'Histórico de alteração' }] : [])
+  ];
+  protected readonly abaAtiva = signal('dados');
+
   protected readonly carregando = signal(this.modoEdicao);
   protected readonly salvando = signal(false);
   protected readonly erro = signal<string | null>(null);
@@ -62,11 +75,23 @@ export class EmprestimoCadastroPage {
   protected readonly idUsuarioOriginal = signal<number | null>(null);
 
   protected readonly itens = signal<EmprestimoItem[]>([]);
+  // Itens locais (empréstimo em criação, ainda sem id) — mesmo padrão de
+  // `composicaoFamiliarLocal` em pessoa-cadastro.page.ts: junta os itens
+  // num array local e manda tudo junto no POST de criação.
+  protected readonly itensLocais = signal<EmprestimoItem[]>([]);
+  protected readonly itensExibidos = computed(() => (this.emprestimoId === null ? this.itensLocais() : this.itens()));
   protected readonly descricoesMateriais = signal<Record<number, string>>({});
   protected readonly formItemAberto = signal(false);
   protected readonly salvandoItem = signal(false);
   protected readonly materialSelecionado = signal<{ id: number; descricao: string } | null>(null);
   protected readonly itemEmEdicao = signal<EmprestimoItem | null>(null);
+
+  private proximoIdItemLocal = -1;
+  // Só leitura — gravada automaticamente pelo backend quando `situacao`
+  // vira "Devolvido" (ver emprestimo.legacy.md / service.py).
+  protected readonly itemEmEdicaoDataDevolucaoEfetiva = computed(
+    () => this.itemEmEdicao()?.dataDevolucaoEfetiva ?? null
+  );
 
   protected readonly historico = signal<EmprestimoHistorico[]>([]);
   protected readonly carregandoHistorico = signal(false);
@@ -129,9 +154,10 @@ export class EmprestimoCadastroPage {
     }
 
     const valores = this.form.getRawValue();
+    const idUsuario = this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id;
     const dados = {
       id_pessoa: this.pessoaSelecionada()!.id,
-      id_usuario: this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id,
+      id_usuario: idUsuario,
       situacao: valores.situacao,
       numero_contrato: valores.numeroContrato || null,
       observacao: valores.observacao || null
@@ -143,7 +169,7 @@ export class EmprestimoCadastroPage {
     const operacao =
       this.emprestimoId !== null
         ? this.emprestimoService.atualizar(this.emprestimoId, dados)
-        : this.emprestimoService.criar(dados);
+        : this.emprestimoService.criar({ ...dados, itens: this.paraItensCreateDto(idUsuario) });
 
     operacao.subscribe({
       next: () => {
@@ -183,20 +209,43 @@ export class EmprestimoCadastroPage {
   }
 
   protected salvarItem(): void {
-    if (this.emprestimoId === null || this.materialSelecionado() === null) {
+    if (this.materialSelecionado() === null) {
       this.erro.set('Selecione o material do item.');
       return;
     }
 
+    const material = this.materialSelecionado()!;
     const valores = this.formItem.getRawValue();
     const dados = {
-      id_material: this.materialSelecionado()!.id,
+      id_material: material.id,
       id_usuario: this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id,
       data_emprestimo: valores.dataEmprestimo || null,
       data_devolucao: valores.dataDevolucao || null,
       situacao: valores.situacao || null,
       renovacao: valores.renovacao || null
     };
+
+    // Empréstimo ainda em criação (sem id): junta o item num array local
+    // em vez de chamar a API — mesmo padrão de `ComposicaoFamiliarTabComponent`.
+    if (this.emprestimoId === null) {
+      const emEdicao = this.itemEmEdicao();
+      const item: EmprestimoItem = {
+        id: emEdicao?.id ?? this.proximoIdItemLocal--,
+        idEmprestimo: 0,
+        idMaterial: dados.id_material,
+        dataEmprestimo: dados.data_emprestimo,
+        dataDevolucao: dados.data_devolucao,
+        dataDevolucaoEfetiva: null,
+        situacao: dados.situacao,
+        renovacao: dados.renovacao
+      };
+      this.itensLocais.update((atuais) =>
+        emEdicao ? atuais.map((i) => (i.id === item.id ? item : i)) : [...atuais, item]
+      );
+      this.descricoesMateriais.update((mapa) => ({ ...mapa, [material.id]: material.descricao }));
+      this.formItemAberto.set(false);
+      return;
+    }
 
     this.salvandoItem.set(true);
     this.erro.set(null);
@@ -218,6 +267,17 @@ export class EmprestimoCadastroPage {
         this.erro.set(descreverErroHttp(error.error));
       }
     });
+  }
+
+  private paraItensCreateDto(idUsuario: number): EmprestimoItemCreateDto[] {
+    return this.itensLocais().map((item) => ({
+      id_material: item.idMaterial,
+      id_usuario: idUsuario,
+      data_emprestimo: item.dataEmprestimo,
+      data_devolucao: item.dataDevolucao,
+      situacao: item.situacao,
+      renovacao: item.renovacao
+    }));
   }
 
   private carregarItens(): void {

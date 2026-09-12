@@ -42,6 +42,7 @@ export function paraItemModel(dto: EmprestimoItemDto): EmprestimoItem {
     idMaterial: dto.id_material,
     dataEmprestimo: dto.data_emprestimo,
     dataDevolucao: dto.data_devolucao,
+    dataDevolucaoEfetiva: dto.data_devolucao_efetiva,
     situacao: dto.situacao,
     renovacao: dto.renovacao
   };
