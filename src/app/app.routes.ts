@@ -55,12 +55,12 @@ export const routes: Routes = [
       {
         path: 'estadias/novo',
         loadComponent: () =>
-          import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then((m) => m.EstadiaCadastroDialogPage)
+          import('./features/estadias/cadastro/estadia-cadastro.page').then((m) => m.EstadiaCadastroPage)
       },
       {
         path: 'estadias/:id/editar',
         loadComponent: () =>
-          import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then((m) => m.EstadiaCadastroDialogPage)
+          import('./features/estadias/cadastro/estadia-cadastro.page').then((m) => m.EstadiaCadastroPage)
       },
       {
         path: 'voluntarios',
