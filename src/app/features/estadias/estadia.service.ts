@@ -17,6 +17,10 @@ import { Estadia, EstadiaAcompanhante, ListaEstadias } from './estadia.model';
 
 export interface ConsultaEstadiasQuery {
   idPessoa?: number;
+  /** Estadias onde a pessoa aparece como acompanhante de outro paciente
+   * (`EstadiaAcompanhante.id_pessoa`), não como titular do leito —
+   * mutuamente exclusivo com `idPessoa`. */
+  idPessoaAcompanhante?: number;
   situacao?: SituacaoEstadiaDto;
   skip?: number;
   take?: number;
@@ -34,6 +38,9 @@ export class EstadiaService {
     };
     if (query.idPessoa !== undefined) {
       params['id_pessoa'] = String(query.idPessoa);
+    }
+    if (query.idPessoaAcompanhante !== undefined) {
+      params['id_pessoa_acompanhante'] = String(query.idPessoaAcompanhante);
     }
     if (query.situacao) {
       params['situacao'] = query.situacao;

@@ -54,7 +54,11 @@
                 <mat-icon>hotel</mat-icon>
                 <span>
                   <strong>{{ estadia.nomePessoa }}</strong>
-                  <small>{{ estadia.tipoPessoa }} · {{ estadia.situacao }}</small>
+                  @if (estadia.viaAcompanhante) {
+                    <small>Acompanhante de {{ estadia.nomePaciente || 'outra pessoa' }} · {{ estadia.situacao }}</small>
+                  } @else {
+                    <small>{{ estadia.tipoPessoa }} · {{ estadia.situacao }}</small>
+                  }
                 </span>
               </a>
               @if (estadia.situacao !== 'Finalizada') {

@@ -34,7 +34,14 @@ const LIMITE_PESSOAS_PARA_EMPRESTIMOS = 5;
 const SITUACAO_EMPRESTIMO_DEVOLVIDO = 'Devolvido';
 
 interface EstadiaComPessoa extends EstadiaResumo {
+  /** Nome da pessoa encontrada na busca — nem sempre a titular do leito
+   * (`estadia.idPessoa`), ver `viaAcompanhante`. */
   nomePessoa: string;
+  /** true quando a pessoa encontrada aparece como acompanhante
+   * (`EstadiaAcompanhante`) de outro paciente, não como titular do leito. */
+  viaAcompanhante: boolean;
+  /** Nome do titular do leito — só preenchido quando `viaAcompanhante`. */
+  nomePaciente?: string;
 }
 
 interface EmprestimoComPessoa extends EmprestimoResumo {
@@ -132,19 +139,72 @@ export class BuscaPage {
 
     // O nome da pessoa é anexado depois, sem round-trip extra — o
     // resumo da estadia não traz o nome, mas já temos ele da busca acima.
+    // Cada candidata é buscada nos dois papéis possíveis: titular do leito
+    // (idPessoa) e acompanhante de outro paciente (idPessoaAcompanhante) —
+    // uma pessoa pode aparecer nos dois, em estadias diferentes.
     forkJoin(
       candidatas.map((pessoa) =>
-        this.estadiaService
-          .listar({ idPessoa: pessoa.id, take: LIMITE_RESULTADOS })
-          .pipe(catchError(() => of({ items: [], total: 0 })))
+        forkJoin({
+          titular: this.estadiaService
+            .listar({ idPessoa: pessoa.id, take: LIMITE_RESULTADOS })
+            .pipe(catchError(() => of({ items: [], total: 0 }))),
+          acompanhante: this.estadiaService
+            .listar({ idPessoaAcompanhante: pessoa.id, take: LIMITE_RESULTADOS })
+            .pipe(catchError(() => of({ items: [], total: 0 })))
+        })
       )
     ).subscribe((resultados) => {
       const todas: EstadiaComPessoa[] = [];
+      const idsVistos = new Set<number>();
       resultados.forEach((resultado, indice) => {
         const nomePessoa = candidatas[indice].nome;
-        resultado.items.forEach((estadia) => todas.push({ ...estadia, nomePessoa }));
+        resultado.titular.items.forEach((estadia) => {
+          if (idsVistos.has(estadia.id)) {
+            return;
+          }
+          idsVistos.add(estadia.id);
+          todas.push({ ...estadia, nomePessoa, viaAcompanhante: false });
+        });
+        resultado.acompanhante.items.forEach((estadia) => {
+          if (idsVistos.has(estadia.id)) {
+            return;
+          }
+          idsVistos.add(estadia.id);
+          todas.push({ ...estadia, nomePessoa, viaAcompanhante: true });
+        });
       });
-      this.estadias.set(todas);
+
+      this.resolverNomesPacientes(todas);
+    });
+  }
+
+  private resolverNomesPacientes(estadias: EstadiaComPessoa[]): void {
+    // Quando a pessoa encontrada é acompanhante, `estadia.idPessoa` é o
+    // titular do leito (outra pessoa) — busca o nome dele pra exibir
+    // "Acompanhante de X" em vez do nome de quem foi buscado.
+    const comoAcompanhante = estadias.filter((e) => e.viaAcompanhante);
+    if (comoAcompanhante.length === 0) {
+      this.estadias.set(estadias);
+      return;
+    }
+
+    const idsPacientes = [...new Set(comoAcompanhante.map((e) => e.idPessoa))];
+    forkJoin(
+      idsPacientes.map((id) => this.pessoaService.buscar(id).pipe(catchError(() => of(null))))
+    ).subscribe((pacientes) => {
+      const nomesPorId = new Map<number, string>();
+      pacientes.forEach((pessoa, indice) => {
+        if (pessoa) {
+          nomesPorId.set(idsPacientes[indice], pessoa.nome);
+        }
+      });
+      this.estadias.set(
+        estadias.map((estadia) =>
+          estadia.viaAcompanhante
+            ? { ...estadia, nomePaciente: nomesPorId.get(estadia.idPessoa) }
+            : estadia
+        )
+      );
     });
   }
 
