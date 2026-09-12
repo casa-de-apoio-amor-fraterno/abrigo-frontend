@@ -1,11 +1,9 @@
-<app-pagina-cadastro
-  [titulo]="modoEdicao ? 'Editar quarto' : 'Novo quarto'"
-  subtitulo="Cadastro de quartos e leitos do Abrigo."
-  voltarPara="/quartos"
-  [carregando]="carregando()"
-  [larguraMaxima]="640"
->
-  <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
+<form [formGroup]="form" (ngSubmit)="salvar()">
+  <app-cadastro-dialog-shell
+    [titulo]="modoEdicao ? 'Editar quarto' : 'Novo quarto'"
+    subtitulo="Cadastro de quartos e leitos do Abrigo."
+    [carregando]="carregando()"
+  >
     @if (modoEdicao && !ativo()) {
       <p class="cadastro__aviso">Este quarto está inativo — não aparece nas seleções de estadia.</p>
     }
@@ -37,19 +35,21 @@
       <p class="cadastro__erro">{{ erro() }}</p>
     }
 
-    <app-cadastro-acoes voltarPara="/quartos" [salvando]="salvando()">
-      @if (modoEdicao && ativo()) {
-        <button
-          extra
-          mat-button
-          type="button"
-          class="cadastro__acao-perigo"
-          [disabled]="inativando()"
-          (click)="inativar()"
-        >
-          Inativar
-        </button>
-      }
-    </app-cadastro-acoes>
-  </form>
-</app-pagina-cadastro>
+    <ng-container acoes>
+      <app-cadastro-acoes voltarPara="/quartos" [salvando]="salvando()">
+        @if (modoEdicao && ativo()) {
+          <button
+            extra
+            mat-button
+            type="button"
+            class="cadastro__acao-perigo"
+            [disabled]="inativando()"
+            (click)="inativar()"
+          >
+            Inativar
+          </button>
+        }
+      </app-cadastro-acoes>
+    </ng-container>
+  </app-cadastro-dialog-shell>
+</form>

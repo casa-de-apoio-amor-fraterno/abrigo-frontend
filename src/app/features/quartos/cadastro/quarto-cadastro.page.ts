@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { QuartoService } from '../quarto.service';
-import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroDialogShellComponent } from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
@@ -17,7 +17,7 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    PaginaCadastroComponent,
+    CadastroDialogShellComponent,
     CadastroAcoesComponent
   ],
   templateUrl: './quarto-cadastro.page.html'
