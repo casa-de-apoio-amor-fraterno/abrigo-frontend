@@ -44,9 +44,13 @@
 
   &__conteudo {
     padding: 8px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
     // O conteúdo projetado (campo do formulário) fica full-width, mesmo
-    // padrão do que era `.busca__popover-campo`.
+    // padrão do que era `.busca__popover-campo` — dá pra projetar mais de
+    // um campo (ex.: pessoa + data em "Nova estadia").
     ::ng-deep > * {
       width: 100%;
     }

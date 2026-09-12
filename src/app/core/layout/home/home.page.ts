@@ -12,6 +12,7 @@ import { QuartoService } from '../../../features/quartos/quarto.service';
 import { QuartoOcupacao, QuartoOcupante } from '../../../features/quartos/quarto.model';
 import { EstadiaService } from '../../../features/estadias/estadia.service';
 import { AcaoPopoverComponent } from '../../../shared/ui/acao-popover/acao-popover.component';
+import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocomplete/pessoa-autocomplete.component';
 
 /** Placeholder puramente visual — não representa uma pessoa/estadia real,
  * só "aqui cabe mais um leito". */
@@ -23,6 +24,7 @@ type LeitoVago = { vago: true };
     DatePipe,
     RouterLink,
     AcaoPopoverComponent,
+    PessoaAutocompleteComponent,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -49,6 +51,15 @@ export class HomePage {
   protected readonly finalizando = signal(false);
   protected readonly erroFinalizar = signal<string | null>(null);
 
+  // Clicar num leito livre abre esse popover pra criar a estadia ali
+  // mesmo — guarda o id do QUARTO (não do "leito", que é só um placeholder
+  // visual sem identidade própria, ver `leitosVagos`).
+  protected readonly estadiaCriarAberta = signal<number | null>(null);
+  protected readonly pessoaNovaEstadia = signal<{ id: number; nome: string } | null>(null);
+  protected readonly dataEntradaNovaEstadia = signal('');
+  protected readonly criandoEstadia = signal(false);
+  protected readonly erroCriarEstadia = signal<string | null>(null);
+
   constructor() {
     this.carregarOcupacao();
   }
@@ -65,6 +76,7 @@ export class HomePage {
   protected abrirFinalizar(ocupante: QuartoOcupante, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    this.fecharCriarEstadia();
     this.erroFinalizar.set(null);
     this.dataSaidaFinalizar.set(new Date().toISOString().slice(0, 10));
     this.estadiaFinalizarAberta.set(ocupante.idEstadia);
@@ -101,6 +113,64 @@ export class HomePage {
     });
   }
 
+  protected abrirCriarEstadia(quarto: QuartoOcupacao, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.fecharFinalizar();
+    this.erroCriarEstadia.set(null);
+    this.pessoaNovaEstadia.set(null);
+    this.dataEntradaNovaEstadia.set(new Date().toISOString().slice(0, 10));
+    this.estadiaCriarAberta.set(quarto.id);
+  }
+
+  protected fecharCriarEstadia(): void {
+    this.estadiaCriarAberta.set(null);
+    this.erroCriarEstadia.set(null);
+  }
+
+  protected confirmarCriarEstadia(quarto: QuartoOcupacao): void {
+    const pessoa = this.pessoaNovaEstadia();
+    const dataEntrada = this.dataEntradaNovaEstadia();
+    if (!pessoa) {
+      this.erroCriarEstadia.set('Selecione a pessoa.');
+      return;
+    }
+    if (!dataEntrada) {
+      this.erroCriarEstadia.set('Informe a data de entrada.');
+      return;
+    }
+
+    const idUsuario = this.auth.sessao()?.usuario_id;
+    if (idUsuario === undefined) {
+      this.erroCriarEstadia.set('Sessão inválida. Faça login novamente.');
+      return;
+    }
+
+    this.criandoEstadia.set(true);
+    this.erroCriarEstadia.set(null);
+
+    this.estadiaService
+      .criar({
+        id_pessoa: pessoa.id,
+        id_quarto: quarto.id,
+        id_usuario: idUsuario,
+        data_entrada: dataEntrada,
+        tipo_pessoa: 'Paciente',
+        situacao: 'Em acompanhamento'
+      })
+      .subscribe({
+        next: () => {
+          this.criandoEstadia.set(false);
+          this.estadiaCriarAberta.set(null);
+          this.carregarOcupacao();
+        },
+        error: (error) => {
+          this.criandoEstadia.set(false);
+          this.erroCriarEstadia.set(descreverErroHttp(error.error));
+        }
+      });
+  }
+
   protected get totalLeitos(): number {
     return this.quartos().reduce((soma, q) => soma + q.leito, 0);
   }
@@ -116,8 +186,18 @@ export class HomePage {
   @HostListener('document:click', ['$event'])
   protected aoClicarFora(event: MouseEvent): void {
     const alvo = event.target as HTMLElement;
+    // Painel do autocomplete de pessoa (dentro do popover de criar
+    // estadia) é renderizado pelo CDK num overlay fora da árvore do
+    // popover — sem essa exceção, escolher uma opção fecharia o popover
+    // antes de processar a seleção.
+    if (alvo.closest('.cdk-overlay-container')) {
+      return;
+    }
     if (this.estadiaFinalizarAberta() !== null && !alvo.closest('.ocupacao__leito--ocupado')) {
       this.fecharFinalizar();
+    }
+    if (this.estadiaCriarAberta() !== null && !alvo.closest('.ocupacao__leito--livre')) {
+      this.fecharCriarEstadia();
     }
   }
 

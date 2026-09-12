@@ -75,11 +75,44 @@
                 }
               }
               @for (vaga of leitosVagos(quarto); track $index) {
-                <div class="ocupacao__leito ocupacao__leito--livre" title="Leito livre">
+                <button
+                  type="button"
+                  class="ocupacao__leito ocupacao__leito--livre"
+                  title="Leito livre — clique pra iniciar uma estadia"
+                  (click)="abrirCriarEstadia(quarto, $event)"
+                >
                   <mat-icon>bed</mat-icon>
-                </div>
+                </button>
               }
             </div>
+
+            @if (estadiaCriarAberta() === quarto.id) {
+              <app-acao-popover
+                icone="hotel"
+                titulo="Nova estadia"
+                [subtitulo]="'Quarto ' + quarto.numero + ' — informe a pessoa e a data de entrada'"
+                [erro]="erroCriarEstadia()"
+                [confirmando]="criandoEstadia()"
+                textoConfirmar="Iniciar estadia"
+                (cancelar)="fecharCriarEstadia()"
+                (confirmar)="confirmarCriarEstadia(quarto)"
+              >
+                <app-pessoa-autocomplete
+                  label="Pessoa"
+                  [valorInicial]="pessoaNovaEstadia()"
+                  (selecionada)="pessoaNovaEstadia.set($event)"
+                />
+                <mat-form-field appearance="outline">
+                  <mat-label>Data de entrada</mat-label>
+                  <input
+                    matInput
+                    type="date"
+                    [value]="dataEntradaNovaEstadia()"
+                    (input)="dataEntradaNovaEstadia.set($any($event.target).value)"
+                  />
+                </mat-form-field>
+              </app-acao-popover>
+            }
 
             @if (quarto.pendentesRevisao.length > 0) {
               <button type="button" class="ocupacao__aviso" (click)="alternarRevisao(quarto.id)">
