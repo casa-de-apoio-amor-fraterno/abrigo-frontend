@@ -1,157 +1,158 @@
-<app-pagina-cadastro
+<app-cadastro-dialog-shell
   [titulo]="modoEdicao ? 'Editar pessoa' : 'Nova pessoa'"
   subtitulo="Dados cadastrais da pessoa atendida pelo Abrigo."
-  voltarPara="/pessoas"
   [carregando]="carregando()"
+  [abas]="abas"
+  [(abaAtiva)]="abaAtiva"
 >
-  @if (mostrarAbasAssistenteSocial) {
-    <mat-tab-group class="cadastro__abas" animationDuration="0ms">
-      <mat-tab label="Dados">
-        <ng-container *ngTemplateOutlet="formularioDados"></ng-container>
-      </mat-tab>
-      <mat-tab label="Avaliação Social">
-        <ng-template matTabContent>
-          <div class="cadastro__aba-conteudo">
-            <app-avaliacao-social-tab [pessoaId]="pessoaId!" />
-          </div>
-        </ng-template>
-      </mat-tab>
-      <mat-tab label="Composição Familiar">
-        <ng-template matTabContent>
-          <div class="cadastro__aba-conteudo">
-            <app-composicao-familiar-tab [pessoaId]="pessoaId!" />
-          </div>
-        </ng-template>
-      </mat-tab>
-    </mat-tab-group>
-  } @else {
-    <ng-container *ngTemplateOutlet="formularioDados"></ng-container>
-  }
-</app-pagina-cadastro>
+  <form id="pessoa-form" [formGroup]="form" (ngSubmit)="salvar()">
+    @if (abaAtiva() === 'dados') {
+      <section class="cadastro__secao cadastro__secao--linha">
+        <div class="cadastro__foto-coluna">
+          <h2>Foto</h2>
+          <app-captura-foto
+            [fotoUrl]="fotoUrlAtual"
+            (capturada)="salvarFoto($event)"
+            (removida)="removerFoto()"
+          />
+          @if (erroFoto()) {
+            <p class="cadastro__erro">{{ erroFoto() }}</p>
+          }
+        </div>
 
-<ng-template #formularioDados>
-  <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
-    @if (modoEdicao) {
-      <section class="cadastro__secao">
-        <h2>Foto</h2>
-        <app-captura-foto
-          [fotoUrl]="fotoUrlAtual"
-          (capturada)="salvarFoto($event)"
-          (removida)="removerFoto()"
-        />
-        @if (erroFoto()) {
-          <p class="cadastro__erro">{{ erroFoto() }}</p>
-        }
+        <div class="cadastro__dados-coluna">
+          <h2>Dados pessoais</h2>
+          <div class="cadastro__grade">
+            <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+              <mat-label>Nome</mat-label>
+              <input matInput formControlName="nome" />
+              @if (form.controls.nome.touched && form.controls.nome.invalid) {
+                <mat-error>Informe o nome</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>Data de nascimento</mat-label>
+              <input matInput type="date" formControlName="dataNascimento" />
+              @if (form.controls.dataNascimento.touched && form.controls.dataNascimento.invalid) {
+                <mat-error>Informe a data de nascimento</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>RG</mat-label>
+              <input matInput formControlName="rg" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>CPF</mat-label>
+              <input matInput formControlName="cpf" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>Profissão</mat-label>
+              <input matInput formControlName="profissao" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>Cartão SUS</mat-label>
+              <input matInput formControlName="cartaoSus" />
+            </mat-form-field>
+          </div>
+        </div>
       </section>
     }
 
-    <section class="cadastro__secao">
-      <h2>Dados pessoais</h2>
-      <div class="cadastro__grade">
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Nome</mat-label>
-          <input matInput formControlName="nome" />
-          @if (form.controls.nome.touched && form.controls.nome.invalid) {
-            <mat-error>Informe o nome</mat-error>
-          }
-        </mat-form-field>
+    @if (abaAtiva() === 'endereco') {
+      <section class="cadastro__secao">
+        <h2>Endereço</h2>
+        <div class="cadastro__grade">
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="idEstado">
+              <mat-option [value]="null">—</mat-option>
+              @for (estado of estados(); track estado.id) {
+                <mat-option [value]="estado.id">{{ estado.nome }} ({{ estado.uf }})</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Data de nascimento</mat-label>
-          <input matInput type="date" formControlName="dataNascimento" />
-          @if (form.controls.dataNascimento.touched && form.controls.dataNascimento.invalid) {
-            <mat-error>Informe a data de nascimento</mat-error>
-          }
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Município</mat-label>
+            <mat-select formControlName="idMunicipio" [disabled]="!form.controls.idEstado.value">
+              <mat-option [value]="null">—</mat-option>
+              @for (municipio of municipios(); track municipio.id) {
+                <mat-option [value]="municipio.id">{{ municipio.nome }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>RG</mat-label>
-          <input matInput formControlName="rg" />
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+            <mat-label>Endereço</mat-label>
+            <input matInput formControlName="endereco" />
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>CPF</mat-label>
-          <input matInput formControlName="cpf" />
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Ponto de referência</mat-label>
+            <input matInput formControlName="pontoReferencia" />
+          </mat-form-field>
+        </div>
+      </section>
+    }
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Profissão</mat-label>
-          <input matInput formControlName="profissao" />
-        </mat-form-field>
+    @if (abaAtiva() === 'atendimento') {
+      <section class="cadastro__secao">
+        <h2>Atendimento</h2>
+        <div class="cadastro__grade">
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Hospital</mat-label>
+            <mat-select formControlName="idHospital">
+              <mat-option [value]="null">—</mat-option>
+              @for (hospital of hospitais(); track hospital.id) {
+                <mat-option [value]="hospital.id">{{ hospital.nome }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Cartão SUS</mat-label>
-          <input matInput formControlName="cartaoSus" />
-        </mat-form-field>
-      </div>
-    </section>
-
-    <section class="cadastro__secao">
-      <h2>Endereço</h2>
-      <div class="cadastro__grade">
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Estado</mat-label>
-          <mat-select formControlName="idEstado">
-            <mat-option [value]="null">—</mat-option>
-            @for (estado of estados(); track estado.id) {
-              <mat-option [value]="estado.id">{{ estado.nome }} ({{ estado.uf }})</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Município</mat-label>
-          <mat-select formControlName="idMunicipio" [disabled]="!form.controls.idEstado.value">
-            <mat-option [value]="null">—</mat-option>
-            @for (municipio of municipios(); track municipio.id) {
-              <mat-option [value]="municipio.id">{{ municipio.nome }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Endereço</mat-label>
-          <input matInput formControlName="endereco" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Ponto de referência</mat-label>
-          <input matInput formControlName="pontoReferencia" />
-        </mat-form-field>
-      </div>
-    </section>
-
-    <section class="cadastro__secao">
-      <h2>Atendimento</h2>
-      <div class="cadastro__grade">
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Hospital</mat-label>
-          <mat-select formControlName="idHospital">
-            <mat-option [value]="null">—</mat-option>
-            @for (hospital of hospitais(); track hospital.id) {
-              <mat-option [value]="hospital.id">{{ hospital.nome }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Observação</mat-label>
-          <textarea matInput formControlName="observacao" rows="3"></textarea>
-        </mat-form-field>
-      </div>
-    </section>
+          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+            <mat-label>Observação</mat-label>
+            <textarea matInput formControlName="observacao" rows="3"></textarea>
+          </mat-form-field>
+        </div>
+      </section>
+    }
 
     @if (erro()) {
       <p class="cadastro__erro">{{ erro() }}</p>
     }
-
-    <app-cadastro-acoes voltarPara="/pessoas" [salvando]="salvando()" />
   </form>
 
-  @if (modoEdicao && contatosUrl) {
-    <section class="cadastro__secao cadastro__subsecao">
-      <h2>Contatos</h2>
-      <app-contatos-tab [recursoBase]="contatosUrl" />
-    </section>
+  @if (abaAtiva() === 'avaliacao') {
+    <div class="cadastro__aba-conteudo">
+      <app-avaliacao-social-tab [pessoaId]="pessoaId!" />
+    </div>
   }
-</ng-template>
+
+  @if (abaAtiva() === 'composicao') {
+    <div class="cadastro__aba-conteudo">
+      <app-composicao-familiar-tab
+        [pessoaId]="pessoaId"
+        (membrosLocaisChange)="composicaoFamiliarLocal.set($event)"
+      />
+    </div>
+  }
+
+  @if (abaAtiva() === 'contatos') {
+    <div class="cadastro__aba-conteudo">
+      <app-contatos-tab
+        [recursoBase]="contatosUrl ?? ''"
+        [modoLocal]="!modoEdicao"
+        (contatosLocaisChange)="contatosLocais.set($event)"
+      />
+    </div>
+  }
+
+  <ng-container acoes>
+    <app-cadastro-acoes voltarPara="/pessoas" formularioId="pessoa-form" [salvando]="salvando()" />
+  </ng-container>
+</app-cadastro-dialog-shell>

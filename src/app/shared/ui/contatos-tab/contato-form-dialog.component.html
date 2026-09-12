@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>{{ modoEdicao ? 'Editar contato' : 'Novo contato' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="salvar()">
+  <mat-dialog-content class="contatos__dialog-conteudo">
+    <div class="contatos__grade">
+      <mat-form-field appearance="outline" class="contatos__campo">
+        <mat-label>Número</mat-label>
+        <input matInput formControlName="numero" />
+        @if (form.controls.numero.touched && form.controls.numero.invalid) {
+          <mat-error>Informe o número</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="contatos__campo">
+        <mat-label>Quem atende (opcional)</mat-label>
+        <input matInput formControlName="nomeContato" placeholder="ex.: Esposa, Sidney" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="contatos__campo contatos__campo--largo">
+        <mat-label>Observação</mat-label>
+        <input matInput formControlName="observacao" />
+      </mat-form-field>
+
+      <div class="contatos__campo">
+        <mat-checkbox formControlName="principal">Contato principal</mat-checkbox>
+      </div>
+    </div>
+
+    @if (erro()) {
+      <p class="contatos__erro">{{ erro() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="contatos__acoes">
+    @if (modoEdicao) {
+      <button
+        mat-button
+        type="button"
+        class="cadastro__acao-perigo"
+        [disabled]="removendo()"
+        (click)="remover()"
+      >
+        Remover
+      </button>
+      <span class="cadastro__espaco"></span>
+    }
+    <button mat-button type="button" (click)="dialogRef.close()">Cancelar</button>
+    <button mat-flat-button type="submit" class="contatos__salvar" [disabled]="salvando()">
+      @if (salvando()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        Salvar contato
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

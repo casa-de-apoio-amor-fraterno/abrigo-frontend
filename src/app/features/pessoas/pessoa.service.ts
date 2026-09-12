@@ -3,6 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { paraEntradaDto as paraContatoEntradaDto } from '../../shared/data/contato/contato.mapper';
+import { ContatoFormulario } from '../../shared/data/contato/contato.model';
+import { ComposicaoFamiliarCreateDto } from './composicao-familiar/composicao-familiar.dto';
 import { ListaPessoasDto, PessoaDto } from './pessoa.dto';
 import { paraEntradaDto, paraListaModel, paraPessoaModel } from './pessoa.mapper';
 import { ListaPessoas, Pessoa, PessoaFormulario } from './pessoa.model';
@@ -34,9 +37,23 @@ export class PessoaService {
     return this.http.get<PessoaDto>(`${this.resource}/${id}`).pipe(map(paraPessoaModel));
   }
 
-  criar(formulario: PessoaFormulario): Observable<Pessoa> {
+  // Composição familiar e contatos são opcionais aqui e só fazem sentido na
+  // criação — a pessoa ainda não tem id pra usar os sub-recursos próprios
+  // (POST /pessoas/{id}/composicao-familiar, POST /pessoas/{id}/contatos),
+  // então o backend aceita ambos aninhados no mesmo payload (ver
+  // PessoaCreate em abrigo-backend/app/features/pessoas/schemas.py) e cria
+  // tudo numa transação só.
+  criar(
+    formulario: PessoaFormulario,
+    composicaoFamiliar: ComposicaoFamiliarCreateDto[] = [],
+    contatos: ContatoFormulario[] = []
+  ): Observable<Pessoa> {
     return this.http
-      .post<PessoaDto>(this.resource, paraEntradaDto(formulario))
+      .post<PessoaDto>(this.resource, {
+        ...paraEntradaDto(formulario),
+        composicao_familiar: composicaoFamiliar,
+        contatos: contatos.map(paraContatoEntradaDto)
+      })
       .pipe(map(paraPessoaModel));
   }
 

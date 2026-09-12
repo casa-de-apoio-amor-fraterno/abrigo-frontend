@@ -4,104 +4,39 @@
       <mat-spinner diameter="32" />
     </div>
   } @else {
-    @if (!formAberto()) {
-      <div class="contatos__cabecalho">
-        <p class="contatos__subtitulo">Telefones de contato.</p>
-        <button mat-flat-button type="button" class="contatos__novo" (click)="novoContato()">
-          <mat-icon>add</mat-icon>
-          Novo contato
-        </button>
-      </div>
+    <div class="contatos__cabecalho">
+      <p class="contatos__subtitulo">Telefones de contato.</p>
+      <button mat-flat-button type="button" class="contatos__novo" (click)="novoContato()">
+        <mat-icon>add</mat-icon>
+        Novo contato
+      </button>
+    </div>
 
-      @if (erro()) {
-        <p class="contatos__erro">{{ erro() }}</p>
-      }
+    @if (erro()) {
+      <p class="contatos__erro">{{ erro() }}</p>
+    }
 
-      @if (contatos().length === 0) {
-        <p class="contatos__vazio">Nenhum contato cadastrado ainda.</p>
-      } @else {
-        <table mat-table [dataSource]="contatos()" class="contatos__tabela">
-          <ng-container matColumnDef="numero">
-            <th mat-header-cell *matHeaderCellDef>Número</th>
-            <td mat-cell *matCellDef="let contato">
-              {{ contato.numero }}
-              @if (contato.observacao) {
-                <span class="contatos__aviso" [title]="contato.observacao">⚠</span>
-              }
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="nomeContato">
-            <th mat-header-cell *matHeaderCellDef>Quem atende</th>
-            <td mat-cell *matCellDef="let contato">{{ contato.nomeContato || '—' }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="principal">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let contato">
-              @if (contato.principal) {
-                <span class="contatos__badge">Principal</span>
-              }
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="acoes">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let contato" class="contatos__acoes-celula">
-              <button mat-icon-button type="button" aria-label="Editar" (click)="editar(contato)">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button type="button" aria-label="Remover" (click)="remover(contato)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="colunas"></tr>
-          <tr mat-row *matRowDef="let row; columns: colunas"></tr>
-        </table>
-      }
+    @if (contatos().length === 0) {
+      <p class="contatos__vazio">Nenhum contato cadastrado ainda.</p>
     } @else {
-      <form class="contatos__form" [formGroup]="form" (ngSubmit)="salvar()">
-        <div class="contatos__grade">
-          <mat-form-field appearance="outline" class="contatos__campo">
-            <mat-label>Número</mat-label>
-            <input matInput formControlName="numero" />
-            @if (form.controls.numero.touched && form.controls.numero.invalid) {
-              <mat-error>Informe o número</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="contatos__campo">
-            <mat-label>Quem atende (opcional)</mat-label>
-            <input matInput formControlName="nomeContato" placeholder="ex.: Esposa, Sidney" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="contatos__campo contatos__campo--largo">
-            <mat-label>Observação</mat-label>
-            <input matInput formControlName="observacao" />
-          </mat-form-field>
-
-          <div class="contatos__campo">
-            <mat-checkbox formControlName="principal">Contato principal</mat-checkbox>
-          </div>
-        </div>
-
-        @if (erro()) {
-          <p class="contatos__erro">{{ erro() }}</p>
+      <ul class="cadastro__lista contatos__lista">
+        @for (contato of contatos(); track contato.id) {
+          <li>
+            <button type="button" class="contatos__cartao" (click)="editar(contato)">
+              @if (contato.principal) {
+                <span class="contatos__badge contatos__badge--canto">Principal</span>
+              }
+              <strong>
+                {{ contato.numero }}
+                @if (contato.observacao) {
+                  <span class="contatos__aviso" [title]="contato.observacao">⚠</span>
+                }
+              </strong>
+              <span>{{ contato.nomeContato || 'Quem atende não informado' }}</span>
+            </button>
+          </li>
         }
-
-        <div class="contatos__acoes">
-          <button mat-button type="button" (click)="cancelar()">Cancelar</button>
-          <button mat-flat-button type="submit" class="contatos__salvar" [disabled]="salvando()">
-            @if (salvando()) {
-              <mat-spinner diameter="20" />
-            } @else {
-              Salvar contato
-            }
-          </button>
-        </div>
-      </form>
+      </ul>
     }
   }
 </div>

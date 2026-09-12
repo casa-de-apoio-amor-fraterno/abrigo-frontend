@@ -34,10 +34,6 @@
     font-size: 14px;
   }
 
-  &__tabela {
-    width: 100%;
-  }
-
   &__aviso {
     margin-left: 4px;
     cursor: help;
@@ -51,39 +47,59 @@
     font-weight: 600;
     background: rgba(38, 166, 91, 0.12);
     color: #1e7e42;
-  }
-
-  &__acoes-celula {
-    display: flex;
-    justify-content: flex-end;
     white-space: nowrap;
-  }
 
-  &__form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  &__grade {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px 16px;
-
-    @media (max-width: 700px) {
-      grid-template-columns: 1fr;
+    &--canto {
+      position: absolute;
+      top: 10px;
+      right: 10px;
     }
   }
 
-  &__campo {
+  // Cards de contato cabem vários por linha (diferente da lista de
+  // Acompanhantes/Itens, que tem mais texto por item) — sobrescreve o
+  // display:flex column de .cadastro__lista. Sem botões de editar/remover
+  // à vista: o card inteiro é clicável e abre direto no formulário de
+  // edição (que já traz a opção de remover — ver &__acoes abaixo).
+  &__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+
+    li {
+      display: block;
+      padding: 0;
+      border: none;
+    }
+  }
+
+  &__cartao {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    position: relative;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: var(--abrigo-surface);
+    border: 1px solid var(--abrigo-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
 
-    &--largo {
-      grid-column: span 2;
+    &:hover {
+      background: var(--abrigo-surface-alt);
+      border-color: var(--abrigo-border-forte);
+    }
 
-      @media (max-width: 700px) {
-        grid-column: span 1;
-      }
+    strong {
+      padding-right: 70px;
+    }
+
+    span {
+      color: var(--abrigo-texto-secundario);
+      font-size: 13px;
     }
   }
 
@@ -91,17 +107,5 @@
     color: #c62828;
     font-size: 13px;
     margin: 0;
-  }
-
-  &__acoes {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-  }
-
-  &__salvar {
-    background: var(--abrigo-primary) !important;
-    color: #fff !important;
-    min-width: 140px;
   }
 }

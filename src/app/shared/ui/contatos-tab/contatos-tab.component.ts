@@ -1,38 +1,27 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, effect, inject, signal, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
 
-import { descreverErroHttp } from '../../../core/http/api-error';
 import { ContatoService } from '../../data/contato/contato.service';
 import { Contato, ContatoFormulario } from '../../data/contato/contato.model';
+import { ContatoFormDialogComponent } from './contato-form-dialog.component';
 
 /**
- * Lista editável de contatos (telefone), reaproveitada em Pessoa e
- * Voluntário — normalização do campo `telefone` legado (texto livre sem
- * estrutura, ver `abrigo-backend/app/features/pessoas/pessoa.legacy.md`,
- * seção Contatos) numa tabela própria. `recursoBase` é a URL completa do
- * sub-recurso (`/api/pessoas/{id}/contatos` ou
- * `/api/voluntarios/{id}/contatos`) — este componente não sabe nem
- * precisa saber a qual entidade pertence.
+ * Lista de contatos (telefone), reaproveitada em Pessoa e Voluntário —
+ * normalização do campo `telefone` legado (texto livre sem estrutura, ver
+ * `abrigo-backend/app/features/pessoas/pessoa.legacy.md`, seção Contatos).
+ * `recursoBase` é a URL completa do sub-recurso
+ * (`/api/pessoas/{id}/contatos` ou `/api/voluntarios/{id}/contatos`) —
+ * este componente não sabe nem precisa saber a qual entidade pertence.
+ * Novo/editar/remover contato abrem em popup próprio (ver
+ * contato-form-dialog.component.ts) — antes era um formulário inline que
+ * trocava de lugar com a lista dentro do mesmo popup de cadastro.
  */
 @Component({
   selector: 'app-contatos-tab',
-  imports: [
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    MatTableModule
-  ],
+  imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './contatos-tab.component.html',
   styleUrl: './contatos-tab.component.scss'
 })
@@ -45,33 +34,35 @@ export class ContatosTabComponent {
   // de input obrigatório nesse cenário de content projection.
   readonly recursoBase = input<string>('');
 
-  private readonly fb = inject(FormBuilder);
-  private readonly service = inject(ContatoService);
+  // Modo local (dono ainda não existe — ex.: pessoa em criação): sem
+  // recursoBase, então em vez de chamar a API a cada contato, junta tudo
+  // num array local e avisa o formulário-pai via `contatosLocaisChange` pra
+  // mandar tudo junto no POST de criação (mesmo padrão de
+  // `ComposicaoFamiliarTabComponent`/`membrosLocaisChange`). Continua
+  // opt-in (não inferido de `!recursoBase()`) porque Voluntário reaproveita
+  // este componente sem suporte a contatos aninhados no backend ainda.
+  readonly modoLocal = input<boolean>(false);
+  readonly contatosLocaisChange = output<ContatoFormulario[]>();
 
-  protected readonly colunas = ['numero', 'nomeContato', 'principal', 'acoes'];
+  private readonly service = inject(ContatoService);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly contatos = signal<Contato[]>([]);
   protected readonly carregando = signal(true);
-  protected readonly salvando = signal(false);
   protected readonly erro = signal<string | null>(null);
-  protected readonly formAberto = signal(false);
-  protected readonly contatoEmEdicao = signal<Contato | null>(null);
 
-  protected readonly form = this.fb.nonNullable.group({
-    numero: ['', [Validators.required]],
-    nomeContato: [''],
-    observacao: [''],
-    principal: [false]
-  });
+  private proximoIdLocal = -1;
 
   constructor() {
     // effect(), não chamada direta no construtor: no cenário de
     // *ngTemplateOutlet em que este componente é usado, o construtor roda
     // antes do Angular aplicar o valor do input (mesma causa do NG0950
-    // documentado acima) — ler `recursoBase()` aqui pegaria o valor padrão
-    // `''`. O effect roda depois, reativo, já com o valor real.
+    // documentado acima) — ler `recursoBase()`/`modoLocal()` aqui pegaria o
+    // valor padrão. O effect roda depois, reativo, já com o valor real.
     effect(() => {
-      if (this.recursoBase()) {
+      if (this.modoLocal()) {
+        this.carregando.set(false);
+      } else if (this.recursoBase()) {
         this.carregar();
       }
     });
@@ -92,71 +83,53 @@ export class ContatosTabComponent {
   }
 
   protected novoContato(): void {
-    this.contatoEmEdicao.set(null);
-    this.form.reset({ numero: '', nomeContato: '', observacao: '', principal: false });
-    this.erro.set(null);
-    this.formAberto.set(true);
+    this.abrirFormulario(null);
   }
 
   protected editar(contato: Contato): void {
-    this.contatoEmEdicao.set(contato);
-    this.form.reset({
-      numero: contato.numero,
-      nomeContato: contato.nomeContato ?? '',
-      observacao: contato.observacao ?? '',
-      principal: contato.principal
-    });
-    this.erro.set(null);
-    this.formAberto.set(true);
+    this.abrirFormulario(contato);
   }
 
-  protected cancelar(): void {
-    this.formAberto.set(false);
+  private abrirFormulario(contato: Contato | null): void {
+    this.dialog
+      .open(ContatoFormDialogComponent, {
+        width: '480px',
+        maxWidth: '95vw',
+        autoFocus: false,
+        data: { recursoBase: this.recursoBase(), contato, modoLocal: this.modoLocal() }
+      })
+      .afterClosed()
+      .subscribe((resultado) => {
+        if (!resultado) {
+          return;
+        }
+
+        if (resultado.tipo === 'persistido') {
+          this.carregar();
+          return;
+        }
+
+        if (resultado.tipo === 'local-salvar') {
+          const local: Contato = { id: contato?.id ?? this.proximoIdLocal--, ...resultado.dados };
+          this.contatos.update((atuais) =>
+            contato ? atuais.map((c) => (c.id === local.id ? local : c)) : [...atuais, local]
+          );
+        } else if (resultado.tipo === 'local-remover' && contato) {
+          this.contatos.update((atuais) => atuais.filter((c) => c.id !== contato.id));
+        }
+
+        this.emitirContatosLocais();
+      });
   }
 
-  protected remover(contato: Contato): void {
-    if (!confirm(`Remover o contato ${contato.numero}?`)) {
-      return;
-    }
-
-    this.service.remover(this.recursoBase(), contato.id).subscribe({
-      next: () => this.carregar(),
-      error: (error) => this.erro.set(descreverErroHttp(error.error))
-    });
-  }
-
-  protected salvar(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const valores = this.form.getRawValue();
-    const dados: ContatoFormulario = {
-      numero: valores.numero,
-      nomeContato: valores.nomeContato || null,
-      observacao: valores.observacao || null,
-      principal: valores.principal
-    };
-
-    this.salvando.set(true);
-    this.erro.set(null);
-
-    const emEdicao = this.contatoEmEdicao();
-    const operacao = emEdicao
-      ? this.service.atualizar(this.recursoBase(), emEdicao.id, dados)
-      : this.service.criar(this.recursoBase(), dados);
-
-    operacao.subscribe({
-      next: () => {
-        this.salvando.set(false);
-        this.formAberto.set(false);
-        this.carregar();
-      },
-      error: (error) => {
-        this.salvando.set(false);
-        this.erro.set(descreverErroHttp(error.error));
-      }
-    });
+  private emitirContatosLocais(): void {
+    this.contatosLocaisChange.emit(
+      this.contatos().map((c) => ({
+        numero: c.numero,
+        nomeContato: c.nomeContato,
+        observacao: c.observacao,
+        principal: c.principal
+      }))
+    );
   }
 }

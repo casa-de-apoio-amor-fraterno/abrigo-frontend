@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -30,10 +30,18 @@ import { ComposicaoFamiliarService } from './composicao-familiar.service';
   styleUrl: './composicao-familiar-tab.component.scss'
 })
 export class ComposicaoFamiliarTabComponent {
-  readonly pessoaId = input<number>(0);
+  // Sem pessoaId (pessoa ainda não existe — tela de criação): a aba junta
+  // os membros num array local, sem chamar a API a cada linha, e avisa o
+  // formulário de Pessoa via `membrosLocaisChange` pra mandar tudo junto
+  // no POST de criação (ver pessoa-cadastro.page.ts `salvar()` e o DTO
+  // aninhado em abrigo-backend/app/features/pessoas/schemas.py).
+  readonly pessoaId = input<number | null>(null);
+  readonly membrosLocaisChange = output<ComposicaoFamiliarCreateDto[]>();
 
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(ComposicaoFamiliarService);
+
+  protected readonly modoLocal = computed(() => this.pessoaId() === null);
 
   protected readonly colunas = ['nome', 'idade', 'grauParentesco', 'estadoCivil', 'renda', 'ocupacao', 'acoes'];
 
@@ -43,6 +51,8 @@ export class ComposicaoFamiliarTabComponent {
   protected readonly erro = signal<string | null>(null);
   protected readonly formAberto = signal(false);
   protected readonly membroEmEdicao = signal<ComposicaoFamiliar | null>(null);
+
+  private proximoIdLocal = -1;
 
   protected readonly form = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
@@ -54,12 +64,16 @@ export class ComposicaoFamiliarTabComponent {
   });
 
   constructor() {
-    this.carregar();
+    if (this.modoLocal()) {
+      this.carregando.set(false);
+    } else {
+      this.carregar();
+    }
   }
 
   private carregar(): void {
     this.carregando.set(true);
-    this.service.listar(this.pessoaId()).subscribe({
+    this.service.listar(this.pessoaId()!).subscribe({
       next: (membros) => {
         this.membros.set(membros);
         this.carregando.set(false);
@@ -101,7 +115,13 @@ export class ComposicaoFamiliarTabComponent {
       return;
     }
 
-    this.service.remover(this.pessoaId(), membro.id).subscribe({
+    if (this.modoLocal()) {
+      this.membros.update((atuais) => atuais.filter((m) => m.id !== membro.id));
+      this.emitirMembrosLocais();
+      return;
+    }
+
+    this.service.remover(this.pessoaId()!, membro.id).subscribe({
       next: () => this.carregar(),
       error: (error) => this.erro.set(descreverErroHttp(error.error))
     });
@@ -123,13 +143,33 @@ export class ComposicaoFamiliarTabComponent {
       ocupacao: valores.ocupacao || null
     };
 
+    if (this.modoLocal()) {
+      const emEdicao = this.membroEmEdicao();
+      const membro: ComposicaoFamiliar = {
+        id: emEdicao?.id ?? this.proximoIdLocal--,
+        idPessoa: 0,
+        nome: dados.nome,
+        idade: dados.idade,
+        grauParentesco: dados.grau_parentesco,
+        estadoCivil: dados.estado_civil,
+        renda: dados.renda,
+        ocupacao: dados.ocupacao
+      };
+      this.membros.update((atuais) =>
+        emEdicao ? atuais.map((m) => (m.id === membro.id ? membro : m)) : [...atuais, membro]
+      );
+      this.emitirMembrosLocais();
+      this.formAberto.set(false);
+      return;
+    }
+
     this.salvando.set(true);
     this.erro.set(null);
 
     const emEdicao = this.membroEmEdicao();
     const operacao = emEdicao
-      ? this.service.atualizar(this.pessoaId(), emEdicao.id, dados)
-      : this.service.criar(this.pessoaId(), dados);
+      ? this.service.atualizar(this.pessoaId()!, emEdicao.id, dados)
+      : this.service.criar(this.pessoaId()!, dados);
 
     operacao.subscribe({
       next: () => {
@@ -142,5 +182,18 @@ export class ComposicaoFamiliarTabComponent {
         this.erro.set(descreverErroHttp(error.error));
       }
     });
+  }
+
+  private emitirMembrosLocais(): void {
+    this.membrosLocaisChange.emit(
+      this.membros().map((m) => ({
+        nome: m.nome,
+        idade: m.idade,
+        grau_parentesco: m.grauParentesco,
+        estado_civil: m.estadoCivil,
+        renda: m.renda,
+        ocupacao: m.ocupacao
+      }))
+    );
   }
 }

@@ -1,0 +1,54 @@
+.contatos {
+  // Formulário curto — nunca precisa da própria rolagem que o
+  // mat-dialog-content tem por padrão (max-height: 65vh + overflow-y:
+  // auto), que às vezes rendia uma barra de rolagem "fantasma" (vazia)
+  // além da da página.
+  &__dialog-conteudo {
+    padding-top: 4px !important;
+    min-width: 320px;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  &__grade {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 16px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__campo {
+    width: 100%;
+
+    &--largo {
+      grid-column: span 2;
+
+      @media (max-width: 480px) {
+        grid-column: span 1;
+      }
+    }
+  }
+
+  &__erro {
+    color: #c62828;
+    font-size: 13px;
+    margin: 8px 0 0;
+  }
+
+  &__acoes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 4px 0 0 !important;
+  }
+
+  &__salvar {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    min-width: 140px;
+  }
+}
