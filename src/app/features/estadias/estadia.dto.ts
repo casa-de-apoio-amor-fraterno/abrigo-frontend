@@ -34,6 +34,11 @@ export interface EstadiaCreateDto {
   tipo_pessoa?: TipoPessoaEstadiaDto;
   situacao: SituacaoEstadiaDto;
   observacao?: string | null;
+  // Acompanhantes aninhados: a estadia ainda não existe pra usar o
+  // sub-recurso próprio (POST /estadias/{id}/acompanhantes), ver
+  // EstadiaCreate.acompanhantes em
+  // abrigo-backend/app/features/estadias/schemas.py.
+  acompanhantes?: EstadiaAcompanhanteCreateDto[];
 }
 
 export type EstadiaUpdateDto = EstadiaCreateDto;

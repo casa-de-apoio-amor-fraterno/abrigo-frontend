@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,9 +15,13 @@ import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocompl
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { QuartoService } from '../../quartos/quarto.service';
 import { Quarto } from '../../quartos/quarto.model';
+import { EstadiaAcompanhanteCreateDto } from '../estadia.dto';
 import { EstadiaService } from '../estadia.service';
 import { EstadiaAcompanhante, SituacaoEstadia, TipoPessoaEstadia } from '../estadia.model';
-import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import {
+  CadastroDialogAba,
+  CadastroDialogShellComponent
+} from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
@@ -32,7 +36,7 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatInputModule,
     MatRadioModule,
     MatSelectModule,
-    PaginaCadastroComponent,
+    CadastroDialogShellComponent,
     CadastroAcoesComponent
   ],
   templateUrl: './estadia-cadastro.page.html'
@@ -51,6 +55,15 @@ export class EstadiaCadastroPage {
     : null;
   protected readonly modoEdicao = this.estadiaId !== null;
 
+  // Acompanhantes já dão pra adicionar na criação — ver
+  // `acompanhantesLocais` e o DTO aninhado em `EstadiaCreate`
+  // (abrigo-backend/app/features/estadias/schemas.py).
+  protected readonly abas: CadastroDialogAba[] = [
+    { id: 'dados', rotulo: 'Dados' },
+    { id: 'acompanhantes', rotulo: 'Acompanhantes' }
+  ];
+  protected readonly abaAtiva = signal('dados');
+
   protected readonly carregando = signal(this.modoEdicao);
   protected readonly salvando = signal(false);
   protected readonly encerrando = signal(false);
@@ -62,10 +75,18 @@ export class EstadiaCadastroPage {
   protected readonly idUsuarioOriginal = signal<number | null>(null);
 
   protected readonly acompanhantes = signal<EstadiaAcompanhante[]>([]);
+  // Acompanhantes locais (estadia em criação, ainda sem id) — mesmo padrão
+  // de `itensLocais` em emprestimo-cadastro.page.ts.
+  protected readonly acompanhantesLocais = signal<EstadiaAcompanhante[]>([]);
+  protected readonly acompanhantesExibidos = computed(() =>
+    this.estadiaId === null ? this.acompanhantesLocais() : this.acompanhantes()
+  );
   protected readonly nomesAcompanhantes = signal<Record<number, string>>({});
   protected readonly formAcompanhanteAberto = signal(false);
   protected readonly salvandoAcompanhante = signal(false);
   protected readonly pessoaAcompanhante = signal<{ id: number; nome: string } | null>(null);
+
+  private proximoIdAcompanhanteLocal = -1;
 
   protected readonly form = this.fb.nonNullable.group({
     idQuarto: this.fb.control<number | null>(null, Validators.required),
@@ -152,7 +173,7 @@ export class EstadiaCadastroPage {
     const operacao =
       this.estadiaId !== null
         ? this.estadiaService.atualizar(this.estadiaId, dados)
-        : this.estadiaService.criar(dados);
+        : this.estadiaService.criar({ ...dados, acompanhantes: this.paraAcompanhantesCreateDto() });
 
     operacao.subscribe({
       next: () => {
@@ -195,17 +216,37 @@ export class EstadiaCadastroPage {
   }
 
   protected salvarAcompanhante(): void {
-    if (this.estadiaId === null || this.formAcompanhante.invalid || this.pessoaAcompanhante() === null) {
+    if (this.formAcompanhante.invalid || this.pessoaAcompanhante() === null) {
       this.formAcompanhante.markAllAsTouched();
       return;
     }
 
+    const pessoa = this.pessoaAcompanhante()!;
     const valores = this.formAcompanhante.getRawValue();
+
+    // Estadia ainda em criação (sem id): junta o acompanhante num array
+    // local em vez de chamar a API — mesmo padrão de `itensLocais` em
+    // emprestimo-cadastro.page.ts.
+    if (this.estadiaId === null) {
+      const acompanhante: EstadiaAcompanhante = {
+        id: this.proximoIdAcompanhanteLocal--,
+        idEstadia: 0,
+        idPessoa: pessoa.id,
+        dataEntrada: valores.dataEntrada,
+        dataSaida: valores.dataSaida || null,
+        grauParentesco: valores.grauParentesco || null
+      };
+      this.acompanhantesLocais.update((atuais) => [...atuais, acompanhante]);
+      this.nomesAcompanhantes.update((mapa) => ({ ...mapa, [pessoa.id]: pessoa.nome }));
+      this.formAcompanhanteAberto.set(false);
+      return;
+    }
+
     this.salvandoAcompanhante.set(true);
 
     this.estadiaService
       .adicionarAcompanhante(this.estadiaId, {
-        id_pessoa: this.pessoaAcompanhante()!.id,
+        id_pessoa: pessoa.id,
         data_entrada: valores.dataEntrada,
         data_saida: valores.dataSaida || null,
         grau_parentesco: valores.grauParentesco || null
@@ -221,6 +262,15 @@ export class EstadiaCadastroPage {
           this.erro.set(descreverErroHttp(error.error));
         }
       });
+  }
+
+  private paraAcompanhantesCreateDto(): EstadiaAcompanhanteCreateDto[] {
+    return this.acompanhantesLocais().map((acompanhante) => ({
+      id_pessoa: acompanhante.idPessoa,
+      data_entrada: acompanhante.dataEntrada,
+      data_saida: acompanhante.dataSaida,
+      grau_parentesco: acompanhante.grauParentesco
+    }));
   }
 
   private carregarAcompanhantes(): void {

@@ -1,99 +1,87 @@
-<app-pagina-cadastro
+<app-cadastro-dialog-shell
   [titulo]="modoEdicao ? 'Editar estadia' : 'Nova estadia'"
   subtitulo="Ocupação de quarto/leito no Abrigo."
-  voltarPara="/estadias"
   [carregando]="carregando()"
+  [abas]="abas"
+  [(abaAtiva)]="abaAtiva"
 >
-  <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
-    <section class="cadastro__secao">
-      <h2>Dados da estadia</h2>
-      <div class="cadastro__grade">
-        <div class="cadastro__campo cadastro__campo--largo">
-          <app-pessoa-autocomplete
-            label="Pessoa"
-            [valorInicial]="pessoaSelecionada()"
-            (selecionada)="selecionarPessoa($event)"
-          />
-        </div>
+  @if (abaAtiva() === 'dados') {
+    <form id="estadia-form" [formGroup]="form" (ngSubmit)="salvar()">
+      <section class="cadastro__secao">
+        <h2>Dados da estadia</h2>
+        <div class="cadastro__grade">
+          <div class="cadastro__campo cadastro__campo--largo">
+            <app-pessoa-autocomplete
+              label="Pessoa"
+              [valorInicial]="pessoaSelecionada()"
+              (selecionada)="selecionarPessoa($event)"
+            />
+          </div>
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Quarto</mat-label>
-          <mat-select formControlName="idQuarto">
-            @for (quarto of quartos(); track quarto.id) {
-              <mat-option [value]="quarto.id" [disabled]="!quarto.ativo">
-                {{ quarto.numero }} — {{ quarto.leito }} leito(s){{ quarto.ativo ? '' : ' (inativo)' }}
-              </mat-option>
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Quarto</mat-label>
+            <mat-select formControlName="idQuarto">
+              @for (quarto of quartos(); track quarto.id) {
+                <mat-option [value]="quarto.id" [disabled]="!quarto.ativo">
+                  {{ quarto.numero }} — {{ quarto.leito }} leito(s){{ quarto.ativo ? '' : ' (inativo)' }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (form.controls.idQuarto.touched && form.controls.idQuarto.invalid) {
+              <mat-error>Selecione o quarto</mat-error>
             }
-          </mat-select>
-          @if (form.controls.idQuarto.touched && form.controls.idQuarto.invalid) {
-            <mat-error>Selecione o quarto</mat-error>
-          }
-        </mat-form-field>
+          </mat-form-field>
 
-        <div class="cadastro__campo cadastro__radio">
-          <span class="cadastro__radio-label">Tipo pessoa</span>
-          <mat-radio-group formControlName="tipoPessoa">
-            <mat-radio-button value="Paciente">Paciente</mat-radio-button>
-            <mat-radio-button value="Acompanhante">Acompanhante</mat-radio-button>
-          </mat-radio-group>
+          <div class="cadastro__campo cadastro__radio">
+            <span class="cadastro__radio-label">Tipo pessoa</span>
+            <mat-radio-group formControlName="tipoPessoa">
+              <mat-radio-button value="Paciente">Paciente</mat-radio-button>
+              <mat-radio-button value="Acompanhante">Acompanhante</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Data de entrada</mat-label>
+            <input matInput type="date" formControlName="dataEntrada" />
+            @if (form.controls.dataEntrada.touched && form.controls.dataEntrada.invalid) {
+              <mat-error>Informe a data de entrada</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Data de saída</mat-label>
+            <input matInput type="date" formControlName="dataSaida" />
+          </mat-form-field>
+
+          <div class="cadastro__campo cadastro__radio">
+            <span class="cadastro__radio-label">Situação</span>
+            <mat-radio-group formControlName="situacao">
+              <mat-radio-button value="Em acompanhamento">Em acompanhamento</mat-radio-button>
+              <mat-radio-button value="Aguardando retorno">Aguardando retorno</mat-radio-button>
+              <mat-radio-button value="Finalizada">Finalizada</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Tempo estadia</mat-label>
+            <input matInput formControlName="tempoEstadia" placeholder="ex.: 06 dias" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+            <mat-label>Observação</mat-label>
+            <textarea matInput formControlName="observacao" rows="3"></textarea>
+          </mat-form-field>
         </div>
+      </section>
 
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Data de entrada</mat-label>
-          <input matInput type="date" formControlName="dataEntrada" />
-          @if (form.controls.dataEntrada.touched && form.controls.dataEntrada.invalid) {
-            <mat-error>Informe a data de entrada</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Data de saída</mat-label>
-          <input matInput type="date" formControlName="dataSaida" />
-        </mat-form-field>
-
-        <div class="cadastro__campo cadastro__radio">
-          <span class="cadastro__radio-label">Situação</span>
-          <mat-radio-group formControlName="situacao">
-            <mat-radio-button value="Em acompanhamento">Em acompanhamento</mat-radio-button>
-            <mat-radio-button value="Aguardando retorno">Aguardando retorno</mat-radio-button>
-            <mat-radio-button value="Finalizada">Finalizada</mat-radio-button>
-          </mat-radio-group>
-        </div>
-
-        <mat-form-field appearance="outline" class="cadastro__campo">
-          <mat-label>Tempo estadia</mat-label>
-          <input matInput formControlName="tempoEstadia" placeholder="ex.: 06 dias" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Observação</mat-label>
-          <textarea matInput formControlName="observacao" rows="3"></textarea>
-        </mat-form-field>
-      </div>
-    </section>
-
-    @if (erro()) {
-      <p class="cadastro__erro">{{ erro() }}</p>
-    }
-
-    <app-cadastro-acoes voltarPara="/estadias" [salvando]="salvando()">
-      @if (modoEdicao && situacaoAtual() !== 'Finalizada') {
-        <button
-          extra
-          mat-button
-          type="button"
-          class="cadastro__acao-perigo"
-          [disabled]="encerrando()"
-          (click)="encerrar()"
-        >
-          Encerrar estadia
-        </button>
+      @if (erro()) {
+        <p class="cadastro__erro">{{ erro() }}</p>
       }
-    </app-cadastro-acoes>
-  </form>
+    </form>
+  }
 
-  @if (modoEdicao) {
-    <section class="cadastro__subsecao">
+  @if (abaAtiva() === 'acompanhantes') {
+    <section class="cadastro__secao">
       <div class="cadastro__subsecao-cabecalho">
         <h2>Acompanhantes</h2>
         @if (!formAcompanhanteAberto()) {
@@ -105,11 +93,11 @@
       </div>
 
       @if (!formAcompanhanteAberto()) {
-        @if (acompanhantes().length === 0) {
+        @if (acompanhantesExibidos().length === 0) {
           <p class="cadastro__vazio">Nenhum acompanhante registrado nesta estadia.</p>
         } @else {
           <ul class="cadastro__lista">
-            @for (acompanhante of acompanhantes(); track acompanhante.id) {
+            @for (acompanhante of acompanhantesExibidos(); track acompanhante.id) {
               <li>
                 <div>
                   <strong>{{ nomesAcompanhantes()[acompanhante.idPessoa] || 'Carregando...' }}</strong>
@@ -160,4 +148,23 @@
       }
     </section>
   }
-</app-pagina-cadastro>
+
+  <ng-container acoes>
+    @if (abaAtiva() === 'dados') {
+      <app-cadastro-acoes voltarPara="/estadias" formularioId="estadia-form" [salvando]="salvando()">
+        @if (modoEdicao && situacaoAtual() !== 'Finalizada') {
+          <button
+            extra
+            mat-button
+            type="button"
+            class="cadastro__acao-perigo"
+            [disabled]="encerrando()"
+            (click)="encerrar()"
+          >
+            Encerrar estadia
+          </button>
+        }
+      </app-cadastro-acoes>
+    }
+  </ng-container>
+</app-cadastro-dialog-shell>
