@@ -6,8 +6,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
+import { ContatoFormulario } from '../../../shared/data/contato/contato.model';
 import { VoluntarioService } from '../voluntario.service';
-import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import {
+  CadastroDialogAba,
+  CadastroDialogShellComponent
+} from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 import { ContatosTabComponent } from '../../../shared/ui/contatos-tab/contatos-tab.component';
 
@@ -19,7 +23,7 @@ import { ContatosTabComponent } from '../../../shared/ui/contatos-tab/contatos-t
     MatFormFieldModule,
     MatInputModule,
     ContatosTabComponent,
-    PaginaCadastroComponent,
+    CadastroDialogShellComponent,
     CadastroAcoesComponent
   ],
   templateUrl: './voluntario-cadastro.page.html'
@@ -35,11 +39,22 @@ export class VoluntarioCadastroPage {
     : null;
   protected readonly modoEdicao = this.voluntarioId !== null;
 
+  // Contatos já dá pra adicionar na criação — ver `contatosLocais` e o DTO
+  // aninhado em `VoluntarioCreate`
+  // (abrigo-backend/app/features/voluntarios/schemas.py).
+  protected readonly abas: CadastroDialogAba[] = [
+    { id: 'dados', rotulo: 'Dados' },
+    { id: 'contatos', rotulo: 'Contatos' }
+  ];
+  protected readonly abaAtiva = signal('dados');
+
   protected readonly carregando = signal(this.modoEdicao);
   protected readonly salvando = signal(false);
   protected readonly inativando = signal(false);
   protected readonly erro = signal<string | null>(null);
   protected readonly ativo = signal(true);
+
+  protected readonly contatosLocais = signal<ContatoFormulario[]>([]);
 
   protected readonly form = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
@@ -101,7 +116,7 @@ export class VoluntarioCadastroPage {
     const operacao =
       this.voluntarioId !== null
         ? this.voluntarioService.atualizar(this.voluntarioId, dados)
-        : this.voluntarioService.criar(dados);
+        : this.voluntarioService.criar(dados, this.contatosLocais());
 
     operacao.subscribe({
       next: () => {

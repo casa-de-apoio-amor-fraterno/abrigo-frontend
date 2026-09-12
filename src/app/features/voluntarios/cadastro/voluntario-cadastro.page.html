@@ -1,83 +1,93 @@
-<app-pagina-cadastro
+<app-cadastro-dialog-shell
   [titulo]="modoEdicao ? 'Editar voluntário' : 'Novo voluntário'"
   subtitulo="Dados cadastrais do voluntário do Abrigo."
-  voltarPara="/voluntarios"
   [carregando]="carregando()"
+  [abas]="abas"
+  [(abaAtiva)]="abaAtiva"
 >
-  <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
-    @if (modoEdicao && !ativo()) {
-      <p class="cadastro__aviso">Este voluntário está inativo.</p>
-    }
-
-    <div class="cadastro__grade">
-      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-        <mat-label>Nome</mat-label>
-        <input matInput formControlName="nome" />
-        @if (form.controls.nome.touched && form.controls.nome.invalid) {
-          <mat-error>Informe o nome</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Setor</mat-label>
-        <input matInput formControlName="setor" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Data de nascimento</mat-label>
-        <input matInput type="date" formControlName="dataNascimento" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Estado civil</mat-label>
-        <input matInput formControlName="estadoCivil" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>CPF</mat-label>
-        <input matInput formControlName="cpf" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Formação</mat-label>
-        <input matInput formControlName="formacao" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-        <mat-label>Endereço</mat-label>
-        <input matInput formControlName="endereco" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-        <mat-label>Observação</mat-label>
-        <textarea matInput formControlName="observacao" rows="3"></textarea>
-      </mat-form-field>
-    </div>
-
-    @if (erro()) {
-      <p class="cadastro__erro">{{ erro() }}</p>
-    }
-
-    <app-cadastro-acoes voltarPara="/voluntarios" [salvando]="salvando()">
-      @if (modoEdicao && ativo()) {
-        <button
-          extra
-          mat-button
-          type="button"
-          class="cadastro__acao-perigo"
-          [disabled]="inativando()"
-          (click)="inativar()"
-        >
-          Inativar
-        </button>
+  @if (abaAtiva() === 'dados') {
+    <form id="voluntario-form" [formGroup]="form" (ngSubmit)="salvar()">
+      @if (modoEdicao && !ativo()) {
+        <p class="cadastro__aviso">Este voluntário está inativo.</p>
       }
-    </app-cadastro-acoes>
-  </form>
 
-  @if (modoEdicao && contatosUrl) {
-    <section class="cadastro__secao cadastro__subsecao">
-      <h2>Contatos</h2>
-      <app-contatos-tab [recursoBase]="contatosUrl" />
-    </section>
+      <div class="cadastro__grade">
+        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+          <mat-label>Nome</mat-label>
+          <input matInput formControlName="nome" />
+          @if (form.controls.nome.touched && form.controls.nome.invalid) {
+            <mat-error>Informe o nome</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Setor</mat-label>
+          <input matInput formControlName="setor" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Data de nascimento</mat-label>
+          <input matInput type="date" formControlName="dataNascimento" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Estado civil</mat-label>
+          <input matInput formControlName="estadoCivil" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>CPF</mat-label>
+          <input matInput formControlName="cpf" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Formação</mat-label>
+          <input matInput formControlName="formacao" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+          <mat-label>Endereço</mat-label>
+          <input matInput formControlName="endereco" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+          <mat-label>Observação</mat-label>
+          <textarea matInput formControlName="observacao" rows="3"></textarea>
+        </mat-form-field>
+      </div>
+
+      @if (erro()) {
+        <p class="cadastro__erro">{{ erro() }}</p>
+      }
+    </form>
   }
-</app-pagina-cadastro>
+
+  @if (abaAtiva() === 'contatos') {
+    <div class="cadastro__aba-conteudo">
+      <app-contatos-tab
+        [recursoBase]="contatosUrl ?? ''"
+        [modoLocal]="!modoEdicao"
+        (contatosLocaisChange)="contatosLocais.set($event)"
+      />
+    </div>
+  }
+
+  <ng-container acoes>
+    @if (abaAtiva() === 'dados') {
+      <app-cadastro-acoes voltarPara="/voluntarios" formularioId="voluntario-form" [salvando]="salvando()">
+        @if (modoEdicao && ativo()) {
+          <button
+            extra
+            mat-button
+            type="button"
+            class="cadastro__acao-perigo"
+            [disabled]="inativando()"
+            (click)="inativar()"
+          >
+            Inativar
+          </button>
+        }
+      </app-cadastro-acoes>
+    }
+  </ng-container>
+</app-cadastro-dialog-shell>

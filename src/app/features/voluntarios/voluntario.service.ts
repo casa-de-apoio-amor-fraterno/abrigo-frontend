@@ -3,6 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { paraEntradaDto as paraContatoEntradaDto } from '../../shared/data/contato/contato.mapper';
+import { ContatoFormulario } from '../../shared/data/contato/contato.model';
 import { ListaVoluntariosDto, VoluntarioCreateDto, VoluntarioDto, VoluntarioUpdateDto } from './voluntario.dto';
 import { paraListaModel, paraModel } from './voluntario.mapper';
 import { ListaVoluntarios, Voluntario } from './voluntario.model';
@@ -34,8 +36,14 @@ export class VoluntarioService {
     return this.http.get<VoluntarioDto>(`${this.resource}/${id}`).pipe(map(paraModel));
   }
 
-  criar(dados: VoluntarioCreateDto): Observable<Voluntario> {
-    return this.http.post<VoluntarioDto>(this.resource, dados).pipe(map(paraModel));
+  // Contatos são opcionais aqui e só fazem sentido na criação — o
+  // voluntário ainda não tem id pra usar o sub-recurso próprio (POST
+  // /voluntarios/{id}/contatos), então o backend aceita os telefones
+  // aninhados no mesmo payload e cria tudo numa transação só.
+  criar(dados: VoluntarioCreateDto, contatos: ContatoFormulario[] = []): Observable<Voluntario> {
+    return this.http
+      .post<VoluntarioDto>(this.resource, { ...dados, contatos: contatos.map(paraContatoEntradaDto) })
+      .pipe(map(paraModel));
   }
 
   atualizar(id: number, dados: VoluntarioUpdateDto): Observable<Voluntario> {
