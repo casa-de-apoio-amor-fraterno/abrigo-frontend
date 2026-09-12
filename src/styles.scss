@@ -377,14 +377,32 @@ body {
       gap: 24px;
       align-items: flex-start;
 
-      @media (max-width: 560px) {
+      // Mesmo breakpoint do drawer virar tela cheia no mobile (ver
+      // `.cadastro-dialog-panel`, styles.scss) — abaixo dele o popup já
+      // não tem largura sobrando pra foto (160px fixos) ficar ao lado dos
+      // campos sem espremer a coluna de dados.
+      @media (max-width: 680px) {
         flex-direction: column;
+        // `align-items: flex-start` faz sentido pra alinhar as DUAS colunas
+        // pelo topo quando lado a lado (linha) — mas, empilhado (coluna),
+        // esse mesmo `flex-start` vira alinhamento no eixo cruzado
+        // (horizontal), fazendo cada coluna encolher pro tamanho do próprio
+        // conteúdo em vez de ocupar 100% da largura. `stretch` corrige.
+        align-items: stretch;
       }
     }
   }
 
   &__foto-coluna {
     flex-shrink: 0;
+
+    @media (max-width: 680px) {
+      // Sem isso, a coluna esticada (ver acima) deixaria o
+      // app-captura-foto/app-upload-foto (160px fixos) só na esquerda,
+      // com o resto da largura vazio ao lado — melhor centralizar.
+      display: flex;
+      justify-content: center;
+    }
   }
 
   &__dados-coluna {

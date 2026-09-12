@@ -51,6 +51,13 @@
   }
 
   &__conteudo {
+    // O Material define `max-height: 65vh` por padrão em
+    // `.mat-mdc-dialog-content` (pensado pra modal centralizado, não pro
+    // nosso drawer de altura cheia — `height: 100dvh` no
+    // `CONFIG_PADRAO` de `cadastro-dialog-host.base.ts`). Sem isso, formulário
+    // curto sobra uma faixa vazia enorme embaixo das ações, mais visível
+    // ainda no mobile (tela cheia, então os 65vh cortam bem antes do fim).
+    max-height: none !important;
     padding: 20px 24px !important;
     display: flex;
     flex-direction: column;
