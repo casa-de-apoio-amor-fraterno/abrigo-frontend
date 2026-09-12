@@ -1,7 +1,7 @@
 <div class="busca">
   <div class="busca__cabecalho">
     <h1>Busca</h1>
-    <p class="busca__subtitulo">Busca em pessoas, estadias, materiais e voluntários do Abrigo.</p>
+    <p class="busca__subtitulo">Busca em pessoas, estadias, empréstimos, materiais e voluntários do Abrigo.</p>
   </div>
 
   <form class="busca__form" (ngSubmit)="buscar()">
@@ -33,7 +33,7 @@
                 <mat-icon>person</mat-icon>
                 <span>
                   <strong>{{ pessoa.nome }}</strong>
-                  <small>{{ pessoa.telefone_principal || 'Sem telefone' }}</small>
+                  <small>{{ pessoa.cpf || 'Sem CPF' }} · {{ pessoa.telefone_principal || 'Sem telefone' }}</small>
                 </span>
               </a>
             </li>
@@ -49,14 +49,141 @@
       } @else {
         <ul class="busca__lista">
           @for (estadia of estadias(); track estadia.id) {
-            <li>
-              <a [routerLink]="['/estadias', estadia.id, 'editar']">
+            <li class="busca__item">
+              <a class="busca__item-link" [routerLink]="['/estadias', estadia.id, 'editar']">
                 <mat-icon>hotel</mat-icon>
                 <span>
                   <strong>{{ estadia.nomePessoa }}</strong>
                   <small>{{ estadia.tipoPessoa }} · {{ estadia.situacao }}</small>
                 </span>
               </a>
+              @if (estadia.situacao !== 'Finalizada') {
+                <div class="busca__acao-finalizar">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="busca__acao-botao"
+                    (click)="abrirFinalizar(estadia, $event)"
+                  >
+                    Finalizar
+                  </button>
+
+                  @if (estadiaFinalizarAberta() === estadia.id) {
+                    <div class="busca__popover" (click)="$event.stopPropagation()">
+                      <div class="busca__popover-cabecalho">
+                        <mat-icon>event_available</mat-icon>
+                        <div>
+                          <div class="busca__popover-titulo">Finalizar estadia</div>
+                          <div class="busca__popover-subtitulo">Informe a data de saída</div>
+                        </div>
+                      </div>
+
+                      <div class="busca__popover-conteudo">
+                        <mat-form-field appearance="outline" class="busca__popover-campo">
+                          <mat-label>Data de saída</mat-label>
+                          <input
+                            matInput
+                            type="date"
+                            [value]="dataSaidaFinalizar()"
+                            (input)="dataSaidaFinalizar.set($any($event.target).value)"
+                          />
+                        </mat-form-field>
+
+                        @if (erroFinalizar()) {
+                          <p class="busca__popover-erro">{{ erroFinalizar() }}</p>
+                        }
+
+                        <div class="busca__popover-acoes">
+                          <button mat-button type="button" (click)="fecharFinalizar()">Cancelar</button>
+                          <button
+                            mat-flat-button
+                            type="button"
+                            class="busca__popover-confirmar"
+                            [disabled]="finalizando()"
+                            (click)="confirmarFinalizar(estadia)"
+                          >
+                            Confirmar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="busca__secao">
+      <h2>Empréstimos</h2>
+      @if (emprestimos().length === 0) {
+        <p class="busca__vazio">Nenhum empréstimo encontrado para as pessoas localizadas.</p>
+      } @else {
+        <ul class="busca__lista">
+          @for (emprestimo of emprestimos(); track emprestimo.id) {
+            <li class="busca__item">
+              <a class="busca__item-link" [routerLink]="['/emprestimos', emprestimo.id, 'editar']">
+                <mat-icon>inventory_2</mat-icon>
+                <span>
+                  <strong>{{ emprestimo.nomePessoa }}</strong>
+                  <small>{{ emprestimo.numeroContrato || 'Sem contrato' }} · {{ emprestimo.situacao }}</small>
+                </span>
+              </a>
+              @if (!estaDevolvido(emprestimo)) {
+                <div class="busca__acao-devolver">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="busca__acao-botao"
+                    (click)="abrirDevolver(emprestimo, $event)"
+                  >
+                    Devolver
+                  </button>
+
+                  @if (emprestimoDevolverAberto() === emprestimo.id) {
+                    <div class="busca__popover" (click)="$event.stopPropagation()">
+                      <div class="busca__popover-cabecalho">
+                        <mat-icon>assignment_return</mat-icon>
+                        <div>
+                          <div class="busca__popover-titulo">Devolver empréstimo</div>
+                          <div class="busca__popover-subtitulo">Informe a data de devolução</div>
+                        </div>
+                      </div>
+
+                      <div class="busca__popover-conteudo">
+                        <mat-form-field appearance="outline" class="busca__popover-campo">
+                          <mat-label>Data de devolução</mat-label>
+                          <input
+                            matInput
+                            type="date"
+                            [value]="dataDevolucao()"
+                            (input)="dataDevolucao.set($any($event.target).value)"
+                          />
+                        </mat-form-field>
+
+                        @if (erroDevolver()) {
+                          <p class="busca__popover-erro">{{ erroDevolver() }}</p>
+                        }
+
+                        <div class="busca__popover-acoes">
+                          <button mat-button type="button" (click)="fecharDevolver()">Cancelar</button>
+                          <button
+                            mat-flat-button
+                            type="button"
+                            class="busca__popover-confirmar"
+                            [disabled]="devolvendo()"
+                            (click)="confirmarDevolver(emprestimo)"
+                          >
+                            Confirmar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
             </li>
           }
         </ul>
@@ -75,7 +202,7 @@
                 <mat-icon>category</mat-icon>
                 <span>
                   <strong>{{ material.descricao }}</strong>
-                  <small>{{ material.situacao }}</small>
+                  <small>{{ material.codigoIdentificacao || 'Sem código' }} · {{ material.situacao }}</small>
                 </span>
               </a>
             </li>

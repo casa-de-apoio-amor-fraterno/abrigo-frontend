@@ -59,6 +59,14 @@ export class EmprestimoService {
     return this.http.delete<void>(`${this.resource}/${id}`);
   }
 
+  devolver(id: number, idUsuario: number, dataDevolucao?: string): Observable<Emprestimo> {
+    const corpo: { id_usuario: number; data_devolucao?: string } = { id_usuario: idUsuario };
+    if (dataDevolucao) {
+      corpo.data_devolucao = dataDevolucao;
+    }
+    return this.http.post<EmprestimoDto>(`${this.resource}/${id}/devolver`, corpo).pipe(map(paraModel));
+  }
+
   listarItens(emprestimoId: number): Observable<EmprestimoItem[]> {
     return this.http
       .get<EmprestimoItemDto[]>(`${this.resource}/${emprestimoId}/itens`)

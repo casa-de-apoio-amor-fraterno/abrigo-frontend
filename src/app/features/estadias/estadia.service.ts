@@ -54,8 +54,9 @@ export class EstadiaService {
     return this.http.put<EstadiaDto>(`${this.resource}/${id}`, dados).pipe(map(paraModel));
   }
 
-  encerrar(id: number): Observable<Estadia> {
-    return this.http.post<EstadiaDto>(`${this.resource}/${id}/encerrar`, {}).pipe(map(paraModel));
+  encerrar(id: number, dataSaida?: string): Observable<Estadia> {
+    const corpo = dataSaida ? { data_saida: dataSaida } : {};
+    return this.http.post<EstadiaDto>(`${this.resource}/${id}/encerrar`, corpo).pipe(map(paraModel));
   }
 
   listarAcompanhantes(estadiaId: number): Observable<EstadiaAcompanhante[]> {
