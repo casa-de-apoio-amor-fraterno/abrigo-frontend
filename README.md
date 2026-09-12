@@ -75,6 +75,25 @@ trabalho (uma tela ou fluxo).
 Essa divisão é um ponto de partida — ajuste conforme o domínio real for
 detalhado durante a migração.
 
+### Componentes compartilhados (`shared/ui`)
+
+Sem regra de negócio — só estrutura/visual reaproveitada entre features.
+Antes de criar um componente novo (ou duplicar markup entre páginas),
+confira se já existe algo aqui:
+
+| Componente | Uso |
+| --- | --- |
+| `acao-popover` | Popover fixo no canto inferior direito pra uma ação rápida sobre um item de lista sem sair da tela/lista (ex.: "Finalizar estadia" e "Devolver empréstimo" na busca global, "Finalizar estadia" ao clicar num leito na tela Início). Só a casca (ícone + título/subtítulo + Cancelar/Confirmar) é genérica — o campo do formulário é projetado via `<ng-content>`. |
+| `pagina-consulta` | Casca comum das telas de Consulta: cabeçalho, área de filtros, estados de carregando/erro/vazio, wrapper da tabela e paginação. |
+| `filtro-pills` | Filtro de situação em pills segmentados (substitui `mat-select` quando são só 3-4 opções fixas — empréstimos, estadias, solicitações de cadastro). |
+| `detalhe-dialog` | Dialog de "visualizar" um item de lista (campos rótulo/valor + link Editar), com foto opcional à direita. |
+| `cadastro-dialog-shell` + `cadastro-dialog-host` | Casca comum dos formulários de Cadastro abertos como popup/drawer à direita (`cadastro-dialog-host` é a base que abre o popup a partir da rota). |
+| `cadastro-acoes` | Rodapé padrão de formulário de Cadastro (Cancelar/Salvar + slot pra ação perigosa tipo Inativar). |
+| `captura-foto` | Captura de foto pela webcam do navegador — usado no cadastro de Pessoa e no auto-cadastro público de paciente. |
+| `contatos-tab` | Lista de contatos (telefone) reaproveitada em Pessoa e Voluntário. |
+| `pessoa-autocomplete` / `material-autocomplete` | Campo de busca com autocomplete de Pessoa/Material, usado nos pickers de Estadia/Empréstimo. |
+| `placeholder-page` | Placeholder "em desenvolvimento" pra rotas ainda não implementadas. |
+
 ### Inventário de migração (`.legacy.md`)
 
 Cada rotina migrada deve registrar sua origem em um `.legacy.md` ao lado dos
