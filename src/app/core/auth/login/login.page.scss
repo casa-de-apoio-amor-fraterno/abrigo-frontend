@@ -135,7 +135,8 @@
     gap: 4px;
     padding: 4px;
     margin-bottom: 24px;
-    background: var(--abrigo-ink);
+    background: var(--abrigo-surface-alt);
+    border: 1px solid var(--abrigo-border);
     border-radius: 999px;
   }
 
@@ -150,7 +151,7 @@
     border: none;
     border-radius: 999px;
     background: transparent;
-    color: rgba(255, 255, 255, 0.65);
+    color: var(--abrigo-texto-secundario);
     font-size: 13px;
     font-weight: 600;
     font-family: inherit;
@@ -164,7 +165,7 @@
     }
 
     &:hover {
-      color: #fff;
+      color: var(--abrigo-ink);
     }
 
     &--ativa {

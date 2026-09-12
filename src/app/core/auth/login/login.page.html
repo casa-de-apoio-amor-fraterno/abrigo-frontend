@@ -33,9 +33,7 @@
           [attr.aria-checked]="perfil() === 'voluntario'"
           (click)="perfil.set('voluntario')"
         >
-          @if (perfil() === 'voluntario') {
-            <mat-icon>check</mat-icon>
-          }
+          <mat-icon>{{ perfil() === 'voluntario' ? 'check' : 'volunteer_activism' }}</mat-icon>
           Sou voluntário
         </button>
         <button
@@ -46,9 +44,7 @@
           [attr.aria-checked]="perfil() === 'paciente'"
           (click)="perfil.set('paciente')"
         >
-          @if (perfil() === 'paciente') {
-            <mat-icon>check</mat-icon>
-          }
+          <mat-icon>{{ perfil() === 'paciente' ? 'check' : 'personal_injury' }}</mat-icon>
           Sou paciente
         </button>
       </div>
