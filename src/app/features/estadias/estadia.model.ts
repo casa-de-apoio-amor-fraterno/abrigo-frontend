@@ -1,5 +1,6 @@
 export type TipoPessoaEstadia = 'Paciente' | 'Acompanhante';
 export type SituacaoEstadia = 'Em acompanhamento' | 'Aguardando retorno' | 'Finalizada';
+export type UnidadeTempoEstadia = 'dias' | 'noites' | 'horas';
 
 export interface EstadiaResumo {
   id: number;
@@ -18,7 +19,10 @@ export interface ListaEstadias {
 
 export interface Estadia extends EstadiaResumo {
   idUsuario: number;
+  /** @deprecated Legado, somente leitura. Ver `tempoEstadiaValor`/`tempoEstadiaUnidade`. */
   tempoEstadia: string | null;
+  tempoEstadiaValor: number | null;
+  tempoEstadiaUnidade: UnidadeTempoEstadia | null;
   observacao: string | null;
   ativo: boolean | null;
 }

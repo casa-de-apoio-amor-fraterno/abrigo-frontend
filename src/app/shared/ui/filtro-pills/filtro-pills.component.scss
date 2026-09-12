@@ -36,5 +36,27 @@
         color: #fff;
       }
     }
+
+    // Variantes de cor pra opções que se beneficiam de ficar visualmente
+    // distinguíveis das outras (ver `OpcaoFiltroPill.variante`) — mesmos
+    // tons já usados em outras telas do app (ver home.page.scss) pra
+    // "aviso"/"erro".
+    &--ativa-aviso {
+      background: #b45309;
+      color: #fff;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+
+    &--ativa-erro {
+      background: #c62828;
+      color: #fff;
+
+      &:hover {
+        color: #fff;
+      }
+    }
   }
 }

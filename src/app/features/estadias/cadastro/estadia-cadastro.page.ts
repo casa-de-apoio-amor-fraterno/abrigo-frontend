@@ -17,12 +17,30 @@ import { QuartoService } from '../../quartos/quarto.service';
 import { Quarto } from '../../quartos/quarto.model';
 import { EstadiaAcompanhanteCreateDto } from '../estadia.dto';
 import { EstadiaService } from '../estadia.service';
-import { EstadiaAcompanhante, SituacaoEstadia, TipoPessoaEstadia } from '../estadia.model';
+import { EstadiaAcompanhante, SituacaoEstadia, TipoPessoaEstadia, UnidadeTempoEstadia } from '../estadia.model';
 import {
   CadastroDialogAba,
   CadastroDialogShellComponent
 } from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
+import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
+
+const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
+  { valor: 'Em acompanhamento', rotulo: 'Em acompanhamento' },
+  { valor: 'Aguardando retorno', rotulo: 'Aguardando retorno', variante: 'aviso' },
+  { valor: 'Finalizada', rotulo: 'Finalizada', variante: 'erro' }
+];
+
+const OPCOES_TIPO_PESSOA: OpcaoFiltroPill[] = [
+  { valor: 'Paciente', rotulo: 'Paciente' },
+  { valor: 'Acompanhante', rotulo: 'Acompanhante' }
+];
+
+const OPCOES_UNIDADE_TEMPO: OpcaoFiltroPill[] = [
+  { valor: 'dias', rotulo: 'Dias' },
+  { valor: 'noites', rotulo: 'Noites' },
+  { valor: 'horas', rotulo: 'Horas' }
+];
 
 @Component({
   selector: 'app-estadia-cadastro-page',
@@ -37,11 +55,15 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatRadioModule,
     MatSelectModule,
     CadastroDialogShellComponent,
-    CadastroAcoesComponent
+    CadastroAcoesComponent,
+    FiltroPillsComponent
   ],
   templateUrl: './estadia-cadastro.page.html'
 })
 export class EstadiaCadastroPage {
+  protected readonly opcoesSituacao = OPCOES_SITUACAO;
+  protected readonly opcoesTipoPessoa = OPCOES_TIPO_PESSOA;
+  protected readonly opcoesUnidadeTempo = OPCOES_UNIDADE_TEMPO;
   private readonly fb = inject(FormBuilder);
   private readonly estadiaService = inject(EstadiaService);
   private readonly pessoaService = inject(PessoaService);
@@ -94,7 +116,8 @@ export class EstadiaCadastroPage {
     dataSaida: [''],
     tipoPessoa: this.fb.nonNullable.control<TipoPessoaEstadia>('Paciente'),
     situacao: this.fb.nonNullable.control<SituacaoEstadia>('Em acompanhamento', Validators.required),
-    tempoEstadia: [''],
+    tempoEstadiaValor: this.fb.control<number | null>(null),
+    tempoEstadiaUnidade: this.fb.nonNullable.control<UnidadeTempoEstadia>('dias'),
     observacao: ['']
   });
 
@@ -116,7 +139,8 @@ export class EstadiaCadastroPage {
             dataSaida: estadia.dataSaida?.slice(0, 10) ?? '',
             tipoPessoa: estadia.tipoPessoa,
             situacao: estadia.situacao,
-            tempoEstadia: estadia.tempoEstadia ?? '',
+            tempoEstadiaValor: estadia.tempoEstadiaValor,
+            tempoEstadiaUnidade: estadia.tempoEstadiaUnidade ?? 'dias',
             observacao: estadia.observacao ?? ''
           });
           this.situacaoAtual.set(estadia.situacao);
@@ -161,7 +185,8 @@ export class EstadiaCadastroPage {
       id_usuario: this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id,
       data_entrada: valores.dataEntrada,
       data_saida: valores.dataSaida || null,
-      tempo_estadia: valores.tempoEstadia || null,
+      tempo_estadia_valor: valores.tempoEstadiaValor,
+      tempo_estadia_unidade: valores.tempoEstadiaUnidade,
       tipo_pessoa: valores.tipoPessoa,
       situacao: valores.situacao,
       observacao: valores.observacao || null

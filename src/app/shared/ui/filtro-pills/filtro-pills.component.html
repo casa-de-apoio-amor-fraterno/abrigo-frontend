@@ -4,7 +4,9 @@
       type="button"
       role="radio"
       class="filtro-pills__opcao"
-      [class.filtro-pills__opcao--ativa]="valor() === opcao.valor"
+      [class.filtro-pills__opcao--ativa]="valor() === opcao.valor && !opcao.variante"
+      [class.filtro-pills__opcao--ativa-aviso]="valor() === opcao.valor && opcao.variante === 'aviso'"
+      [class.filtro-pills__opcao--ativa-erro]="valor() === opcao.valor && opcao.variante === 'erro'"
       [attr.aria-checked]="valor() === opcao.valor"
       (click)="selecionar(opcao.valor)"
     >

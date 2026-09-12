@@ -3,6 +3,10 @@ import { Component, input, output } from '@angular/core';
 export interface OpcaoFiltroPill {
   valor: string;
   rotulo: string;
+  /** Cor de destaque quando ativa, além da cor padrão (primária) — pra
+   * situações que se beneficiam de ficar visualmente distinguíveis das
+   * outras (ex.: `SituacaoEstadia`, ver estadia-consulta/cadastro). */
+  variante?: 'aviso' | 'erro';
 }
 
 /**

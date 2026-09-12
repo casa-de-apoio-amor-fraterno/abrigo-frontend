@@ -1,6 +1,7 @@
 /** Espelha os schemas de abrigo-backend, app/features/estadias/schemas.py. */
 export type TipoPessoaEstadiaDto = 'Paciente' | 'Acompanhante';
 export type SituacaoEstadiaDto = 'Em acompanhamento' | 'Aguardando retorno' | 'Finalizada';
+export type UnidadeTempoEstadiaDto = 'dias' | 'noites' | 'horas';
 
 export interface EstadiaResumoDto {
   id: number;
@@ -19,7 +20,10 @@ export interface ListaEstadiasDto {
 
 export interface EstadiaDto extends EstadiaResumoDto {
   id_usuario: number;
+  /** @deprecated Legado, somente leitura. Ver `tempo_estadia_valor`/`tempo_estadia_unidade`. */
   tempo_estadia: string | null;
+  tempo_estadia_valor: number | null;
+  tempo_estadia_unidade: UnidadeTempoEstadiaDto | null;
   observacao: string | null;
   ativo: boolean | null;
 }
@@ -30,7 +34,8 @@ export interface EstadiaCreateDto {
   id_usuario: number;
   data_entrada: string;
   data_saida?: string | null;
-  tempo_estadia?: string | null;
+  tempo_estadia_valor?: number | null;
+  tempo_estadia_unidade?: UnidadeTempoEstadiaDto | null;
   tipo_pessoa?: TipoPessoaEstadiaDto;
   situacao: SituacaoEstadiaDto;
   observacao?: string | null;

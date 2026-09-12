@@ -20,8 +20,8 @@ const ITENS_POR_PAGINA = 20;
 const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
   { valor: '', rotulo: 'Todas' },
   { valor: 'Em acompanhamento', rotulo: 'Em acompanhamento' },
-  { valor: 'Aguardando retorno', rotulo: 'Aguardando retorno' },
-  { valor: 'Finalizada', rotulo: 'Finalizada' }
+  { valor: 'Aguardando retorno', rotulo: 'Aguardando retorno', variante: 'aviso' },
+  { valor: 'Finalizada', rotulo: 'Finalizada', variante: 'erro' }
 ];
 
 @Component({

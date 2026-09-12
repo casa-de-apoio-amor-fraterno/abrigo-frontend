@@ -356,6 +356,13 @@ body {
     min-width: 0;
   }
 
+  // Pills de situação no topo do formulário (ver estadia-cadastro.page.html)
+  // — mesmo respiro usado antes da grade de campos.
+  &__situacao {
+    display: block;
+    margin-bottom: 16px;
+  }
+
   &__grade {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -375,6 +382,16 @@ body {
       @media (max-width: 700px) {
         grid-column: span 1;
       }
+    }
+
+    // Pills sem rótulo próprio (auto-declarativas) dentro da grade —
+    // centralizada verticalmente pra acompanhar a altura do
+    // mat-form-field ao lado (ver estadia-cadastro.page.html, "Tipo
+    // pessoa"/"Unidade").
+    &--pills {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
     }
   }
 

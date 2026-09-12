@@ -9,6 +9,14 @@
     <form id="estadia-form" [formGroup]="form" (ngSubmit)="salvar()">
       <section class="cadastro__secao">
         <h2>Dados da estadia</h2>
+
+        <app-filtro-pills
+          class="cadastro__situacao"
+          [opcoes]="opcoesSituacao"
+          [valor]="form.controls.situacao.value"
+          (mudanca)="form.controls.situacao.setValue($any($event))"
+        />
+
         <div class="cadastro__grade">
           <div class="cadastro__campo cadastro__campo--largo">
             <app-pessoa-autocomplete
@@ -32,12 +40,12 @@
             }
           </mat-form-field>
 
-          <div class="cadastro__campo cadastro__radio">
-            <span class="cadastro__radio-label">Tipo pessoa</span>
-            <mat-radio-group formControlName="tipoPessoa">
-              <mat-radio-button value="Paciente">Paciente</mat-radio-button>
-              <mat-radio-button value="Acompanhante">Acompanhante</mat-radio-button>
-            </mat-radio-group>
+          <div class="cadastro__campo cadastro__campo--pills">
+            <app-filtro-pills
+              [opcoes]="opcoesTipoPessoa"
+              [valor]="form.controls.tipoPessoa.value"
+              (mudanca)="form.controls.tipoPessoa.setValue($any($event))"
+            />
           </div>
 
           <mat-form-field appearance="outline" class="cadastro__campo">
@@ -53,19 +61,18 @@
             <input matInput type="date" formControlName="dataSaida" />
           </mat-form-field>
 
-          <div class="cadastro__campo cadastro__radio">
-            <span class="cadastro__radio-label">Situação</span>
-            <mat-radio-group formControlName="situacao">
-              <mat-radio-button value="Em acompanhamento">Em acompanhamento</mat-radio-button>
-              <mat-radio-button value="Aguardando retorno">Aguardando retorno</mat-radio-button>
-              <mat-radio-button value="Finalizada">Finalizada</mat-radio-button>
-            </mat-radio-group>
-          </div>
-
           <mat-form-field appearance="outline" class="cadastro__campo">
             <mat-label>Tempo estadia</mat-label>
-            <input matInput formControlName="tempoEstadia" placeholder="ex.: 06 dias" />
+            <input matInput type="number" min="0" formControlName="tempoEstadiaValor" />
           </mat-form-field>
+
+          <div class="cadastro__campo cadastro__campo--pills">
+            <app-filtro-pills
+              [opcoes]="opcoesUnidadeTempo"
+              [valor]="form.controls.tempoEstadiaUnidade.value"
+              (mudanca)="form.controls.tempoEstadiaUnidade.setValue($any($event))"
+            />
+          </div>
 
           <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
             <mat-label>Observação</mat-label>
