@@ -1,0 +1,88 @@
+.cadastro-dialog {
+  &__cabecalho {
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 !important;
+    padding: 20px 12px 0 24px;
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      color: var(--abrigo-ink);
+    }
+  }
+
+  &__subtitulo {
+    margin: 0;
+    color: var(--abrigo-texto-secundario);
+    font-size: 13px;
+  }
+
+  &__pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 14px 24px 0;
+  }
+
+  &__pill {
+    border: 1px solid var(--abrigo-border-forte);
+    background: transparent;
+    color: var(--abrigo-texto-secundario);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: var(--abrigo-surface-alt);
+    }
+
+    &--ativa,
+    &--ativa:hover {
+      background: var(--abrigo-primary);
+      border-color: var(--abrigo-primary);
+      color: #fff;
+    }
+  }
+
+  &__conteudo {
+    padding: 20px 24px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    // O <form> de cada entidade não é autor de layout próprio (isso virou
+    // responsabilidade daqui, ver styles.scss) — só precisa empilhar seus
+    // próprios campos/seções com o mesmo respiro.
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+  &__estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+  }
+
+  &__rodape {
+    padding: 12px 24px !important;
+    border-top: 1px solid var(--abrigo-border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__proximo {
+    margin-right: auto;
+    color: var(--abrigo-primary-dark) !important;
+  }
+}

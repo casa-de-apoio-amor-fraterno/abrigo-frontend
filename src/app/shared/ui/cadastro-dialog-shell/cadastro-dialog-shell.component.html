@@ -1,0 +1,46 @@
+<div class="cadastro-dialog__cabecalho" mat-dialog-title>
+  <div>
+    <h2>{{ titulo() }}</h2>
+    @if (subtitulo()) {
+      <p class="cadastro-dialog__subtitulo">{{ subtitulo() }}</p>
+    }
+  </div>
+  <button mat-icon-button type="button" (click)="dialogRef.close()" aria-label="Fechar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+@if (mostrarPills()) {
+  <div class="cadastro-dialog__pills">
+    @for (aba of abas(); track aba.id) {
+      <button
+        type="button"
+        class="cadastro-dialog__pill"
+        [class.cadastro-dialog__pill--ativa]="aba.id === abaAtiva()"
+        (click)="selecionarAba(aba.id)"
+      >
+        {{ aba.rotulo }}
+      </button>
+    }
+  </div>
+}
+
+<mat-dialog-content class="cadastro-dialog__conteudo">
+  @if (carregando()) {
+    <div class="cadastro-dialog__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else {
+    <ng-content />
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="cadastro-dialog__rodape">
+  @if (mostrarProximo()) {
+    <button mat-button type="button" class="cadastro-dialog__proximo" (click)="proximaAba()">
+      Próximo
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  }
+  <ng-content select="[acoes]" />
+</mat-dialog-actions>

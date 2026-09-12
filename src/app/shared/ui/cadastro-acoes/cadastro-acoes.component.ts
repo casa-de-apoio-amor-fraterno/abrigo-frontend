@@ -20,6 +20,13 @@ export class CadastroAcoesComponent {
   readonly salvando = input<boolean>(false);
   readonly textoSalvar = input<string>('Salvar');
   readonly textoCancelar = input<string>('Cancelar');
+  // Só precisa quando este componente é projetado fora do <form> que ele
+  // deveria submeter (ex.: no popup de cadastro, o rodapé fica ao lado do
+  // conteúdo rolável, não dentro do <form> — que também não pode envolver
+  // tudo porque sub-recursos como Contatos têm o próprio <form> aninhado).
+  // Usa o atributo HTML `form`, que associa um botão a um <form> pelo id
+  // mesmo estando fora dele.
+  readonly formularioId = input<string | null>(null);
 
   readonly cancelar = output<void>();
 }

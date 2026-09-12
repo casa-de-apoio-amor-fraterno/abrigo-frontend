@@ -34,7 +34,7 @@
   }
 
   &__brand-text {
-    font-family: 'Playfair Display', 'Times New Roman', serif;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
     font-size: 17px;
     font-weight: 700;
     color: var(--abrigo-ink);
@@ -53,8 +53,11 @@
     letter-spacing: 0.8px;
     text-transform: uppercase;
     white-space: nowrap;
+    flex-shrink: 0;
 
-    @media (max-width: 700px) {
+    // Some junto com o sidenav/bottom-nav (900px, não os 700px da busca)
+    // — era o que sobrava competindo por espaço com a busca no tablet.
+    @media (max-width: 900px) {
       display: none;
     }
   }
@@ -63,6 +66,7 @@
     display: flex;
     align-items: center;
     flex: 1;
+    min-width: 0;
     max-width: 480px;
     margin: 0 16px;
     padding-left: 14px;
@@ -78,11 +82,17 @@
 
     input {
       flex: 1;
+      min-width: 0;
       border: none;
       outline: none;
       background: transparent;
       font-size: 14px;
-      min-width: 0;
+    }
+
+    // Entre 701 e 900px (tablet) a busca ainda cabe, só precisa de menos
+    // margem lateral pra não disputar espaço com o resto do topbar.
+    @media (max-width: 900px) {
+      margin: 0 8px;
     }
 
     @media (max-width: 700px) {

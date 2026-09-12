@@ -6,7 +6,13 @@
   } @else {
     <button mat-button type="button" (click)="cancelar.emit()">{{ textoCancelar() }}</button>
   }
-  <button mat-flat-button type="submit" class="cadastro__salvar" [disabled]="salvando()">
+  <button
+    mat-flat-button
+    type="submit"
+    class="cadastro__salvar"
+    [attr.form]="formularioId()"
+    [disabled]="salvando()"
+  >
     @if (salvando()) {
       <mat-spinner diameter="20" />
     } @else {

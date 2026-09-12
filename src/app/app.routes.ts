@@ -25,12 +25,12 @@ export const routes: Routes = [
       {
         path: 'pessoas/novo',
         loadComponent: () =>
-          import('./features/pessoas/cadastro/pessoa-cadastro.page').then((m) => m.PessoaCadastroPage)
+          import('./features/pessoas/cadastro/pessoa-cadastro-dialog.page').then((m) => m.PessoaCadastroDialogPage)
       },
       {
         path: 'pessoas/:id/editar',
         loadComponent: () =>
-          import('./features/pessoas/cadastro/pessoa-cadastro.page').then((m) => m.PessoaCadastroPage)
+          import('./features/pessoas/cadastro/pessoa-cadastro-dialog.page').then((m) => m.PessoaCadastroDialogPage)
       },
       {
         path: 'quartos',
@@ -40,12 +40,12 @@ export const routes: Routes = [
       {
         path: 'quartos/novo',
         loadComponent: () =>
-          import('./features/quartos/cadastro/quarto-cadastro.page').then((m) => m.QuartoCadastroPage)
+          import('./features/quartos/cadastro/quarto-cadastro-dialog.page').then((m) => m.QuartoCadastroDialogPage)
       },
       {
         path: 'quartos/:id/editar',
         loadComponent: () =>
-          import('./features/quartos/cadastro/quarto-cadastro.page').then((m) => m.QuartoCadastroPage)
+          import('./features/quartos/cadastro/quarto-cadastro-dialog.page').then((m) => m.QuartoCadastroDialogPage)
       },
       {
         path: 'estadias',
@@ -55,12 +55,12 @@ export const routes: Routes = [
       {
         path: 'estadias/novo',
         loadComponent: () =>
-          import('./features/estadias/cadastro/estadia-cadastro.page').then((m) => m.EstadiaCadastroPage)
+          import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then((m) => m.EstadiaCadastroDialogPage)
       },
       {
         path: 'estadias/:id/editar',
         loadComponent: () =>
-          import('./features/estadias/cadastro/estadia-cadastro.page').then((m) => m.EstadiaCadastroPage)
+          import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then((m) => m.EstadiaCadastroDialogPage)
       },
       {
         path: 'voluntarios',
@@ -70,12 +70,16 @@ export const routes: Routes = [
       {
         path: 'voluntarios/novo',
         loadComponent: () =>
-          import('./features/voluntarios/cadastro/voluntario-cadastro.page').then((m) => m.VoluntarioCadastroPage)
+          import('./features/voluntarios/cadastro/voluntario-cadastro-dialog.page').then(
+            (m) => m.VoluntarioCadastroDialogPage
+          )
       },
       {
         path: 'voluntarios/:id/editar',
         loadComponent: () =>
-          import('./features/voluntarios/cadastro/voluntario-cadastro.page').then((m) => m.VoluntarioCadastroPage)
+          import('./features/voluntarios/cadastro/voluntario-cadastro-dialog.page').then(
+            (m) => m.VoluntarioCadastroDialogPage
+          )
       },
       {
         path: 'emprestimos',
@@ -85,12 +89,16 @@ export const routes: Routes = [
       {
         path: 'emprestimos/novo',
         loadComponent: () =>
-          import('./features/emprestimos/cadastro/emprestimo-cadastro.page').then((m) => m.EmprestimoCadastroPage)
+          import('./features/emprestimos/cadastro/emprestimo-cadastro-dialog.page').then(
+            (m) => m.EmprestimoCadastroDialogPage
+          )
       },
       {
         path: 'emprestimos/:id/editar',
         loadComponent: () =>
-          import('./features/emprestimos/cadastro/emprestimo-cadastro.page').then((m) => m.EmprestimoCadastroPage)
+          import('./features/emprestimos/cadastro/emprestimo-cadastro-dialog.page').then(
+            (m) => m.EmprestimoCadastroDialogPage
+          )
       },
       {
         path: 'materiais',
@@ -100,12 +108,16 @@ export const routes: Routes = [
       {
         path: 'materiais/novo',
         loadComponent: () =>
-          import('./features/materiais/cadastro/material-cadastro.page').then((m) => m.MaterialCadastroPage)
+          import('./features/materiais/cadastro/material-cadastro-dialog.page').then(
+            (m) => m.MaterialCadastroDialogPage
+          )
       },
       {
         path: 'materiais/:id/editar',
         loadComponent: () =>
-          import('./features/materiais/cadastro/material-cadastro.page').then((m) => m.MaterialCadastroPage)
+          import('./features/materiais/cadastro/material-cadastro-dialog.page').then(
+            (m) => m.MaterialCadastroDialogPage
+          )
       },
       {
         path: 'busca',
