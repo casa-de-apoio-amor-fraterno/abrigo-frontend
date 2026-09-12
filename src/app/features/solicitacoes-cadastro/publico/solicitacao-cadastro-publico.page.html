@@ -1,0 +1,71 @@
+<div class="solicitacao-publico">
+  <div class="solicitacao-publico__card">
+    <img class="solicitacao-publico__logo" src="logo-casa-de-apoio.png" alt="Casa de Apoio Amor Fraterno" />
+
+    @if (enviado()) {
+      <div class="solicitacao-publico__sucesso">
+        <mat-icon>check_circle</mat-icon>
+        <h2>Cadastro enviado!</h2>
+        <p>
+          Recebemos seus dados. A equipe do Abrigo vai analisar e confirmar seu
+          cadastro em breve.
+        </p>
+        <a mat-flat-button class="solicitacao-publico__voltar" routerLink="/login">Voltar ao início</a>
+      </div>
+    } @else {
+      <h2>Cadastro de paciente</h2>
+      <p class="solicitacao-publico__subtitulo">
+        Preencha seus dados. Depois de enviado, a equipe do Abrigo confirma seu
+        cadastro.
+      </p>
+
+      <app-captura-foto
+        [fotoUrl]="fotoLocalUrl()"
+        (capturada)="capturarFoto($event)"
+        (removida)="removerFoto()"
+      />
+
+      <form [formGroup]="form" (ngSubmit)="enviar()">
+        <mat-form-field appearance="outline" class="solicitacao-publico__campo">
+          <mat-label>Nome completo</mat-label>
+          <input matInput formControlName="nome" />
+          @if (form.controls.nome.touched && form.controls.nome.invalid) {
+            <mat-error>Informe seu nome</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="solicitacao-publico__campo">
+          <mat-label>Data de nascimento</mat-label>
+          <input matInput type="date" formControlName="dataNascimento" />
+          @if (form.controls.dataNascimento.touched && form.controls.dataNascimento.invalid) {
+            <mat-error>Informe sua data de nascimento</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="solicitacao-publico__campo">
+          <mat-label>CPF</mat-label>
+          <input matInput formControlName="cpf" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="solicitacao-publico__campo">
+          <mat-label>Telefone</mat-label>
+          <input matInput formControlName="telefone" />
+        </mat-form-field>
+
+        @if (erro()) {
+          <p class="solicitacao-publico__erro">{{ erro() }}</p>
+        }
+
+        <button mat-flat-button type="submit" class="solicitacao-publico__enviar" [disabled]="enviando()">
+          @if (enviando()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            Enviar cadastro
+          }
+        </button>
+
+        <a class="solicitacao-publico__link" routerLink="/login">Voltar ao login</a>
+      </form>
+    }
+  </div>
+</div>

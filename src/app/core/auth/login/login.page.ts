@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,10 +11,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { descreverErroHttp } from '../../http/api-error';
 import { AuthService } from '../auth.service';
 
+export type PerfilAcessoLogin = 'voluntario' | 'paciente';
+
 @Component({
   selector: 'app-login-page',
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -29,6 +32,12 @@ export class LoginPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  // "Sou paciente" não loga — leva pro auto-cadastro público
+  // (/cadastro-paciente, ver SolicitacaoCadastroPublicoPage), que fica
+  // pendente de aprovação da equipe. Só voluntário (equipe) usa
+  // usuário/senha de verdade.
+  protected readonly perfil = signal<PerfilAcessoLogin>('voluntario');
 
   protected readonly senhaVisivel = signal(false);
   protected readonly carregando = signal(false);

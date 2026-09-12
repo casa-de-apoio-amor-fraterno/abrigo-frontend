@@ -1,0 +1,28 @@
+.solicitacao-cadastro {
+  &__coluna-foto {
+    width: 1%;
+    white-space: nowrap;
+
+    mat-icon {
+      color: var(--abrigo-texto-terciario);
+    }
+  }
+
+  &__foto {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__aprovar {
+    color: #1e7e42 !important;
+    border-color: var(--abrigo-border-forte) !important;
+    margin-right: 8px;
+  }
+
+  &__revogar {
+    color: #c62828 !important;
+    border-color: var(--abrigo-border-forte) !important;
+  }
+}

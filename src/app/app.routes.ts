@@ -8,6 +8,15 @@ export const routes: Routes = [
     loadComponent: () => import('./core/auth/login/login.page').then((m) => m.LoginPage)
   },
   {
+    // Público, sem authGuard — é assim que o paciente se auto-cadastra
+    // pelo próprio celular (ver login.page, "Sou paciente").
+    path: 'cadastro-paciente',
+    loadComponent: () =>
+      import('./features/solicitacoes-cadastro/publico/solicitacao-cadastro-publico.page').then(
+        (m) => m.SolicitacaoCadastroPublicoPage
+      )
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./core/layout/shell/shell.page').then((m) => m.ShellPage),
@@ -122,6 +131,13 @@ export const routes: Routes = [
       {
         path: 'busca',
         loadComponent: () => import('./features/busca/busca.page').then((m) => m.BuscaPage)
+      },
+      {
+        path: 'solicitacoes-cadastro',
+        loadComponent: () =>
+          import('./features/solicitacoes-cadastro/consulta/solicitacao-cadastro-consulta.page').then(
+            (m) => m.SolicitacaoCadastroConsultaPage
+          )
       }
     ]
   }

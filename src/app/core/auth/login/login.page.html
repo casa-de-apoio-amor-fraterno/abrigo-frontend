@@ -20,61 +20,104 @@
     <img class="login__mobile-logo" src="logo-casa-de-apoio.png" alt="Casa de Apoio Amor Fraterno" />
     <span class="login__badge login__badge--mobile">Setor Abrigo</span>
 
-    <form class="login__card" [formGroup]="form" (ngSubmit)="entrar()">
+    <div class="login__card">
       <h2>Entrar</h2>
       <p class="login__subtitle">Acesse o sistema do Abrigo com seu usuário e senha.</p>
 
-      <mat-form-field appearance="outline" class="login__field">
-        <mat-label>Usuário</mat-label>
-        <input matInput formControlName="usuario" autocomplete="username" />
-        @if (form.controls.usuario.touched && form.controls.usuario.invalid) {
-          <mat-error>Informe o usuário</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="login__field">
-        <mat-label>Senha</mat-label>
-        <input
-          matInput
-          [type]="senhaVisivel() ? 'text' : 'password'"
-          formControlName="senha"
-          autocomplete="current-password"
-        />
+      <div class="login__perfil" role="radiogroup" aria-label="Tipo de acesso">
         <button
           type="button"
-          mat-icon-button
-          matSuffix
-          (click)="alternarVisibilidadeSenha()"
-          [attr.aria-label]="senhaVisivel() ? 'Ocultar senha' : 'Mostrar senha'"
+          role="radio"
+          class="login__perfil-opcao"
+          [class.login__perfil-opcao--ativa]="perfil() === 'voluntario'"
+          [attr.aria-checked]="perfil() === 'voluntario'"
+          (click)="perfil.set('voluntario')"
         >
-          <mat-icon>{{ senhaVisivel() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          @if (perfil() === 'voluntario') {
+            <mat-icon>check</mat-icon>
+          }
+          Sou voluntário
         </button>
-        @if (form.controls.senha.touched && form.controls.senha.invalid) {
-          <mat-error>Informe a senha</mat-error>
-        }
-      </mat-form-field>
-
-      <div class="login__row">
-        <mat-checkbox formControlName="lembrar">Lembrar-me</mat-checkbox>
-        <a class="login__link" href="#">Esqueceu a senha?</a>
+        <button
+          type="button"
+          role="radio"
+          class="login__perfil-opcao"
+          [class.login__perfil-opcao--ativa]="perfil() === 'paciente'"
+          [attr.aria-checked]="perfil() === 'paciente'"
+          (click)="perfil.set('paciente')"
+        >
+          @if (perfil() === 'paciente') {
+            <mat-icon>check</mat-icon>
+          }
+          Sou paciente
+        </button>
       </div>
 
-      @if (erro()) {
-        <p class="login__erro">{{ erro() }}</p>
-      }
+      @if (perfil() === 'voluntario') {
+        <form [formGroup]="form" (ngSubmit)="entrar()">
+          <mat-form-field appearance="outline" class="login__field">
+            <mat-label>Usuário</mat-label>
+            <input matInput formControlName="usuario" autocomplete="username" />
+            @if (form.controls.usuario.touched && form.controls.usuario.invalid) {
+              <mat-error>Informe o usuário</mat-error>
+            }
+          </mat-form-field>
 
-      <button
-        mat-flat-button
-        type="submit"
-        class="login__submit"
-        [disabled]="carregando()"
-      >
-        @if (carregando()) {
-          <mat-spinner diameter="20" />
-        } @else {
-          Entrar
-        }
-      </button>
-    </form>
+          <mat-form-field appearance="outline" class="login__field">
+            <mat-label>Senha</mat-label>
+            <input
+              matInput
+              [type]="senhaVisivel() ? 'text' : 'password'"
+              formControlName="senha"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="alternarVisibilidadeSenha()"
+              [attr.aria-label]="senhaVisivel() ? 'Ocultar senha' : 'Mostrar senha'"
+            >
+              <mat-icon>{{ senhaVisivel() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (form.controls.senha.touched && form.controls.senha.invalid) {
+              <mat-error>Informe a senha</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="login__row">
+            <mat-checkbox formControlName="lembrar">Lembrar-me</mat-checkbox>
+            <a class="login__link" href="#">Esqueceu a senha?</a>
+          </div>
+
+          @if (erro()) {
+            <p class="login__erro">{{ erro() }}</p>
+          }
+
+          <button
+            mat-flat-button
+            type="submit"
+            class="login__submit"
+            [disabled]="carregando()"
+          >
+            @if (carregando()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Entrar
+            }
+          </button>
+        </form>
+      } @else {
+        <div class="login__paciente">
+          <p>
+            Faça seu cadastro pelo celular, com a câmera, e aguarde a aprovação da
+            equipe do Abrigo.
+          </p>
+          <a mat-flat-button class="login__submit" routerLink="/cadastro-paciente">
+            Fazer meu cadastro
+          </a>
+        </div>
+      }
+    </div>
   </section>
 </div>

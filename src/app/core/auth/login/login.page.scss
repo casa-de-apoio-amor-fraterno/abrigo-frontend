@@ -130,8 +130,71 @@
     font-size: 14px;
   }
 
+  &__perfil {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 24px;
+    background: var(--abrigo-ink);
+    border-radius: 999px;
+  }
+
+  &__perfil-opcao {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      color: #fff;
+    }
+
+    &--ativa {
+      background: var(--abrigo-primary);
+      color: #fff;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+
   &__field {
     width: 100%;
+  }
+
+  &__paciente {
+    p {
+      margin: 0 0 20px;
+      color: rgba(0, 0, 0, 0.7);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    a.login__submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
   }
 
   &__row {

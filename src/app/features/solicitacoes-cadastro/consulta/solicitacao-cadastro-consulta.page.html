@@ -1,0 +1,85 @@
+<app-pagina-consulta
+  titulo="Cadastros de pacientes"
+  subtitulo="Solicitações de auto-cadastro feitas pelo próprio paciente, pendentes de aprovação."
+  [carregando]="carregando()"
+  [erro]="erro()"
+  [vazio]="itens().length === 0"
+  mensagemVazio="Nenhuma solicitação encontrada."
+  [total]="total()"
+  [pagina]="pagina()"
+  [itensPorPagina]="itensPorPagina"
+  rotuloItem="solicitação(ões)"
+  (paginaAnterior)="paginaAnterior()"
+  (paginaProxima)="proximaPagina()"
+>
+  <mat-select
+    filtros
+    class="consulta__select-situacao"
+    [value]="situacao()"
+    (selectionChange)="filtrarPorSituacao($event.value)"
+  >
+    <mat-option value="">Todas as situações</mat-option>
+    <mat-option value="Pendente">Pendente</mat-option>
+    <mat-option value="Aprovada">Aprovada</mat-option>
+    <mat-option value="Revogada">Revogada</mat-option>
+  </mat-select>
+
+  <table class="consulta__tabela">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Telefone</th>
+        <th>Situação</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (solicitacao of itens(); track solicitacao.id) {
+        <tr>
+          <td class="solicitacao-cadastro__coluna-foto">
+            @if (fotosUrl()[solicitacao.id]) {
+              <img [src]="fotosUrl()[solicitacao.id]" alt="" class="solicitacao-cadastro__foto" />
+            } @else {
+              <mat-icon>person</mat-icon>
+            }
+          </td>
+          <td class="consulta__coluna-principal">{{ solicitacao.nome }}</td>
+          <td>{{ solicitacao.cpf || '—' }}</td>
+          <td>{{ solicitacao.telefone || '—' }}</td>
+          <td>
+            <span
+              class="consulta__badge"
+              [class.consulta__badge--neutro]="solicitacao.situacao !== 'Pendente'"
+            >
+              {{ solicitacao.situacao }}
+            </span>
+          </td>
+          <td class="consulta__coluna-acao">
+            @if (solicitacao.situacao === 'Pendente') {
+              <button
+                mat-stroked-button
+                type="button"
+                class="solicitacao-cadastro__aprovar"
+                [disabled]="processando() === solicitacao.id"
+                (click)="aprovar(solicitacao)"
+              >
+                Aprovar
+              </button>
+              <button
+                mat-stroked-button
+                type="button"
+                class="solicitacao-cadastro__revogar"
+                [disabled]="processando() === solicitacao.id"
+                (click)="revogar(solicitacao)"
+              >
+                Revogar
+              </button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-pagina-consulta>

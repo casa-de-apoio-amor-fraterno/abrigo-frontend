@@ -1,0 +1,103 @@
+.solicitacao-publico {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f6f6;
+  padding: 24px;
+
+  &__card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 24px;
+      color: var(--abrigo-ink);
+    }
+  }
+
+  &__logo {
+    max-width: 200px;
+    align-self: center;
+    margin-bottom: 24px;
+  }
+
+  &__subtitulo {
+    margin: 0 0 20px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+  }
+
+  &__campo {
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  &__erro {
+    color: #c62828;
+    font-size: 13px;
+    margin: 4px 0 0;
+  }
+
+  &__enviar {
+    height: 46px;
+    margin-top: 20px;
+    border-radius: 8px;
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  &__link {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--abrigo-primary-dark);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__sucesso {
+    text-align: center;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: var(--abrigo-primary);
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: rgba(0, 0, 0, 0.65);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 24px;
+    }
+  }
+
+  &__voltar {
+    height: 46px;
+    border-radius: 8px;
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+  }
+}
