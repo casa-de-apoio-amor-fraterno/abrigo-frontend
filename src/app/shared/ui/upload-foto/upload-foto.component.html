@@ -1,0 +1,31 @@
+<div class="upload-foto">
+  @if (fotoUrl()) {
+    <img class="upload-foto__imagem" [src]="fotoUrl()" alt="Foto do material" />
+  } @else {
+    <div class="upload-foto__placeholder">
+      <mat-icon>inventory_2</mat-icon>
+    </div>
+  }
+
+  @if (erro()) {
+    <p class="upload-foto__erro">{{ erro() }}</p>
+  }
+
+  <div class="upload-foto__acoes">
+    <button mat-button type="button" (click)="abrirSeletor()">
+      <mat-icon>upload</mat-icon>
+      {{ fotoUrl() ? 'Trocar foto' : 'Enviar foto' }}
+    </button>
+    @if (fotoUrl()) {
+      <button mat-button type="button" class="cadastro__acao-perigo" (click)="remover()">Remover foto</button>
+    }
+  </div>
+
+  <input
+    #inputArquivo
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    hidden
+    (change)="selecionarArquivo($event)"
+  />
+</div>

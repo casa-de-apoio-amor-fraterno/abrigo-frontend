@@ -7,7 +7,8 @@ export function paraResumoModel(dto: MaterialResumoDto): MaterialResumo {
     descricao: dto.descricao,
     codigoIdentificacao: dto.codigo_identificacao,
     situacao: dto.situacao,
-    disponivelEmprestimo: dto.disponivel_emprestimo
+    disponivelEmprestimo: dto.disponivel_emprestimo,
+    tem_foto: dto.tem_foto
   };
 }
 

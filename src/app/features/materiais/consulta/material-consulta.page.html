@@ -36,6 +36,7 @@
   <table class="consulta__tabela">
     <thead>
       <tr>
+        <th></th>
         <th>Descrição</th>
         <th>Situação</th>
         <th>Disponível p/ empréstimo</th>
@@ -45,6 +46,15 @@
     <tbody>
       @for (material of itens(); track material.id) {
         <tr>
+          <td>
+            @if (material.tem_foto) {
+              <img class="consulta__thumb" [src]="fotoThumbUrl(material.id)" alt="" />
+            } @else {
+              <div class="consulta__thumb consulta__thumb--vazio">
+                <mat-icon>inventory_2</mat-icon>
+              </div>
+            }
+          </td>
           <td class="consulta__coluna-principal">{{ material.descricao }}</td>
           <td>{{ material.situacao }}</td>
           <td>{{ material.disponivelEmprestimo ? 'Sim' : 'Não' }}</td>

@@ -243,6 +243,29 @@ body {
     }
   }
 
+  // Miniatura de foto na listagem (ver material-consulta.page.html) — usa
+  // `foto_thumb` (gerado no servidor), não a imagem inteira.
+  &__thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--abrigo-surface-alt);
+
+    &--vazio {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--abrigo-texto-terciario);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
   // Badge genérico de status/situação — cor "positiva" por padrão, use
   // &--neutro pro estado inativo/finalizado/devolvido.
   &__badge {

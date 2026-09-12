@@ -37,6 +37,10 @@ export class MaterialConsultaPage {
     this.consultar();
   }
 
+  protected fotoThumbUrl(id: number): string {
+    return this.materialService.fotoThumbUrl(id);
+  }
+
   protected visualizar(material: MaterialResumo): void {
     this.dialog.open(DetalheDialogComponent, {
       width: '420px',

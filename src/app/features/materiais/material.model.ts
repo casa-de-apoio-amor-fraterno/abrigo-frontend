@@ -4,6 +4,7 @@ export interface MaterialResumo {
   codigoIdentificacao: string | null;
   situacao: string;
   disponivelEmprestimo: boolean;
+  tem_foto: boolean;
 }
 
 export interface ListaMateriais {

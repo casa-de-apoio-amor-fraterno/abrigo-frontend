@@ -5,6 +5,7 @@ export interface MaterialResumoDto {
   codigo_identificacao: string | null;
   situacao: string;
   disponivel_emprestimo: boolean;
+  tem_foto: boolean;
 }
 
 export interface ListaMateriaisDto {
@@ -22,6 +23,7 @@ export interface MaterialDto {
   observacao: string | null;
   motivo_baixa: string | null;
   ativo: boolean | null;
+  tem_foto: boolean;
 }
 
 export interface MaterialCreateDto {

@@ -49,4 +49,24 @@ export class MaterialService {
   inativar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.resource}/${id}`);
   }
+
+  /** URL direta da imagem (GET /api/materiais/{id}/foto) — sem endpoint próprio
+   * pra baixar/pré-carregar, usada direto em `<img [src]>`. */
+  fotoUrl(id: number): string {
+    return `${this.resource}/${id}/foto`;
+  }
+
+  fotoThumbUrl(id: number): string {
+    return `${this.resource}/${id}/foto/thumb`;
+  }
+
+  salvarFoto(id: number, arquivo: Blob): Observable<Material> {
+    const formData = new FormData();
+    formData.append('arquivo', arquivo, 'foto.jpg');
+    return this.http.put<MaterialDto>(`${this.resource}/${id}/foto`, formData).pipe(map(paraModel));
+  }
+
+  removerFoto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.resource}/${id}/foto`);
+  }
 }

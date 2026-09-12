@@ -8,50 +8,62 @@
       <p class="cadastro__aviso">Este material está inativo.</p>
     }
 
-    <div class="cadastro__grade">
-      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-        <mat-label>Descrição / Nome</mat-label>
-        <input matInput formControlName="descricao" />
-        @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
-          <mat-error>Informe a descrição</mat-error>
+    <section class="cadastro__secao cadastro__secao--linha">
+      <div class="cadastro__foto-coluna">
+        <h2>Foto</h2>
+        <app-upload-foto [fotoUrl]="fotoUrlAtual" (capturada)="salvarFoto($event)" (removida)="removerFoto()" />
+        @if (erroFoto()) {
+          <p class="cadastro__erro">{{ erroFoto() }}</p>
         }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Código identificação</mat-label>
-        <input matInput formControlName="codigoIdentificacao" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Local</mat-label>
-        <input matInput formControlName="local" placeholder="ex.: Casa, Empréstimo" />
-        @if (form.controls.local.touched && form.controls.local.invalid) {
-          <mat-error>Informe o local</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="cadastro__campo">
-        <mat-label>Situação</mat-label>
-        <input matInput formControlName="situacao" placeholder="ex.: Disponível, Emprestado" />
-        @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
-          <mat-error>Informe a situação</mat-error>
-        }
-      </mat-form-field>
-
-      <div class="cadastro__campo cadastro__checkbox">
-        <mat-checkbox formControlName="disponivelEmprestimo">Disponível para empréstimo</mat-checkbox>
       </div>
 
-      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-        <mat-label>Observação</mat-label>
-        <textarea matInput formControlName="observacao" rows="3"></textarea>
-      </mat-form-field>
+      <div class="cadastro__dados-coluna">
+        <div class="cadastro__grade">
+          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+            <mat-label>Descrição / Nome</mat-label>
+            <input matInput formControlName="descricao" />
+            @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
+              <mat-error>Informe a descrição</mat-error>
+            }
+          </mat-form-field>
 
-      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-        <mat-label>Motivo baixa</mat-label>
-        <textarea matInput formControlName="motivoBaixa" rows="2"></textarea>
-      </mat-form-field>
-    </div>
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Código identificação</mat-label>
+            <input matInput formControlName="codigoIdentificacao" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Local</mat-label>
+            <input matInput formControlName="local" placeholder="ex.: Casa, Empréstimo" />
+            @if (form.controls.local.touched && form.controls.local.invalid) {
+              <mat-error>Informe o local</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Situação</mat-label>
+            <input matInput formControlName="situacao" placeholder="ex.: Disponível, Emprestado" />
+            @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
+              <mat-error>Informe a situação</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="cadastro__campo cadastro__checkbox">
+            <mat-checkbox formControlName="disponivelEmprestimo">Disponível para empréstimo</mat-checkbox>
+          </div>
+
+          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+            <mat-label>Observação</mat-label>
+            <textarea matInput formControlName="observacao" rows="3"></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+            <mat-label>Motivo baixa</mat-label>
+            <textarea matInput formControlName="motivoBaixa" rows="2"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+    </section>
 
     @if (erro()) {
       <p class="cadastro__erro">{{ erro() }}</p>
