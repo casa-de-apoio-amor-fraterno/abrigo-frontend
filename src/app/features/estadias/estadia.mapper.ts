@@ -14,7 +14,9 @@ export function paraResumoModel(dto: EstadiaResumoDto): EstadiaResumo {
     dataEntrada: dto.data_entrada,
     dataSaida: dto.data_saida,
     situacao: dto.situacao,
-    tipoPessoa: dto.tipo_pessoa
+    tipoPessoa: dto.tipo_pessoa,
+    tempoEstadiaValor: dto.tempo_estadia_valor,
+    tempoEstadiaUnidade: dto.tempo_estadia_unidade
   };
 }
 

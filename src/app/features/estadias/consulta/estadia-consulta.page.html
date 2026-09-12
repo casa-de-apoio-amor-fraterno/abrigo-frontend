@@ -38,6 +38,7 @@
         <th>Quarto</th>
         <th>Entrada</th>
         <th>Saída</th>
+        <th>Tempo estadia</th>
         <th>Situação</th>
         <th></th>
       </tr>
@@ -50,8 +51,13 @@
           <td>{{ numerosQuartos()[estadia.idQuarto] || '—' }}</td>
           <td>{{ estadia.dataEntrada | date: 'dd/MM/yyyy' }}</td>
           <td>{{ estadia.dataSaida ? (estadia.dataSaida | date: 'dd/MM/yyyy') : '—' }}</td>
+          <td>{{ estadia.tempoEstadiaValor ? estadia.tempoEstadiaValor + ' ' + estadia.tempoEstadiaUnidade : '—' }}</td>
           <td>
-            <span class="consulta__badge" [class.consulta__badge--neutro]="estadia.situacao === 'Finalizada'">
+            <span
+              class="consulta__badge"
+              [class.consulta__badge--aviso]="estadia.situacao === 'Aguardando retorno'"
+              [class.consulta__badge--erro]="estadia.situacao === 'Finalizada'"
+            >
               {{ estadia.situacao }}
             </span>
           </td>

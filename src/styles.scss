@@ -258,6 +258,19 @@ body {
       background: var(--abrigo-border);
       color: var(--abrigo-texto-terciario);
     }
+
+    // Variantes de cor pra situações que se beneficiam de ficar
+    // visualmente distinguíveis das outras (ver estadia-consulta.page.html,
+    // mesmos tons de `app-filtro-pills`/home.page.scss).
+    &--aviso {
+      background: rgba(180, 83, 9, 0.14);
+      color: #b45309;
+    }
+
+    &--erro {
+      background: rgba(198, 40, 40, 0.12);
+      color: #c62828;
+    }
   }
 
   &__ajuda-cpf {

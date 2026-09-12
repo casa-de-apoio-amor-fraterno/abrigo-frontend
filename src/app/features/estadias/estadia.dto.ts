@@ -11,6 +11,8 @@ export interface EstadiaResumoDto {
   data_saida: string | null;
   situacao: SituacaoEstadiaDto;
   tipo_pessoa: TipoPessoaEstadiaDto;
+  tempo_estadia_valor: number | null;
+  tempo_estadia_unidade: UnidadeTempoEstadiaDto | null;
 }
 
 export interface ListaEstadiasDto {

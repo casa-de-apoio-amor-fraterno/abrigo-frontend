@@ -94,13 +94,14 @@ export class EstadiaConsultaPage {
   private gerarCsvEstadias(itens: EstadiaResumo[], nomesPessoas: Record<number, string>): void {
     exportarCsv(
       'estadias.csv',
-      ['Pessoa', 'Tipo', 'Quarto', 'Entrada', 'Saída', 'Situação'],
+      ['Pessoa', 'Tipo', 'Quarto', 'Entrada', 'Saída', 'Tempo estadia', 'Situação'],
       itens.map((e) => [
         nomesPessoas[e.idPessoa] ?? `Pessoa #${e.idPessoa}`,
         e.tipoPessoa,
         this.numerosQuartos()[e.idQuarto] ?? `Quarto #${e.idQuarto}`,
         e.dataEntrada,
         e.dataSaida,
+        e.tempoEstadiaValor ? `${e.tempoEstadiaValor} ${e.tempoEstadiaUnidade}` : '',
         e.situacao
       ])
     );

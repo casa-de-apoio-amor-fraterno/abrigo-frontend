@@ -10,6 +10,8 @@ export interface EstadiaResumo {
   dataSaida: string | null;
   situacao: SituacaoEstadia;
   tipoPessoa: TipoPessoaEstadia;
+  tempoEstadiaValor: number | null;
+  tempoEstadiaUnidade: UnidadeTempoEstadia | null;
 }
 
 export interface ListaEstadias {
