@@ -3,9 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { QuartoCreateDto, QuartoDto, QuartoUpdateDto } from './quarto.dto';
-import { paraModel } from './quarto.mapper';
-import { Quarto } from './quarto.model';
+import { QuartoCreateDto, QuartoDto, QuartoOcupacaoDto, QuartoUpdateDto } from './quarto.dto';
+import { paraModel, paraOcupacaoModel } from './quarto.mapper';
+import { Quarto, QuartoOcupacao } from './quarto.model';
 
 @Injectable({ providedIn: 'root' })
 export class QuartoService {
@@ -33,5 +33,11 @@ export class QuartoService {
 
   inativar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.resource}/${id}`);
+  }
+
+  listarOcupacao(): Observable<QuartoOcupacao[]> {
+    return this.http
+      .get<QuartoOcupacaoDto[]>(`${this.resource}/ocupacao`)
+      .pipe(map((itens) => itens.map(paraOcupacaoModel)));
   }
 }

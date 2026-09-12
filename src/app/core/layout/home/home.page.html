@@ -1,4 +1,86 @@
 <div class="home">
   <h1>Olá, {{ auth.sessao()?.nome ?? 'bem-vindo(a)' }}!</h1>
   <p>Este é o painel inicial do sistema do Abrigo — Casa de Apoio Amor Fraterno.</p>
+
+  <section class="ocupacao">
+    <div class="ocupacao__cabecalho">
+      <h2>Ocupação dos quartos</h2>
+      @if (!carregando() && !erro()) {
+        <span class="ocupacao__resumo">
+          {{ totalOcupados }} de {{ totalLeitos }} leitos ocupados
+          @if (totalPendentesRevisao > 0) {
+            <span class="ocupacao__resumo-aviso">
+              · {{ totalPendentesRevisao }} estadia(s) antiga(s) sem finalizar
+            </span>
+          }
+        </span>
+      }
+    </div>
+
+    @if (carregando()) {
+      <div class="ocupacao__estado">
+        <mat-spinner diameter="28" />
+      </div>
+    } @else if (erro()) {
+      <p class="ocupacao__estado ocupacao__estado--erro">{{ erro() }}</p>
+    } @else if (quartos().length === 0) {
+      <p class="ocupacao__vazio">Nenhum quarto ativo cadastrado.</p>
+    } @else {
+      <div class="ocupacao__legenda">
+        <span><span class="ocupacao__amostra ocupacao__amostra--ocupado"></span> Ocupado</span>
+        <span><span class="ocupacao__amostra ocupacao__amostra--livre"></span> Livre</span>
+      </div>
+
+      <div class="ocupacao__grade">
+        @for (quarto of quartos(); track quarto.id) {
+          <div class="ocupacao__quarto">
+            <div class="ocupacao__quarto-cabecalho">
+              <strong>Quarto {{ quarto.numero }}</strong>
+              @if (quarto.descricao) {
+                <span class="ocupacao__quarto-descricao">{{ quarto.descricao }}</span>
+              }
+            </div>
+
+            <div class="ocupacao__leitos">
+              @for (ocupante of quarto.ocupantes; track ocupante.idEstadia) {
+                <a
+                  class="ocupacao__leito ocupacao__leito--ocupado"
+                  [routerLink]="['/estadias', ocupante.idEstadia, 'editar']"
+                  [title]="ocupante.nomePessoa + ' — desde ' + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
+                >
+                  <mat-icon>bed</mat-icon>
+                </a>
+              }
+              @for (vaga of leitosVagos(quarto); track $index) {
+                <div class="ocupacao__leito ocupacao__leito--livre" title="Leito livre">
+                  <mat-icon>bed</mat-icon>
+                </div>
+              }
+            </div>
+
+            @if (quarto.pendentesRevisao.length > 0) {
+              <button type="button" class="ocupacao__aviso" (click)="alternarRevisao(quarto.id)">
+                <mat-icon>warning</mat-icon>
+                {{ quarto.pendentesRevisao.length }} estadia(s) antiga(s) sem finalizar
+                <mat-icon class="ocupacao__aviso-seta">{{
+                  revisaoAberta() === quarto.id ? 'expand_less' : 'expand_more'
+                }}</mat-icon>
+              </button>
+
+              @if (revisaoAberta() === quarto.id) {
+                <ul class="ocupacao__revisao">
+                  @for (pendente of quarto.pendentesRevisao; track pendente.idEstadia) {
+                    <li>
+                      <span>{{ pendente.nomePessoa }} — desde {{ pendente.dataEntrada | date: 'dd/MM/yyyy' }}</span>
+                      <a [routerLink]="['/estadias', pendente.idEstadia, 'editar']">Revisar</a>
+                    </li>
+                  }
+                </ul>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+  </section>
 </div>
