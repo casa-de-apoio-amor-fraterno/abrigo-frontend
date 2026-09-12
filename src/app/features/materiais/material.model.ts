@@ -1,6 +1,7 @@
 export interface MaterialResumo {
   id: number;
   descricao: string;
+  codigoIdentificacao: string | null;
   situacao: string;
   disponivelEmprestimo: boolean;
 }

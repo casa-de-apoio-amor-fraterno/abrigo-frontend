@@ -1,10 +1,9 @@
-<app-pagina-cadastro
-  [titulo]="modoEdicao ? 'Editar material' : 'Novo material'"
-  subtitulo="Cadastro de materiais e equipamentos do Abrigo."
-  voltarPara="/materiais"
-  [carregando]="carregando()"
->
-  <form class="cadastro__form" [formGroup]="form" (ngSubmit)="salvar()">
+<form [formGroup]="form" (ngSubmit)="salvar()">
+  <app-cadastro-dialog-shell
+    [titulo]="modoEdicao ? 'Editar material' : 'Novo material'"
+    subtitulo="Cadastro de materiais e equipamentos do Abrigo."
+    [carregando]="carregando()"
+  >
     @if (modoEdicao && !ativo()) {
       <p class="cadastro__aviso">Este material está inativo.</p>
     }
@@ -58,19 +57,21 @@
       <p class="cadastro__erro">{{ erro() }}</p>
     }
 
-    <app-cadastro-acoes voltarPara="/materiais" [salvando]="salvando()">
-      @if (modoEdicao && ativo()) {
-        <button
-          extra
-          mat-button
-          type="button"
-          class="cadastro__acao-perigo"
-          [disabled]="inativando()"
-          (click)="inativar()"
-        >
-          Inativar
-        </button>
-      }
-    </app-cadastro-acoes>
-  </form>
-</app-pagina-cadastro>
+    <ng-container acoes>
+      <app-cadastro-acoes voltarPara="/materiais" [salvando]="salvando()">
+        @if (modoEdicao && ativo()) {
+          <button
+            extra
+            mat-button
+            type="button"
+            class="cadastro__acao-perigo"
+            [disabled]="inativando()"
+            (click)="inativar()"
+          >
+            Inativar
+          </button>
+        }
+      </app-cadastro-acoes>
+    </ng-container>
+  </app-cadastro-dialog-shell>
+</form>

@@ -2,6 +2,7 @@
 export interface MaterialResumoDto {
   id: number;
   descricao: string;
+  codigo_identificacao: string | null;
   situacao: string;
   disponivel_emprestimo: boolean;
 }

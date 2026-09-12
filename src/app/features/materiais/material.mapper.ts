@@ -5,6 +5,7 @@ export function paraResumoModel(dto: MaterialResumoDto): MaterialResumo {
   return {
     id: dto.id,
     descricao: dto.descricao,
+    codigoIdentificacao: dto.codigo_identificacao,
     situacao: dto.situacao,
     disponivelEmprestimo: dto.disponivel_emprestimo
   };
@@ -17,7 +18,6 @@ export function paraListaModel(dto: ListaMateriaisDto): ListaMateriais {
 export function paraModel(dto: MaterialDto): Material {
   return {
     ...paraResumoModel(dto),
-    codigoIdentificacao: dto.codigo_identificacao,
     local: dto.local,
     observacao: dto.observacao,
     motivoBaixa: dto.motivo_baixa,

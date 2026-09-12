@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { MaterialService } from '../material.service';
-import { PaginaCadastroComponent } from '../../../shared/ui/pagina-cadastro/pagina-cadastro.component';
+import { CadastroDialogShellComponent } from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 
 @Component({
@@ -19,7 +19,7 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
-    PaginaCadastroComponent,
+    CadastroDialogShellComponent,
     CadastroAcoesComponent
   ],
   templateUrl: './material-cadastro.page.html'
