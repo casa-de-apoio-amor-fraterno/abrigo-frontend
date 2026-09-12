@@ -43,13 +43,36 @@
 
             <div class="ocupacao__leitos">
               @for (ocupante of quarto.ocupantes; track ocupante.idEstadia) {
-                <a
+                <button
+                  type="button"
                   class="ocupacao__leito ocupacao__leito--ocupado"
-                  [routerLink]="['/estadias', ocupante.idEstadia, 'editar']"
                   [title]="ocupante.nomePessoa + ' — desde ' + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
+                  (click)="abrirFinalizar(ocupante, $event)"
                 >
                   <mat-icon>bed</mat-icon>
-                </a>
+                </button>
+
+                @if (estadiaFinalizarAberta() === ocupante.idEstadia) {
+                  <app-acao-popover
+                    icone="event_available"
+                    titulo="Finalizar estadia"
+                    [subtitulo]="ocupante.nomePessoa + ' — informe a data de saída'"
+                    [erro]="erroFinalizar()"
+                    [confirmando]="finalizando()"
+                    (cancelar)="fecharFinalizar()"
+                    (confirmar)="confirmarFinalizar(ocupante.idEstadia)"
+                  >
+                    <mat-form-field appearance="outline">
+                      <mat-label>Data de saída</mat-label>
+                      <input
+                        matInput
+                        type="date"
+                        [value]="dataSaidaFinalizar()"
+                        (input)="dataSaidaFinalizar.set($any($event.target).value)"
+                      />
+                    </mat-form-field>
+                  </app-acao-popover>
+                }
               }
               @for (vaga of leitosVagos(quarto); track $index) {
                 <div class="ocupacao__leito ocupacao__leito--livre" title="Leito livre">

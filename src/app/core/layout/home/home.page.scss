@@ -126,7 +126,10 @@
     justify-content: center;
     width: 34px;
     height: 34px;
+    padding: 0;
+    border: none;
     border-radius: 8px;
+    font-family: inherit;
     text-decoration: none;
 
     mat-icon {
