@@ -68,3 +68,12 @@ export interface EstadiaAcompanhanteCreateDto {
   data_saida?: string | null;
   grau_parentesco?: string | null;
 }
+
+export interface EstadiaHistoricoDto {
+  id: number;
+  id_estadia: number;
+  id_usuario: number;
+  tipo: string;
+  observacao: string;
+  data_cadastro: string;
+}

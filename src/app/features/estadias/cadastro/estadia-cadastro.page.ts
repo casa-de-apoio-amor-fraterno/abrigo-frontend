@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 
@@ -19,7 +20,13 @@ import { HospitalService } from '../../hospitais/hospital.service';
 import { Hospital } from '../../hospitais/hospital.model';
 import { EstadiaAcompanhanteCreateDto } from '../estadia.dto';
 import { EstadiaService } from '../estadia.service';
-import { EstadiaAcompanhante, SituacaoEstadia, TipoPessoaEstadia, UnidadeTempoEstadia } from '../estadia.model';
+import {
+  EstadiaAcompanhante,
+  EstadiaHistorico,
+  SituacaoEstadia,
+  TipoPessoaEstadia,
+  UnidadeTempoEstadia
+} from '../estadia.model';
 import {
   CadastroDialogAba,
   CadastroDialogShellComponent
@@ -54,6 +61,7 @@ const OPCOES_UNIDADE_TEMPO: OpcaoFiltroPill[] = [
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     MatRadioModule,
     MatSelectModule,
     CadastroDialogShellComponent,
@@ -88,10 +96,13 @@ export class EstadiaCadastroPage {
 
   // Acompanhantes já dão pra adicionar na criação — ver
   // `acompanhantesLocais` e o DTO aninhado em `EstadiaCreate`
-  // (abrigo-backend/app/features/estadias/schemas.py).
+  // (abrigo-backend/app/features/estadias/schemas.py). Histórico continua
+  // exclusivo de edição (trilha de auditoria, só existe depois que a
+  // estadia já foi criada — mesmo padrão de emprestimo-cadastro.page.ts).
   protected readonly abas: CadastroDialogAba[] = [
     { id: 'dados', rotulo: 'Dados' },
-    { id: 'acompanhantes', rotulo: 'Acompanhantes' }
+    { id: 'acompanhantes', rotulo: 'Acompanhantes' },
+    ...(this.modoEdicao ? [{ id: 'historico', rotulo: 'Histórico' }] : [])
   ];
   protected readonly abaAtiva = signal('dados');
 
@@ -117,6 +128,9 @@ export class EstadiaCadastroPage {
   protected readonly formAcompanhanteAberto = signal(false);
   protected readonly salvandoAcompanhante = signal(false);
   protected readonly pessoaAcompanhante = signal<{ id: number; nome: string } | null>(null);
+
+  protected readonly historico = signal<EstadiaHistorico[]>([]);
+  protected readonly carregandoHistorico = signal(false);
 
   private proximoIdAcompanhanteLocal = -1;
 
@@ -165,6 +179,7 @@ export class EstadiaCadastroPage {
           });
 
           this.carregarAcompanhantes();
+          this.carregarHistorico();
         },
         error: () => {
           this.erro.set('Não foi possível carregar os dados da estadia.');
@@ -233,7 +248,8 @@ export class EstadiaCadastroPage {
     this.encerrando.set(true);
     this.erro.set(null);
 
-    this.estadiaService.encerrar(this.estadiaId).subscribe({
+    const idUsuario = this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id;
+    this.estadiaService.encerrar(this.estadiaId, undefined, undefined, undefined, idUsuario).subscribe({
       next: () => {
         void this.router.navigateByUrl('/estadias');
       },
@@ -327,5 +343,27 @@ export class EstadiaCadastroPage {
         });
       });
     });
+  }
+
+  private carregarHistorico(): void {
+    if (this.estadiaId === null) {
+      return;
+    }
+    this.carregandoHistorico.set(true);
+    this.estadiaService.listarHistorico(this.estadiaId).subscribe({
+      next: (historico) => {
+        this.historico.set(historico);
+        this.carregandoHistorico.set(false);
+      },
+      error: () => this.carregandoHistorico.set(false)
+    });
+  }
+
+  protected nomeUsuarioHistorico(idUsuario: number): string {
+    const sessao = this.auth.sessao();
+    if (sessao && sessao.usuario_id === idUsuario) {
+      return sessao.nome;
+    }
+    return `Usuário #${idUsuario}`;
   }
 }

@@ -40,3 +40,14 @@ export interface EstadiaAcompanhante {
   dataSaida: string | null;
   grauParentesco: string | null;
 }
+
+/** Roadmap de eventos da estadia (Inclusão/Alteração/Encerramento) — mesmo
+ * padrão de EmprestimoHistorico, ver estadia.legacy.md. */
+export interface EstadiaHistorico {
+  id: number;
+  idEstadia: number;
+  idUsuario: number;
+  tipo: string;
+  observacao: string;
+  dataCadastro: string;
+}

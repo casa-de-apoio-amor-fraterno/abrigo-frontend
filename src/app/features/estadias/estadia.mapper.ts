@@ -1,10 +1,17 @@
 import {
   EstadiaAcompanhanteDto,
   EstadiaDto,
+  EstadiaHistoricoDto,
   EstadiaResumoDto,
   ListaEstadiasDto
 } from './estadia.dto';
-import { Estadia, EstadiaAcompanhante, EstadiaResumo, ListaEstadias } from './estadia.model';
+import {
+  Estadia,
+  EstadiaAcompanhante,
+  EstadiaHistorico,
+  EstadiaResumo,
+  ListaEstadias
+} from './estadia.model';
 
 export function paraResumoModel(dto: EstadiaResumoDto): EstadiaResumo {
   return {
@@ -45,5 +52,16 @@ export function paraAcompanhanteModel(dto: EstadiaAcompanhanteDto): EstadiaAcomp
     dataEntrada: dto.data_entrada,
     dataSaida: dto.data_saida,
     grauParentesco: dto.grau_parentesco
+  };
+}
+
+export function paraHistoricoModel(dto: EstadiaHistoricoDto): EstadiaHistorico {
+  return {
+    id: dto.id,
+    idEstadia: dto.id_estadia,
+    idUsuario: dto.id_usuario,
+    tipo: dto.tipo,
+    observacao: dto.observacao,
+    dataCadastro: dto.data_cadastro
   };
 }

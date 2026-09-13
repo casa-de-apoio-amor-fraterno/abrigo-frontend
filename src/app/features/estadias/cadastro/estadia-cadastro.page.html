@@ -167,6 +167,29 @@
     </section>
   }
 
+  @if (abaAtiva() === 'historico') {
+    @if (carregandoHistorico()) {
+      <div class="cadastro__estado">
+        <mat-spinner diameter="32" />
+      </div>
+    } @else if (historico().length === 0) {
+      <p class="cadastro__vazio">Nenhum histórico registrado ainda.</p>
+    } @else {
+      <ul class="cadastro__lista-historico">
+        @for (registro of historico(); track registro.id) {
+          <li>
+            <div class="cadastro__historico-cabecalho">
+              <span class="cadastro__historico-tipo">{{ registro.tipo }}</span>
+              <span class="cadastro__historico-data">{{ registro.dataCadastro | date: 'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <p>{{ registro.observacao }}</p>
+            <span class="cadastro__historico-usuario">{{ nomeUsuarioHistorico(registro.idUsuario) }}</span>
+          </li>
+        }
+      </ul>
+    }
+  }
+
   <ng-container acoes>
     @if (abaAtiva() === 'dados') {
       <app-cadastro-acoes voltarPara="/estadias" formularioId="estadia-form" [salvando]="salvando()">

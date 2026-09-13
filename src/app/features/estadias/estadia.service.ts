@@ -8,12 +8,19 @@ import {
   EstadiaAcompanhanteDto,
   EstadiaCreateDto,
   EstadiaDto,
+  EstadiaHistoricoDto,
   EstadiaUpdateDto,
   ListaEstadiasDto,
   SituacaoEstadiaDto
 } from './estadia.dto';
-import { paraAcompanhanteModel, paraListaModel, paraModel } from './estadia.mapper';
-import { Estadia, EstadiaAcompanhante, ListaEstadias } from './estadia.model';
+import { paraAcompanhanteModel, paraHistoricoModel, paraListaModel, paraModel } from './estadia.mapper';
+import {
+  Estadia,
+  EstadiaAcompanhante,
+  EstadiaHistorico,
+  ListaEstadias,
+  UnidadeTempoEstadia
+} from './estadia.model';
 
 export interface ConsultaEstadiasQuery {
   idPessoa?: number;
@@ -61,8 +68,29 @@ export class EstadiaService {
     return this.http.put<EstadiaDto>(`${this.resource}/${id}`, dados).pipe(map(paraModel));
   }
 
-  encerrar(id: number, dataSaida?: string): Observable<Estadia> {
-    const corpo = dataSaida ? { data_saida: dataSaida } : {};
+  encerrar(
+    id: number,
+    dataSaida?: string,
+    tempoEstadiaValor?: number,
+    tempoEstadiaUnidade?: UnidadeTempoEstadia,
+    idUsuario?: number
+  ): Observable<Estadia> {
+    const corpo: Record<string, unknown> = {};
+    if (dataSaida) {
+      corpo['data_saida'] = dataSaida;
+    }
+    if (tempoEstadiaValor !== undefined) {
+      corpo['tempo_estadia_valor'] = tempoEstadiaValor;
+    }
+    if (tempoEstadiaUnidade !== undefined) {
+      corpo['tempo_estadia_unidade'] = tempoEstadiaUnidade;
+    }
+    // Opcional — sem ele o encerramento não fica registrado no histórico
+    // da estadia (ver EstadiaHistorico/estadia.legacy.md), mas o resto do
+    // fluxo funciona normalmente.
+    if (idUsuario !== undefined) {
+      corpo['id_usuario'] = idUsuario;
+    }
     return this.http.post<EstadiaDto>(`${this.resource}/${id}/encerrar`, corpo).pipe(map(paraModel));
   }
 
@@ -79,5 +107,11 @@ export class EstadiaService {
     return this.http
       .post<EstadiaAcompanhanteDto>(`${this.resource}/${estadiaId}/acompanhantes`, dados)
       .pipe(map(paraAcompanhanteModel));
+  }
+
+  listarHistorico(estadiaId: number): Observable<EstadiaHistorico[]> {
+    return this.http
+      .get<EstadiaHistoricoDto[]>(`${this.resource}/${estadiaId}/historico`)
+      .pipe(map((itens) => itens.map(paraHistoricoModel)));
   }
 }
