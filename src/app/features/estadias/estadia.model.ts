@@ -21,6 +21,9 @@ export interface ListaEstadias {
 
 export interface Estadia extends EstadiaResumo {
   idUsuario: number;
+  /** Hospital deste atendimento específico — movido de `Pessoa.id_hospital`
+   * (contextual à estadia, não permanente da pessoa; ver estadia.legacy.md). */
+  idHospital: number | null;
   /** @deprecated Legado, somente leitura. Ver `tempoEstadiaValor`/`tempoEstadiaUnidade`. */
   tempoEstadia: string | null;
   tempoEstadiaValor: number | null;

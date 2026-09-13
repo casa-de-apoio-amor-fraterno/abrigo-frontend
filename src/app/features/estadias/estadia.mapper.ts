@@ -28,6 +28,7 @@ export function paraModel(dto: EstadiaDto): Estadia {
   return {
     ...paraResumoModel(dto),
     idUsuario: dto.id_usuario,
+    idHospital: dto.id_hospital,
     tempoEstadia: dto.tempo_estadia,
     tempoEstadiaValor: dto.tempo_estadia_valor,
     tempoEstadiaUnidade: dto.tempo_estadia_unidade,

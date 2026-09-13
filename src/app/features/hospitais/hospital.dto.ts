@@ -4,3 +4,9 @@ export interface HospitalDto {
   nome: string;
   ativo: boolean;
 }
+
+export interface HospitalCreateDto {
+  nome: string;
+}
+
+export type HospitalUpdateDto = HospitalCreateDto;

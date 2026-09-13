@@ -242,7 +242,11 @@ export class EmprestimoCadastroPage {
         dataDevolucao: dados.data_devolucao,
         dataDevolucaoEfetiva: null,
         situacao: dados.situacao,
-        renovacao: dados.renovacao
+        renovacao: dados.renovacao,
+        // Item ainda não persistido — descrição/foto reais só existem depois
+        // que o empréstimo é salvo e os itens vêm da API (ver EmprestimoItem).
+        descricaoMaterial: material.descricao,
+        temFotoMaterial: false
       };
       this.itensLocais.update((atuais) =>
         emEdicao ? atuais.map((i) => (i.id === item.id ? item : i)) : [...atuais, item]

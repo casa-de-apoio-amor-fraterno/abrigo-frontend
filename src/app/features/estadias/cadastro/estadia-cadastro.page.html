@@ -61,9 +61,10 @@
             <input matInput type="date" formControlName="dataSaida" />
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-form-field appearance="outline" class="cadastro__campo campo-tempo-estadia">
             <mat-label>Tempo estadia</mat-label>
             <input matInput type="number" min="0" formControlName="tempoEstadiaValor" />
+            <span matSuffix>{{ rotuloUnidadeTempo(form.controls.tempoEstadiaUnidade.value) }}</span>
           </mat-form-field>
 
           <div class="cadastro__campo cadastro__campo--pills">
@@ -73,6 +74,16 @@
               (mudanca)="form.controls.tempoEstadiaUnidade.setValue($any($event))"
             />
           </div>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Hospital</mat-label>
+            <mat-select formControlName="idHospital">
+              <mat-option [value]="null">—</mat-option>
+              @for (hospital of hospitais(); track hospital.id) {
+                <mat-option [value]="hospital.id">{{ hospital.nome }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
           <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
             <mat-label>Observação</mat-label>

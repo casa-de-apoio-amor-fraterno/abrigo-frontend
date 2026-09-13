@@ -17,7 +17,7 @@ import { PessoaResumo } from '../pessoas/pessoa.model';
 import { EstadiaService } from '../estadias/estadia.service';
 import { EstadiaResumo } from '../estadias/estadia.model';
 import { EmprestimoService } from '../emprestimos/emprestimo.service';
-import { EmprestimoResumo } from '../emprestimos/emprestimo.model';
+import { EmprestimoItem, EmprestimoResumo } from '../emprestimos/emprestimo.model';
 import { MaterialService } from '../materiais/material.service';
 import { MaterialResumo } from '../materiais/material.model';
 import { VoluntarioService } from '../voluntarios/voluntario.service';
@@ -92,6 +92,7 @@ export class BuscaPage {
   protected readonly dataDevolucao = signal('');
   protected readonly devolvendo = signal(false);
   protected readonly erroDevolver = signal<string | null>(null);
+  protected readonly itensDevolver = signal<EmprestimoItem[]>([]);
 
   constructor() {
     // Reage a novas buscas feitas pela barra do topo (mesma rota /busca,
@@ -287,11 +288,18 @@ export class BuscaPage {
     this.erroDevolver.set(null);
     this.dataDevolucao.set(new Date().toISOString().slice(0, 10));
     this.emprestimoDevolverAberto.set(emprestimo.id);
+    this.itensDevolver.set([]);
+    this.emprestimoService.listarItens(emprestimo.id).subscribe((itens) => this.itensDevolver.set(itens));
   }
 
   protected fecharDevolver(): void {
     this.emprestimoDevolverAberto.set(null);
     this.erroDevolver.set(null);
+    this.itensDevolver.set([]);
+  }
+
+  protected fotoThumbUrl(idMaterial: number): string {
+    return this.materialService.fotoThumbUrl(idMaterial);
   }
 
   protected confirmarDevolver(emprestimo: EmprestimoComPessoa): void {

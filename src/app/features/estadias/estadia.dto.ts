@@ -22,6 +22,8 @@ export interface ListaEstadiasDto {
 
 export interface EstadiaDto extends EstadiaResumoDto {
   id_usuario: number;
+  /** Opcional — nem todo atendimento envolve hospital (ver estadia.legacy.md). */
+  id_hospital: number | null;
   /** @deprecated Legado, somente leitura. Ver `tempo_estadia_valor`/`tempo_estadia_unidade`. */
   tempo_estadia: string | null;
   tempo_estadia_valor: number | null;
@@ -34,6 +36,7 @@ export interface EstadiaCreateDto {
   id_pessoa: number;
   id_quarto: number;
   id_usuario: number;
+  id_hospital?: number | null;
   data_entrada: string;
   data_saida?: string | null;
   tempo_estadia_valor?: number | null;

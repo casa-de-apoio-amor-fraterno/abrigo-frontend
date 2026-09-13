@@ -137,6 +137,22 @@
                       (cancelar)="fecharDevolver()"
                       (confirmar)="confirmarDevolver(emprestimo)"
                     >
+                      @if (itensDevolver().length > 0) {
+                        <ul class="busca__itens-devolver">
+                          @for (item of itensDevolver(); track item.id) {
+                            <li>
+                              @if (item.temFotoMaterial) {
+                                <img class="busca__itens-devolver-thumb" [src]="fotoThumbUrl(item.idMaterial)" alt="" />
+                              } @else {
+                                <div class="busca__itens-devolver-thumb busca__itens-devolver-thumb--vazio">
+                                  <mat-icon>inventory_2</mat-icon>
+                                </div>
+                              }
+                              <span>{{ item.descricaoMaterial }}</span>
+                            </li>
+                          }
+                        </ul>
+                      }
                       <mat-form-field appearance="outline">
                         <mat-label>Data de devolução</mat-label>
                         <input

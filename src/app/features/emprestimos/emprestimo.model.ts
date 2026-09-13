@@ -35,6 +35,9 @@ export interface EmprestimoItem {
   dataDevolucaoEfetiva: string | null;
   situacao: SituacaoEmprestimo | null;
   renovacao: string | null;
+  /** Anexados pelo backend a partir do material — ver EmprestimoItemDto. */
+  descricaoMaterial: string;
+  temFotoMaterial: boolean;
 }
 
 export interface EmprestimoHistorico {

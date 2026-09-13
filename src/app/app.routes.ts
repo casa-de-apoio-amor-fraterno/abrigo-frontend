@@ -57,6 +57,25 @@ export const routes: Routes = [
           import('./features/quartos/cadastro/quarto-cadastro-dialog.page').then((m) => m.QuartoCadastroDialogPage)
       },
       {
+        path: 'hospitais',
+        loadComponent: () =>
+          import('./features/hospitais/consulta/hospital-consulta.page').then((m) => m.HospitalConsultaPage)
+      },
+      {
+        path: 'hospitais/novo',
+        loadComponent: () =>
+          import('./features/hospitais/cadastro/hospital-cadastro-dialog.page').then(
+            (m) => m.HospitalCadastroDialogPage
+          )
+      },
+      {
+        path: 'hospitais/:id/editar',
+        loadComponent: () =>
+          import('./features/hospitais/cadastro/hospital-cadastro-dialog.page').then(
+            (m) => m.HospitalCadastroDialogPage
+          )
+      },
+      {
         path: 'estadias',
         loadComponent: () =>
           import('./features/estadias/consulta/estadia-consulta.page').then((m) => m.EstadiaConsultaPage)

@@ -15,6 +15,8 @@ import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocompl
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { QuartoService } from '../../quartos/quarto.service';
 import { Quarto } from '../../quartos/quarto.model';
+import { HospitalService } from '../../hospitais/hospital.service';
+import { Hospital } from '../../hospitais/hospital.model';
 import { EstadiaAcompanhanteCreateDto } from '../estadia.dto';
 import { EstadiaService } from '../estadia.service';
 import { EstadiaAcompanhante, SituacaoEstadia, TipoPessoaEstadia, UnidadeTempoEstadia } from '../estadia.model';
@@ -64,10 +66,17 @@ export class EstadiaCadastroPage {
   protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly opcoesTipoPessoa = OPCOES_TIPO_PESSOA;
   protected readonly opcoesUnidadeTempo = OPCOES_UNIDADE_TEMPO;
+
+  // Mostra a unidade escolhida na pill como sufixo dentro do próprio campo
+  // numérico (ex.: "4 Noites"), em vez de só a pill isolada ao lado.
+  protected rotuloUnidadeTempo(unidade: UnidadeTempoEstadia): string {
+    return OPCOES_UNIDADE_TEMPO.find((opcao) => opcao.valor === unidade)?.rotulo ?? '';
+  }
   private readonly fb = inject(FormBuilder);
   private readonly estadiaService = inject(EstadiaService);
   private readonly pessoaService = inject(PessoaService);
   private readonly quartoService = inject(QuartoService);
+  private readonly hospitalService = inject(HospitalService);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -92,6 +101,7 @@ export class EstadiaCadastroPage {
   protected readonly erro = signal<string | null>(null);
 
   protected readonly quartos = signal<Quarto[]>([]);
+  protected readonly hospitais = signal<Hospital[]>([]);
   protected readonly pessoaSelecionada = signal<{ id: number; nome: string } | null>(null);
   protected readonly situacaoAtual = signal<SituacaoEstadia | null>(null);
   protected readonly idUsuarioOriginal = signal<number | null>(null);
@@ -112,6 +122,7 @@ export class EstadiaCadastroPage {
 
   protected readonly form = this.fb.nonNullable.group({
     idQuarto: this.fb.control<number | null>(null, Validators.required),
+    idHospital: this.fb.control<number | null>(null),
     dataEntrada: ['', [Validators.required]],
     dataSaida: [''],
     tipoPessoa: this.fb.nonNullable.control<TipoPessoaEstadia>('Paciente'),
@@ -129,12 +140,14 @@ export class EstadiaCadastroPage {
 
   constructor() {
     this.quartoService.listar(false).subscribe((quartos) => this.quartos.set(quartos));
+    this.hospitalService.listar().subscribe((hospitais) => this.hospitais.set(hospitais));
 
     if (this.estadiaId !== null) {
       this.estadiaService.buscar(this.estadiaId).subscribe({
         next: (estadia) => {
           this.form.patchValue({
             idQuarto: estadia.idQuarto,
+            idHospital: estadia.idHospital,
             dataEntrada: estadia.dataEntrada.slice(0, 10),
             dataSaida: estadia.dataSaida?.slice(0, 10) ?? '',
             tipoPessoa: estadia.tipoPessoa,
@@ -183,6 +196,7 @@ export class EstadiaCadastroPage {
       id_pessoa: this.pessoaSelecionada()!.id,
       id_quarto: valores.idQuarto!,
       id_usuario: this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id,
+      id_hospital: valores.idHospital,
       data_entrada: valores.dataEntrada,
       data_saida: valores.dataSaida || null,
       tempo_estadia_valor: valores.tempoEstadiaValor,

@@ -1,0 +1,75 @@
+<app-pagina-consulta
+  titulo="Hospitais"
+  subtitulo="Hospitais e origens/motivos de atendimento usados em estadias e pessoas."
+  [carregando]="carregando()"
+  [erro]="erro()"
+  [vazio]="itensFiltrados().length === 0"
+  mensagemVazio="Nenhum hospital encontrado."
+  [paginado]="false"
+  [total]="itensFiltrados().length"
+  rotuloItem="hospital(is)"
+>
+  <ng-container acoes>
+    <button mat-button type="button" class="consulta__exportar-btn" (click)="exportarCsv()">
+      <mat-icon>download</mat-icon>
+      Exportar CSV
+    </button>
+    <a mat-flat-button routerLink="/hospitais/novo" class="consulta__nova-btn">
+      <mat-icon>add</mat-icon>
+      Novo hospital
+    </a>
+  </ng-container>
+
+  <ng-container filtros>
+    <input
+      type="search"
+      placeholder="Buscar por nome..."
+      [value]="termoBusca()"
+      (input)="termoBusca.set($any($event.target).value)"
+    />
+    <mat-slide-toggle [checked]="mostrarInativos()" (change)="alternarMostrarInativos()">
+      Mostrar inativos
+    </mat-slide-toggle>
+  </ng-container>
+
+  <table class="consulta__tabela">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (hospital of itensFiltrados(); track hospital.id) {
+        <tr [class.consulta__linha--inativa]="!hospital.ativo">
+          <td class="consulta__coluna-principal">{{ hospital.nome }}</td>
+          <td>
+            <span class="consulta__badge" [class.consulta__badge--neutro]="!hospital.ativo">
+              {{ hospital.ativo ? 'Ativo' : 'Inativo' }}
+            </span>
+          </td>
+          <td class="consulta__coluna-acao">
+            <button
+              mat-icon-button
+              type="button"
+              class="consulta__botao-visualizar"
+              aria-label="Visualizar hospital"
+              (click)="visualizar(hospital)"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <a
+              mat-icon-button
+              [routerLink]="['/hospitais', hospital.id, 'editar']"
+              class="consulta__botao-editar"
+              aria-label="Editar hospital"
+            >
+              <mat-icon>edit</mat-icon>
+            </a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-pagina-consulta>

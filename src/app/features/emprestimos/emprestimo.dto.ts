@@ -58,6 +58,11 @@ export interface EmprestimoItemDto {
   data_devolucao_efetiva: string | null;
   situacao: SituacaoEmprestimo | null;
   renovacao: string | null;
+  /** Anexados pelo backend a partir de `Material` — não são colunas de
+   * `emprestimo_item` (ver EmprestimoItemResponse em
+   * abrigo-backend/app/features/emprestimos/schemas.py). */
+  descricao_material: string;
+  tem_foto_material: boolean;
 }
 
 export interface EmprestimoItemCreateDto {

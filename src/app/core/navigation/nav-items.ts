@@ -9,6 +9,7 @@ export const NAV_ITEMS: NavItem[] = [
   { rota: '/pessoas', rotulo: 'Pessoas', icone: 'groups' },
   { rota: '/quartos', rotulo: 'Quartos', icone: 'meeting_room' },
   { rota: '/estadias', rotulo: 'Estadias', icone: 'hotel' },
+  { rota: '/hospitais', rotulo: 'Hospitais', icone: 'local_hospital' },
   { rota: '/voluntarios', rotulo: 'Voluntários', icone: 'volunteer_activism' },
   { rota: '/emprestimos', rotulo: 'Empréstimos', icone: 'inventory_2' },
   { rota: '/materiais', rotulo: 'Materiais', icone: 'category' },
