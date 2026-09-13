@@ -152,6 +152,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/busca/busca.page').then((m) => m.BuscaPage)
       },
       {
+        // Protótipo do fluxo de assinatura por toque — ver contrato-demo.page.ts.
+        path: 'contrato-demo',
+        loadComponent: () => import('./features/contrato-demo/contrato-demo.page').then((m) => m.ContratoDemoPage)
+      },
+      {
         path: 'solicitacoes-cadastro',
         loadComponent: () =>
           import('./features/solicitacoes-cadastro/consulta/solicitacao-cadastro-consulta.page').then(

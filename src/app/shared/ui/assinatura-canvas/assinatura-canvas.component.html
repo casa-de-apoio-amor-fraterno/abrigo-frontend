@@ -1,0 +1,32 @@
+<div class="assinatura-canvas">
+  <canvas
+    #canvas
+    class="assinatura-canvas__area"
+    [class.assinatura-canvas__area--confirmada]="assinaturaConfirmada()"
+    (pointerdown)="aoIniciarTraco($event)"
+    (pointermove)="aoMoverPonteiro($event)"
+    (pointerup)="aoSoltarTraco()"
+    (pointerleave)="aoSoltarTraco()"
+  ></canvas>
+
+  @if (!temTraco() && !assinaturaConfirmada()) {
+    <p class="assinatura-canvas__dica">Assine aqui com o dedo ou a caneta</p>
+  }
+
+  <div class="assinatura-canvas__acoes">
+    <button mat-button type="button" (click)="limpar()" [disabled]="!temTraco()">
+      <mat-icon>refresh</mat-icon>
+      Limpar
+    </button>
+    @if (!assinaturaConfirmada()) {
+      <button mat-flat-button type="button" (click)="confirmar()" [disabled]="!podeConfirmar()">
+        Confirmar assinatura
+      </button>
+    } @else {
+      <span class="assinatura-canvas__confirmado">
+        <mat-icon>check_circle</mat-icon>
+        Assinatura confirmada
+      </span>
+    }
+  </div>
+</div>

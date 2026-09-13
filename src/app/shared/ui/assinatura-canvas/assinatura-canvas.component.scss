@@ -1,0 +1,45 @@
+.assinatura-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__area {
+    width: 100%;
+    height: 220px;
+    border: 2px dashed rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    background: #fff;
+    // Sem isso, o gesto de assinar num tablet rola a página inteira em vez
+    // de desenhar no canvas — é o motivo mais comum de "canvas de
+    // assinatura não funciona" em dispositivo touch.
+    touch-action: none;
+    cursor: crosshair;
+
+    &--confirmada {
+      border-style: solid;
+      border-color: #2e7d32;
+    }
+  }
+
+  &__dica {
+    margin: 0;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 0.85rem;
+  }
+
+  &__acoes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__confirmado {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #2e7d32;
+    font-size: 0.9rem;
+  }
+}

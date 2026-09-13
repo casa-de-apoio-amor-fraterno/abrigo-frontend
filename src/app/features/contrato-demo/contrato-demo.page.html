@@ -1,0 +1,41 @@
+<div class="contrato-demo">
+  <mat-card class="contrato-demo__card">
+    <p class="contrato-demo__aviso">
+      <mat-icon>science</mat-icon>
+      Protótipo — valida o fluxo de assinatura por toque/caneta, não é a tela final de contrato.
+    </p>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nome da pessoa</mat-label>
+      <input matInput [(ngModel)]="nomePessoa" name="nomePessoa" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Texto do contrato</mat-label>
+      <textarea matInput rows="6" [(ngModel)]="textoContrato" name="textoContrato"></textarea>
+    </mat-form-field>
+
+    <app-assinatura-canvas />
+
+    @if (erro()) {
+      <p class="contrato-demo__erro">{{ erro() }}</p>
+    }
+
+    <div class="contrato-demo__acoes">
+      <button mat-flat-button type="button" [disabled]="!podeGerar() || gerando()" (click)="gerarPdf()">
+        @if (gerando()) {
+          Gerando...
+        } @else {
+          Gerar PDF
+        }
+      </button>
+    </div>
+
+    @if (pdfUrl(); as url) {
+      <a class="contrato-demo__link-pdf" mat-stroked-button [href]="url" target="_blank" rel="noopener">
+        <mat-icon>picture_as_pdf</mat-icon>
+        Abrir PDF gerado
+      </a>
+    }
+  </mat-card>
+</div>
