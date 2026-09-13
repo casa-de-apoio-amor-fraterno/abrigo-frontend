@@ -23,6 +23,7 @@ import { MaterialResumo } from '../materiais/material.model';
 import { VoluntarioService } from '../voluntarios/voluntario.service';
 import { VoluntarioResumo } from '../voluntarios/voluntario.model';
 import { AcaoPopoverComponent } from '../../shared/ui/acao-popover/acao-popover.component';
+import { agoraDatetimeLocal } from '../../shared/util/data';
 
 const LIMITE_RESULTADOS = 10;
 const LIMITE_PESSOAS_PARA_ESTADIAS = 5;
@@ -239,7 +240,7 @@ export class BuscaPage {
     event.stopPropagation();
     this.fecharDevolver();
     this.erroFinalizar.set(null);
-    this.dataSaidaFinalizar.set(new Date().toISOString().slice(0, 10));
+    this.dataSaidaFinalizar.set(agoraDatetimeLocal());
     this.estadiaFinalizarAberta.set(estadia.id);
   }
 

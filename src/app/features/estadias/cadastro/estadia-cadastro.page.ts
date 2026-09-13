@@ -33,6 +33,7 @@ import {
 } from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
+import { agoraDatetimeLocal } from '../../../shared/util/data';
 
 const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
   { valor: 'Em acompanhamento', rotulo: 'Em acompanhamento' },
@@ -137,7 +138,10 @@ export class EstadiaCadastroPage {
   protected readonly form = this.fb.nonNullable.group({
     idQuarto: this.fb.control<number | null>(null, Validators.required),
     idHospital: this.fb.control<number | null>(null),
-    dataEntrada: ['', [Validators.required]],
+    // Pré-preenchido com a hora atual do computador ao criar uma estadia
+    // nova (ver `agoraDatetimeLocal`) — em edição, sobrescrito pelo valor
+    // real da estadia no `constructor` abaixo.
+    dataEntrada: [this.modoEdicao ? '' : agoraDatetimeLocal(), [Validators.required]],
     dataSaida: [''],
     tipoPessoa: this.fb.nonNullable.control<TipoPessoaEstadia>('Paciente'),
     situacao: this.fb.nonNullable.control<SituacaoEstadia>('Em acompanhamento', Validators.required),
@@ -162,8 +166,8 @@ export class EstadiaCadastroPage {
           this.form.patchValue({
             idQuarto: estadia.idQuarto,
             idHospital: estadia.idHospital,
-            dataEntrada: estadia.dataEntrada.slice(0, 10),
-            dataSaida: estadia.dataSaida?.slice(0, 10) ?? '',
+            dataEntrada: estadia.dataEntrada.slice(0, 16),
+            dataSaida: estadia.dataSaida?.slice(0, 16) ?? '',
             tipoPessoa: estadia.tipoPessoa,
             situacao: estadia.situacao,
             tempoEstadiaValor: estadia.tempoEstadiaValor,

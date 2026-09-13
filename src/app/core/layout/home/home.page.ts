@@ -18,6 +18,7 @@ import { Hospital } from '../../../features/hospitais/hospital.model';
 import { AcaoPopoverComponent } from '../../../shared/ui/acao-popover/acao-popover.component';
 import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocomplete/pessoa-autocomplete.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
+import { agoraDatetimeLocal } from '../../../shared/util/data';
 
 const OPCOES_TIPO_PESSOA: OpcaoFiltroPill[] = [
   { valor: 'Paciente', rotulo: 'Paciente' },
@@ -142,7 +143,7 @@ export class HomePage {
     this.erroFinalizar.set(null);
     this.dataEntradaFinalizar = ocupante.dataEntrada;
     this.tempoEditadoManualmente = false;
-    this.dataSaidaFinalizar.set(new Date().toISOString().slice(0, 10));
+    this.dataSaidaFinalizar.set(agoraDatetimeLocal());
     this.recalcularTempoFinalizar();
     this.estadiaFinalizarAberta.set(ocupante.idEstadia);
   }
@@ -226,7 +227,7 @@ export class HomePage {
     this.fecharFinalizar();
     this.erroCriarEstadia.set(null);
     this.pessoaNovaEstadia.set(null);
-    this.dataEntradaNovaEstadia.set(new Date().toISOString().slice(0, 10));
+    this.dataEntradaNovaEstadia.set(agoraDatetimeLocal());
     this.tipoPessoaNovaEstadia.set('Paciente');
     this.idHospitalNovaEstadia.set(null);
     this.observacaoNovaEstadia.set('');

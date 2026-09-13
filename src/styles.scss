@@ -63,6 +63,29 @@ body {
   background: var(--abrigo-bg);
 }
 
+// O Material esconde de propósito o indicador nativo de calendário
+// (`.mdc-text-field__input::-webkit-calendar-picker-indicator { display:
+// none }`, no CSS base dele — espera que se use `<mat-datepicker>` em vez
+// de `<input type="date">` cru). Como o app usa `<input type="date">` cru
+// em vários formulários (mais simples, sem precisar de um componente de
+// datepicker à parte), precisa de !important pra vencer essa regra e
+// devolver o ícone/popup nativo — sem ele, o campo só edita por segmento
+// (dd/mm/aaaa digitado), sem abrir calendário algum. `datetime-local` sofre
+// do mesmo problema (Estadia.data_entrada/data_saida, ver
+// estadia-cadastro.page.html) — mesma regra estendida pro tipo novo.
+input[matInput][type='date'],
+input[matInput][type='datetime-local'] {
+  -webkit-appearance: auto;
+  appearance: auto;
+
+  &::-webkit-calendar-picker-indicator {
+    display: block !important;
+    -webkit-appearance: auto;
+    opacity: 1 !important;
+    cursor: pointer !important;
+  }
+}
+
 // "Mobília" compartilhada das páginas de Consulta e Cadastro (ver
 // shared/ui/pagina-consulta e shared/ui/pagina-cadastro). Fica global, não
 // no .scss de cada componente, porque grande parte do markup que usa essas
@@ -593,6 +616,14 @@ body {
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+// Campo "Tempo estadia" (número + sufixo de unidade, ex.: "4 Dias") — usado
+// em estadia-cadastro.page.html e home.page.html (popover de finalizar).
+// Sem isso, o número fica alinhado à esquerda e o sufixo à direita, com um
+// vão enorme entre os dois; alinhar o número à direita cola ele no sufixo.
+.campo-tempo-estadia input {
+  text-align: right;
 }
 
 .cadastro-dialog-panel {

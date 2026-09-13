@@ -83,10 +83,10 @@
                       (confirmar)="confirmarFinalizar(estadia)"
                     >
                       <mat-form-field appearance="outline">
-                        <mat-label>Data de saída</mat-label>
+                        <mat-label>Data/hora de saída</mat-label>
                         <input
                           matInput
-                          type="date"
+                          type="datetime-local"
                           [value]="dataSaidaFinalizar()"
                           (input)="dataSaidaFinalizar.set($any($event.target).value)"
                         />

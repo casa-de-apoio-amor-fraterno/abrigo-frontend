@@ -63,10 +63,10 @@
                     (confirmar)="confirmarFinalizar(ocupante.idEstadia)"
                   >
                     <mat-form-field appearance="outline">
-                      <mat-label>Data de saída</mat-label>
+                      <mat-label>Data/hora de saída</mat-label>
                       <input
                         matInput
-                        type="date"
+                        type="datetime-local"
                         [value]="dataSaidaFinalizar()"
                         (input)="alterarDataSaidaFinalizar($any($event.target).value)"
                       />
@@ -124,10 +124,10 @@
                   (mudanca)="tipoPessoaNovaEstadia.set($any($event))"
                 />
                 <mat-form-field appearance="outline">
-                  <mat-label>Data de entrada</mat-label>
+                  <mat-label>Data/hora de entrada</mat-label>
                   <input
                     matInput
-                    type="date"
+                    type="datetime-local"
                     [value]="dataEntradaNovaEstadia()"
                     (input)="dataEntradaNovaEstadia.set($any($event.target).value)"
                   />

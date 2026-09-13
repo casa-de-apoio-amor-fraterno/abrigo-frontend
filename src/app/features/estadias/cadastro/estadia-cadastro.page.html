@@ -49,16 +49,16 @@
           </div>
 
           <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Data de entrada</mat-label>
-            <input matInput type="date" formControlName="dataEntrada" />
+            <mat-label>Data/hora de entrada</mat-label>
+            <input matInput type="datetime-local" formControlName="dataEntrada" />
             @if (form.controls.dataEntrada.touched && form.controls.dataEntrada.invalid) {
               <mat-error>Informe a data de entrada</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Data de saída</mat-label>
-            <input matInput type="date" formControlName="dataSaida" />
+            <mat-label>Data/hora de saída</mat-label>
+            <input matInput type="datetime-local" formControlName="dataSaida" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="cadastro__campo campo-tempo-estadia">
