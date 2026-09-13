@@ -10,7 +10,7 @@ html {
     (
       color: mat.$cyan-palette,
       typography: Roboto,
-      density: 0
+      density: 0,
     )
   );
 
@@ -624,6 +624,28 @@ input[matInput][type='datetime-local'] {
 // vão enorme entre os dois; alinhar o número à direita cola ele no sufixo.
 .campo-tempo-estadia input {
   text-align: right;
+}
+
+// Diálogo de assinatura (assinatura-canvas.component.ts) — sempre em tela
+// cheia, não só no mobile (mesmo num desktop, assinar precisa do máximo de
+// espaço possível), sem os cantos arredondados/padding padrão do Material.
+.assinatura-dialog-panel {
+  max-width: 100vw !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  margin: 0 !important;
+
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: #fff;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .mdc-dialog__surface {
+    border-radius: 0 !important;
+    height: 100%;
+  }
 }
 
 .cadastro-dialog-panel {

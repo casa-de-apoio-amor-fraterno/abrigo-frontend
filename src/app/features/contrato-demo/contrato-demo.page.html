@@ -22,7 +22,12 @@
     }
 
     <div class="contrato-demo__acoes">
-      <button mat-flat-button type="button" [disabled]="!podeGerar() || gerando()" (click)="gerarPdf()">
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="!podeGerar() || gerando()"
+        (click)="gerarPdf()"
+      >
         @if (gerando()) {
           Gerando...
         } @else {
@@ -32,7 +37,13 @@
     </div>
 
     @if (pdfUrl(); as url) {
-      <a class="contrato-demo__link-pdf" mat-stroked-button [href]="url" target="_blank" rel="noopener">
+      <a
+        class="contrato-demo__link-pdf"
+        mat-stroked-button
+        [href]="url"
+        target="_blank"
+        rel="noopener"
+      >
         <mat-icon>picture_as_pdf</mat-icon>
         Abrir PDF gerado
       </a>

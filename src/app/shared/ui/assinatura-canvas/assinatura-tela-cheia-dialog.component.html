@@ -1,0 +1,26 @@
+<div class="assinatura-tela-cheia">
+  <p class="assinatura-tela-cheia__aviso-retrato">
+    <mat-icon>screen_rotation</mat-icon>
+    Gire o aparelho na horizontal pra assinar melhor
+  </p>
+
+  <canvas
+    #canvas
+    class="assinatura-tela-cheia__canvas"
+    (pointerdown)="aoIniciarTraco($event)"
+    (pointermove)="aoMoverPonteiro($event)"
+    (pointerup)="aoSoltarTraco()"
+    (pointerleave)="aoSoltarTraco()"
+  ></canvas>
+
+  <div class="assinatura-tela-cheia__acoes">
+    <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+    <button mat-button type="button" (click)="limpar()" [disabled]="!temTraco()">
+      <mat-icon>refresh</mat-icon>
+      Limpar
+    </button>
+    <button mat-flat-button type="button" (click)="confirmar()" [disabled]="!podeConfirmar()">
+      Confirmar assinatura
+    </button>
+  </div>
+</div>

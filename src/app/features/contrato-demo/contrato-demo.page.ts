@@ -27,10 +27,10 @@ import { ContratoDemoService } from './contrato-demo.service';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    AssinaturaCanvasComponent
+    AssinaturaCanvasComponent,
   ],
   templateUrl: './contrato-demo.page.html',
-  styleUrl: './contrato-demo.page.scss'
+  styleUrl: './contrato-demo.page.scss',
 })
 export class ContratoDemoPage {
   private readonly contratoDemoService = inject(ContratoDemoService);
@@ -74,7 +74,7 @@ export class ContratoDemoPage {
       .gerarPdf({
         nomePessoa: this.nomePessoa,
         textoContrato: this.textoContrato,
-        assinaturaPngBase64: assinatura
+        assinaturaPngBase64: assinatura,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -85,7 +85,7 @@ export class ContratoDemoPage {
         error: async (resposta) => {
           this.gerando.set(false);
           this.erro.set(await this.descreverErroBlob(resposta.error));
-        }
+        },
       });
   }
 

@@ -24,9 +24,9 @@ export class ContratoDemoService {
       {
         nome_pessoa: dados.nomePessoa,
         texto_contrato: dados.textoContrato,
-        assinatura_png_base64: dados.assinaturaPngBase64
+        assinatura_png_base64: dados.assinaturaPngBase64,
       },
-      { responseType: 'blob' }
+      { responseType: 'blob' },
     );
   }
 }
