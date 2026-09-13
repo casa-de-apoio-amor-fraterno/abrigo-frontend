@@ -68,9 +68,25 @@
                         matInput
                         type="date"
                         [value]="dataSaidaFinalizar()"
-                        (input)="dataSaidaFinalizar.set($any($event.target).value)"
+                        (input)="alterarDataSaidaFinalizar($any($event.target).value)"
                       />
                     </mat-form-field>
+                    <mat-form-field appearance="outline" class="campo-tempo-estadia">
+                      <mat-label>Tempo estadia</mat-label>
+                      <input
+                        matInput
+                        type="number"
+                        min="0"
+                        [value]="tempoEstadiaValorFinalizar()"
+                        (input)="alterarTempoEstadiaValorFinalizar($any($event.target).valueAsNumber || null)"
+                      />
+                      <span matSuffix>{{ rotuloUnidadeTempo(tempoEstadiaUnidadeFinalizar()) }}</span>
+                    </mat-form-field>
+                    <app-filtro-pills
+                      [opcoes]="opcoesUnidadeTempo"
+                      [valor]="tempoEstadiaUnidadeFinalizar()"
+                      (mudanca)="alterarTempoEstadiaUnidadeFinalizar($any($event))"
+                    />
                   </app-acao-popover>
                 }
               }
@@ -102,6 +118,11 @@
                   [valorInicial]="pessoaNovaEstadia()"
                   (selecionada)="pessoaNovaEstadia.set($event)"
                 />
+                <app-filtro-pills
+                  [opcoes]="opcoesTipoPessoa"
+                  [valor]="tipoPessoaNovaEstadia()"
+                  (mudanca)="tipoPessoaNovaEstadia.set($any($event))"
+                />
                 <mat-form-field appearance="outline">
                   <mat-label>Data de entrada</mat-label>
                   <input
@@ -110,6 +131,27 @@
                     [value]="dataEntradaNovaEstadia()"
                     (input)="dataEntradaNovaEstadia.set($any($event.target).value)"
                   />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Hospital</mat-label>
+                  <mat-select
+                    [value]="idHospitalNovaEstadia()"
+                    (selectionChange)="idHospitalNovaEstadia.set($event.value)"
+                  >
+                    <mat-option [value]="null">—</mat-option>
+                    @for (hospital of hospitais(); track hospital.id) {
+                      <mat-option [value]="hospital.id">{{ hospital.nome }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Observação</mat-label>
+                  <textarea
+                    matInput
+                    rows="2"
+                    [value]="observacaoNovaEstadia()"
+                    (input)="observacaoNovaEstadia.set($any($event.target).value)"
+                  ></textarea>
                 </mat-form-field>
               </app-acao-popover>
             }

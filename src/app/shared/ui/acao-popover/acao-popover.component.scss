@@ -46,7 +46,13 @@
     padding: 8px 16px 16px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    // 4px deixava a label flutuante do mat-form-field (outline) colada —
+    // às vezes sobreposta — no elemento anterior quando ele não é outro
+    // mat-form-field (ex.: as pills de "Paciente/Acompanhante" acima do
+    // campo "Data de entrada" em "Nova estadia"). Mat-form-field já reserva
+    // espaço pra própria label via subscript wrapper embaixo, mas não tem
+    // margem própria em cima.
+    gap: 14px;
 
     // O conteúdo projetado (campo do formulário) fica full-width, mesmo
     // padrão do que era `.busca__popover-campo` — dá pra projetar mais de
