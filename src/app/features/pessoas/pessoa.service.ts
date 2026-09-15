@@ -63,10 +63,12 @@ export class PessoaService {
       .pipe(map(paraPessoaModel));
   }
 
-  /** URL direta da imagem (GET /api/pessoas/{id}/foto) — sem endpoint próprio
-   * exigindo autenticação, então dá pra usar direto num `<img [src]>`. */
-  fotoUrl(id: number): string {
-    return `${this.resource}/${id}/foto`;
+  /** GET /api/pessoas/{id}/foto exige autenticação (foto de pessoa
+   * atendida é dado sensível), então não dá pra usar direto num
+   * `<img [src]>` — precisa passar pelo `HttpClient` (que o
+   * `authInterceptor` anexa o Bearer token) e virar object URL. */
+  buscarFoto(id: number): Observable<Blob> {
+    return this.http.get(`${this.resource}/${id}/foto`, { responseType: 'blob' });
   }
 
   salvarFoto(id: number, arquivo: Blob): Observable<Pessoa> {

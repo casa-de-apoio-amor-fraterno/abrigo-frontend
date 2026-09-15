@@ -22,6 +22,7 @@ export class CapturaFotoComponent {
 
   protected readonly video = viewChild<ElementRef<HTMLVideoElement>>('video');
   protected readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+  protected readonly arquivoInput = viewChild<ElementRef<HTMLInputElement>>('arquivoInput');
 
   protected readonly streamAtivo = signal<MediaStream | null>(null);
   protected readonly previaUrl = signal<string | null>(null);
@@ -69,7 +70,28 @@ export class CapturaFotoComponent {
 
   protected tentarNovamente(): void {
     this.limparPreVisualizacao();
-    void this.ativarCamera();
+  }
+
+  protected selecionarArquivo(): void {
+    this.erro.set(null);
+    this.arquivoInput()?.nativeElement.click();
+  }
+
+  protected arquivoSelecionado(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    const arquivo = input.files?.[0] ?? null;
+    input.value = '';
+
+    if (!arquivo) {
+      return;
+    }
+    if (!arquivo.type.startsWith('image/')) {
+      this.erro.set('Selecione um arquivo de imagem.');
+      return;
+    }
+
+    this.blobCapturado = arquivo;
+    this.previaUrl.set(URL.createObjectURL(arquivo));
   }
 
   protected confirmar(): void {

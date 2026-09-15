@@ -92,10 +92,13 @@ export class PessoaCadastroPage {
   // `fotoLocal`/`fotoLocalUrl`) e só é enviada depois que `salvar()` cria a
   // pessoa e recebe o id.
   protected readonly temFoto = signal(false);
-  protected readonly fotoVersion = signal(0);
   protected readonly erroFoto = signal<string | null>(null);
   protected readonly fotoLocal = signal<Blob | null>(null);
   protected readonly fotoLocalUrl = signal<string | null>(null);
+  // GET /pessoas/{id}/foto exige autenticação — não dá pra usar a URL direto
+  // num <img [src]>, então busca o blob via HttpClient (authInterceptor
+  // anexa o token) e guarda como object URL (ver carregarFotoRemota).
+  protected readonly fotoRemotaUrl = signal<string | null>(null);
 
   protected readonly estados = signal<Estado[]>([]);
   protected readonly municipios = signal<Municipio[]>([]);
@@ -121,6 +124,10 @@ export class PessoaCadastroPage {
       const url = this.fotoLocalUrl();
       if (url) {
         URL.revokeObjectURL(url);
+      }
+      const remota = this.fotoRemotaUrl();
+      if (remota) {
+        URL.revokeObjectURL(remota);
       }
     });
 
@@ -159,6 +166,7 @@ export class PessoaCadastroPage {
             observacao: pessoa.observacao ?? ''
           });
           this.temFoto.set(pessoa.tem_foto);
+          this.carregarFotoRemota();
           this.carregando.set(false);
         },
         error: () => {
@@ -239,12 +247,19 @@ export class PessoaCadastroPage {
     if (this.pessoaId === null) {
       return this.fotoLocalUrl();
     }
-    if (!this.temFoto()) {
-      return null;
+    return this.fotoRemotaUrl();
+  }
+
+  private carregarFotoRemota(): void {
+    const anterior = this.fotoRemotaUrl();
+    if (anterior) {
+      URL.revokeObjectURL(anterior);
     }
-    // cache-busting: sem isso, o navegador mostraria a foto antiga (mesma
-    // URL) depois de trocar/remover.
-    return `${this.pessoaService.fotoUrl(this.pessoaId)}?v=${this.fotoVersion()}`;
+    if (this.pessoaId === null || !this.temFoto()) {
+      this.fotoRemotaUrl.set(null);
+      return;
+    }
+    this.pessoaService.buscarFoto(this.pessoaId).subscribe((blob) => this.fotoRemotaUrl.set(URL.createObjectURL(blob)));
   }
 
   protected salvarFoto(arquivo: Blob): void {
@@ -263,7 +278,7 @@ export class PessoaCadastroPage {
     this.pessoaService.salvarFoto(this.pessoaId, arquivo).subscribe({
       next: () => {
         this.temFoto.set(true);
-        this.fotoVersion.update((v) => v + 1);
+        this.carregarFotoRemota();
       },
       error: (error) => this.erroFoto.set(descreverErroHttp(error.error))
     });
@@ -290,7 +305,7 @@ export class PessoaCadastroPage {
     this.pessoaService.removerFoto(this.pessoaId).subscribe({
       next: () => {
         this.temFoto.set(false);
-        this.fotoVersion.update((v) => v + 1);
+        this.carregarFotoRemota();
       },
       error: (error) => this.erroFoto.set(descreverErroHttp(error.error))
     });

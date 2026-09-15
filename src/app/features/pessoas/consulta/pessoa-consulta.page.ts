@@ -43,23 +43,37 @@ export class PessoaConsultaPage {
   }
 
   protected visualizar(pessoa: PessoaResumo): void {
-    this.dialog.open(DetalheDialogComponent, {
-      width: pessoa.tem_foto ? '480px' : '420px',
-      data: {
-        titulo: pessoa.nome,
-        campos: [
-          { rotulo: 'CPF', valor: pessoa.cpf ? mascararCpf(pessoa.cpf) : '—' },
-          { rotulo: 'Telefone', valor: pessoa.telefone_principal || '—' },
-          {
-            rotulo: 'Nascimento',
-            valor: pessoa.data_nascimento ? formatDate(pessoa.data_nascimento, 'dd/MM/yyyy', 'pt-BR') : '—'
-          }
-        ],
-        linkEditar: ['/pessoas', pessoa.id, 'editar'],
-        labelEditar: 'Editar pessoa',
-        fotoUrl: pessoa.tem_foto ? this.pessoaService.fotoUrl(pessoa.id) : null
+    const abrir = (fotoUrl: string | null): void => {
+      const dialogRef = this.dialog.open(DetalheDialogComponent, {
+        width: pessoa.tem_foto ? '480px' : '420px',
+        data: {
+          titulo: pessoa.nome,
+          campos: [
+            { rotulo: 'CPF', valor: pessoa.cpf ? mascararCpf(pessoa.cpf) : '—' },
+            { rotulo: 'Telefone', valor: pessoa.telefone_principal || '—' },
+            {
+              rotulo: 'Nascimento',
+              valor: pessoa.data_nascimento ? formatDate(pessoa.data_nascimento, 'dd/MM/yyyy', 'pt-BR') : '—'
+            }
+          ],
+          linkEditar: ['/pessoas', pessoa.id, 'editar'],
+          labelEditar: 'Editar pessoa',
+          fotoUrl
+        }
+      });
+      if (fotoUrl) {
+        dialogRef.afterClosed().subscribe(() => URL.revokeObjectURL(fotoUrl));
       }
-    });
+    };
+
+    // GET /pessoas/{id}/foto exige autenticação — não dá pra usar a URL
+    // direto num <img [src]>, precisa buscar o blob via HttpClient (ver
+    // PessoaService.buscarFoto) e virar object URL.
+    if (pessoa.tem_foto) {
+      this.pessoaService.buscarFoto(pessoa.id).subscribe((blob) => abrir(URL.createObjectURL(blob)));
+    } else {
+      abrir(null);
+    }
   }
 
   protected exportarCsv(): void {
