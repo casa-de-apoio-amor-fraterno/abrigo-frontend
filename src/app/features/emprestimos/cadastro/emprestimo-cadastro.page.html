@@ -127,6 +127,57 @@
     }
   }
 
+  @if (abaAtiva() === 'contrato') {
+    @if (carregandoContrato()) {
+      <div class="cadastro__estado">
+        <mat-spinner diameter="32" />
+      </div>
+    } @else if (contrato(); as contratoAssinado) {
+      <p class="cadastro__subtitulo">
+        Contrato assinado em {{ contratoAssinado.dataAssinatura | date: 'dd/MM/yyyy HH:mm' }}.
+      </p>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="abrindoPdfContrato()"
+        (click)="abrirPdfContrato()"
+      >
+        <mat-icon>picture_as_pdf</mat-icon>
+        @if (abrindoPdfContrato()) {
+          Abrindo...
+        } @else {
+          Abrir PDF do contrato
+        }
+      </button>
+    } @else {
+      <p class="cadastro__subtitulo">
+        Peça pro responsável assinar na tela abaixo (toque ou caneta) pra gerar o termo de
+        comodato assinado.
+      </p>
+
+      <app-assinatura-canvas />
+
+      @if (erroContrato()) {
+        <p class="cadastro__erro">{{ erroContrato() }}</p>
+      }
+
+      <div class="cadastro__subsecao-cabecalho">
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="!podeAssinarContrato() || assinandoContrato()"
+          (click)="assinarContrato()"
+        >
+          @if (assinandoContrato()) {
+            Assinando...
+          } @else {
+            Assinar contrato
+          }
+        </button>
+      </div>
+    }
+  }
+
   @if (abaAtiva() === 'historico') {
     @if (carregandoHistorico()) {
       <div class="cadastro__estado">

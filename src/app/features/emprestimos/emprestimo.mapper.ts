@@ -1,4 +1,5 @@
 import {
+  EmprestimoContratoDto,
   EmprestimoDto,
   EmprestimoHistoricoDto,
   EmprestimoItemDto,
@@ -7,6 +8,7 @@ import {
 } from './emprestimo.dto';
 import {
   Emprestimo,
+  EmprestimoContrato,
   EmprestimoHistorico,
   EmprestimoItem,
   EmprestimoResumo,
@@ -58,5 +60,14 @@ export function paraHistoricoModel(dto: EmprestimoHistoricoDto): EmprestimoHisto
     tipo: dto.tipo,
     observacao: dto.observacao,
     dataCadastro: dto.data_cadastro
+  };
+}
+
+export function paraContratoModel(dto: EmprestimoContratoDto): EmprestimoContrato {
+  return {
+    id: dto.id,
+    idEmprestimo: dto.id_emprestimo,
+    idUsuario: dto.id_usuario,
+    dataAssinatura: dto.data_assinatura
   };
 }

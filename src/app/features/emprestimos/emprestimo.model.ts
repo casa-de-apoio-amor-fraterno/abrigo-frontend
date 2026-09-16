@@ -48,3 +48,13 @@ export interface EmprestimoHistorico {
   observacao: string;
   dataCadastro: string;
 }
+
+/** Termo de responsabilidade assinado por toque/caneta — um por empréstimo
+ * (`EmprestimoContrato.id_emprestimo` é `unique` no backend). O PDF em si
+ * não vem nesse recurso, só os metadados; ver `EmprestimoService.obterPdfContrato`. */
+export interface EmprestimoContrato {
+  id: number;
+  idEmprestimo: number;
+  idUsuario: number;
+  dataAssinatura: string;
+}

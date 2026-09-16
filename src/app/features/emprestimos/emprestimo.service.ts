@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
+  EmprestimoContratoDto,
   EmprestimoCreateDto,
   EmprestimoDto,
   EmprestimoHistoricoDto,
@@ -13,8 +14,20 @@ import {
   EmprestimoUpdateDto,
   ListaEmprestimosDto
 } from './emprestimo.dto';
-import { paraHistoricoModel, paraItemModel, paraListaModel, paraModel } from './emprestimo.mapper';
-import { Emprestimo, EmprestimoHistorico, EmprestimoItem, ListaEmprestimos } from './emprestimo.model';
+import {
+  paraContratoModel,
+  paraHistoricoModel,
+  paraItemModel,
+  paraListaModel,
+  paraModel
+} from './emprestimo.mapper';
+import {
+  Emprestimo,
+  EmprestimoContrato,
+  EmprestimoHistorico,
+  EmprestimoItem,
+  ListaEmprestimos
+} from './emprestimo.model';
 
 export interface ConsultaEmprestimosQuery {
   idPessoa?: number;
@@ -93,5 +106,30 @@ export class EmprestimoService {
     return this.http
       .get<EmprestimoHistoricoDto[]>(`${this.resource}/${emprestimoId}/historico`)
       .pipe(map((itens) => itens.map(paraHistoricoModel)));
+  }
+
+  /** `404` quando o empréstimo ainda não tem contrato assinado — o
+   * componente que chama isso trata o erro como "ainda não assinado", não
+   * como falha de verdade. */
+  buscarContrato(emprestimoId: number): Observable<EmprestimoContrato> {
+    return this.http
+      .get<EmprestimoContratoDto>(`${this.resource}/${emprestimoId}/contrato`)
+      .pipe(map(paraContratoModel));
+  }
+
+  obterPdfContrato(emprestimoId: number): Observable<Blob> {
+    return this.http.get(`${this.resource}/${emprestimoId}/contrato/pdf`, { responseType: 'blob' });
+  }
+
+  /** Assina o contrato (gera o PDF com o texto real do modelo — ver
+   * `app/features/emprestimos/service.py` no backend — colando a
+   * assinatura capturada no canvas). Um contrato por empréstimo: assinar
+   * de novo retorna 409. */
+  assinarContrato(emprestimoId: number, assinaturaPngBase64: string): Observable<EmprestimoContrato> {
+    return this.http
+      .post<EmprestimoContratoDto>(`${this.resource}/${emprestimoId}/contrato`, {
+        assinatura_png_base64: assinaturaPngBase64
+      })
+      .pipe(map(paraContratoModel));
   }
 }

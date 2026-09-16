@@ -86,3 +86,10 @@ export interface EmprestimoHistoricoDto {
   observacao: string;
   data_cadastro: string;
 }
+
+export interface EmprestimoContratoDto {
+  id: number;
+  id_emprestimo: number;
+  id_usuario: number;
+  data_assinatura: string;
+}

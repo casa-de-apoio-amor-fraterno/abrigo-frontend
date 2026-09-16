@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,13 +12,19 @@ import { MatSelectModule } from '@angular/material/select';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { descreverErroHttp } from '../../../core/http/api-error';
+import { AssinaturaCanvasComponent } from '../../../shared/ui/assinatura-canvas/assinatura-canvas.component';
 import { MaterialAutocompleteComponent } from '../../../shared/ui/material-autocomplete/material-autocomplete.component';
 import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocomplete/pessoa-autocomplete.component';
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { MaterialService } from '../../materiais/material.service';
 import { EmprestimoItemCreateDto } from '../emprestimo.dto';
 import { EmprestimoService } from '../emprestimo.service';
-import { EmprestimoHistorico, EmprestimoItem, SituacaoEmprestimo } from '../emprestimo.model';
+import {
+  EmprestimoContrato,
+  EmprestimoHistorico,
+  EmprestimoItem,
+  SituacaoEmprestimo
+} from '../emprestimo.model';
 import {
   CadastroDialogAba,
   CadastroDialogShellComponent
@@ -38,7 +45,8 @@ import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadast
     MatProgressSpinnerModule,
     MatSelectModule,
     CadastroDialogShellComponent,
-    CadastroAcoesComponent
+    CadastroAcoesComponent,
+    AssinaturaCanvasComponent
   ],
   templateUrl: './emprestimo-cadastro.page.html',
   styleUrl: './emprestimo-cadastro.page.scss'
@@ -51,6 +59,7 @@ export class EmprestimoCadastroPage {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly emprestimoId = this.route.snapshot.paramMap.get('id')
     ? Number(this.route.snapshot.paramMap.get('id'))
@@ -65,7 +74,14 @@ export class EmprestimoCadastroPage {
   protected readonly abas: CadastroDialogAba[] = [
     { id: 'dados', rotulo: 'Dados' },
     { id: 'itens', rotulo: 'Itens do empréstimo' },
-    ...(this.modoEdicao ? [{ id: 'historico', rotulo: 'Histórico de alteração' }] : [])
+    // Contrato depende de um id de empréstimo já persistido (é um
+    // sub-recurso, POST /emprestimos/{id}/contrato) — só existe em edição.
+    ...(this.modoEdicao
+      ? [
+          { id: 'historico', rotulo: 'Histórico de alteração' },
+          { id: 'contrato', rotulo: 'Contrato' }
+        ]
+      : [])
   ];
   protected readonly abaAtiva = signal('dados');
 
@@ -97,6 +113,13 @@ export class EmprestimoCadastroPage {
 
   protected readonly historico = signal<EmprestimoHistorico[]>([]);
   protected readonly carregandoHistorico = signal(false);
+
+  protected readonly assinaturaCanvas = viewChild(AssinaturaCanvasComponent);
+  protected readonly contrato = signal<EmprestimoContrato | null>(null);
+  protected readonly carregandoContrato = signal(false);
+  protected readonly assinandoContrato = signal(false);
+  protected readonly erroContrato = signal<string | null>(null);
+  protected readonly abrindoPdfContrato = signal(false);
 
   // Situação do cabeçalho não é digitada pelo usuário — calculada pelo
   // backend a partir dos itens (ver emprestimo.legacy.md / service.py),
@@ -133,6 +156,7 @@ export class EmprestimoCadastroPage {
 
           this.carregarItens();
           this.carregarHistorico();
+          this.carregarContrato();
         },
         error: () => {
           this.erro.set('Não foi possível carregar os dados do empréstimo.');
@@ -331,5 +355,79 @@ export class EmprestimoCadastroPage {
       return sessao.nome;
     }
     return `Usuário #${idUsuario}`;
+  }
+
+  protected podeAssinarContrato(): boolean {
+    return !!this.assinaturaCanvas()?.obterAssinatura();
+  }
+
+  protected assinarContrato(): void {
+    const assinatura = this.assinaturaCanvas()?.obterAssinatura();
+    if (this.emprestimoId === null || !assinatura) {
+      return;
+    }
+
+    this.erroContrato.set(null);
+    this.assinandoContrato.set(true);
+
+    this.emprestimoService
+      .assinarContrato(this.emprestimoId, assinatura)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (contrato) => {
+          this.assinandoContrato.set(false);
+          this.contrato.set(contrato);
+        },
+        error: (error) => {
+          this.assinandoContrato.set(false);
+          this.erroContrato.set(descreverErroHttp(error.error));
+        }
+      });
+  }
+
+  protected abrirPdfContrato(): void {
+    if (this.emprestimoId === null) {
+      return;
+    }
+    this.erroContrato.set(null);
+    this.abrindoPdfContrato.set(true);
+    this.emprestimoService
+      .obterPdfContrato(this.emprestimoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blob) => {
+          this.abrindoPdfContrato.set(false);
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank', 'noopener');
+          // Não revoga na hora — a aba recém-aberta ainda precisa da URL
+          // pra carregar o PDF; deixa o navegador liberar ao fechar.
+        },
+        error: () => {
+          this.abrindoPdfContrato.set(false);
+          this.erroContrato.set('Não foi possível abrir o PDF do contrato.');
+        }
+      });
+  }
+
+  private carregarContrato(): void {
+    if (this.emprestimoId === null) {
+      return;
+    }
+    this.carregandoContrato.set(true);
+    this.emprestimoService
+      .buscarContrato(this.emprestimoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        // 404 aqui é o caso normal "ainda não assinado" (ver
+        // EmprestimoService.buscarContrato), não um erro de carregamento.
+        next: (contrato) => {
+          this.contrato.set(contrato);
+          this.carregandoContrato.set(false);
+        },
+        error: () => {
+          this.contrato.set(null);
+          this.carregandoContrato.set(false);
+        }
+      });
   }
 }
