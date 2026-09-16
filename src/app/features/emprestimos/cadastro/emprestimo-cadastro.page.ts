@@ -119,7 +119,12 @@ export class EmprestimoCadastroPage {
   protected readonly carregandoContrato = signal(false);
   protected readonly assinandoContrato = signal(false);
   protected readonly erroContrato = signal<string | null>(null);
-  protected readonly abrindoPdfContrato = signal(false);
+  // URL local do PDF já assinado — carregada assim que o contrato é
+  // encontrado (ver `carregarContrato`) pra virar um link comum
+  // (`<a href target="_blank">`), não um `window.open()` disparado de
+  // dentro de um callback assíncrono (bloqueado como pop-up na maioria dos
+  // navegadores — mesmo padrão de `contrato-demo.page.ts`).
+  protected readonly pdfContratoUrl = signal<string | null>(null);
 
   // Situação do cabeçalho não é digitada pelo usuário — calculada pelo
   // backend a partir dos itens (ver emprestimo.legacy.md / service.py),
@@ -139,6 +144,8 @@ export class EmprestimoCadastroPage {
   });
 
   constructor() {
+    this.destroyRef.onDestroy(() => this.revogarPdfContratoUrl());
+
     if (this.emprestimoId !== null) {
       this.emprestimoService.buscar(this.emprestimoId).subscribe({
         next: (emprestimo) => {
@@ -377,34 +384,11 @@ export class EmprestimoCadastroPage {
         next: (contrato) => {
           this.assinandoContrato.set(false);
           this.contrato.set(contrato);
+          this.carregarPdfContrato();
         },
         error: (error) => {
           this.assinandoContrato.set(false);
           this.erroContrato.set(descreverErroHttp(error.error));
-        }
-      });
-  }
-
-  protected abrirPdfContrato(): void {
-    if (this.emprestimoId === null) {
-      return;
-    }
-    this.erroContrato.set(null);
-    this.abrindoPdfContrato.set(true);
-    this.emprestimoService
-      .obterPdfContrato(this.emprestimoId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (blob) => {
-          this.abrindoPdfContrato.set(false);
-          const url = URL.createObjectURL(blob);
-          window.open(url, '_blank', 'noopener');
-          // Não revoga na hora — a aba recém-aberta ainda precisa da URL
-          // pra carregar o PDF; deixa o navegador liberar ao fechar.
-        },
-        error: () => {
-          this.abrindoPdfContrato.set(false);
-          this.erroContrato.set('Não foi possível abrir o PDF do contrato.');
         }
       });
   }
@@ -423,11 +407,32 @@ export class EmprestimoCadastroPage {
         next: (contrato) => {
           this.contrato.set(contrato);
           this.carregandoContrato.set(false);
+          this.carregarPdfContrato();
         },
         error: () => {
           this.contrato.set(null);
           this.carregandoContrato.set(false);
         }
       });
+  }
+
+  private carregarPdfContrato(): void {
+    if (this.emprestimoId === null) {
+      return;
+    }
+    this.emprestimoService
+      .obterPdfContrato(this.emprestimoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blob) => this.pdfContratoUrl.set(URL.createObjectURL(blob)),
+        error: () => this.erroContrato.set('Não foi possível carregar o PDF do contrato.')
+      });
+  }
+
+  private revogarPdfContratoUrl(): void {
+    const url = this.pdfContratoUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
   }
 }
