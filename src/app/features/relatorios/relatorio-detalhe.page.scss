@@ -1,0 +1,125 @@
+.relatorio-detalhe {
+  padding: 8px 4px;
+  max-width: 640px;
+
+  &__voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 16px;
+    color: var(--abrigo-texto-secundario);
+    text-decoration: none;
+    font-size: 13px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      color: var(--abrigo-ink);
+    }
+  }
+
+  &__cabecalho {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    h1 {
+      margin: 0 0 4px;
+      color: var(--abrigo-ink);
+    }
+
+    p {
+      margin: 0;
+      color: var(--abrigo-texto-secundario);
+    }
+  }
+
+  &__icone {
+    flex-shrink: 0;
+    color: var(--abrigo-primary);
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  &__periodo {
+    margin-bottom: 20px;
+  }
+
+  &__periodo-rotulo {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__resumo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  &__resumo-estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px 0;
+    color: var(--abrigo-texto-secundario);
+
+    &--erro {
+      color: #c62828;
+    }
+  }
+
+  &__resumo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 140px;
+    padding: 12px 16px;
+    background: var(--abrigo-surface);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px var(--abrigo-sombra);
+  }
+
+  &__resumo-valor {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--abrigo-primary);
+  }
+
+  &__resumo-rotulo {
+    font-size: 12px;
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__erro {
+    color: #c62828;
+    margin-bottom: 16px;
+  }
+
+  &__acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+
+    button,
+    a {
+      min-width: 200px;
+    }
+
+    mat-spinner {
+      display: inline-block;
+      margin-right: 8px;
+    }
+  }
+}

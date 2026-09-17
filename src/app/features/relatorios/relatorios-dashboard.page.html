@@ -1,0 +1,17 @@
+<div class="relatorios">
+  <h1>Relatórios</h1>
+  <p>Escolha o relatório que deseja gerar em PDF.</p>
+
+  <div class="relatorios__lista">
+    @for (relatorio of relatorios; track relatorio.tipo) {
+      <a class="relatorios__item" [routerLink]="['/relatorios', relatorio.tipo]">
+        <mat-icon class="relatorios__icone">{{ relatorio.icone }}</mat-icon>
+        <div class="relatorios__item-texto">
+          <strong>{{ relatorio.titulo }}</strong>
+          <span>{{ relatorio.descricao }}</span>
+        </div>
+        <mat-icon class="relatorios__seta">chevron_right</mat-icon>
+      </a>
+    }
+  </div>
+</div>

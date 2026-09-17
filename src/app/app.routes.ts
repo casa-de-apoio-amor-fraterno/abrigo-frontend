@@ -152,6 +152,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/busca/busca.page').then((m) => m.BuscaPage)
       },
       {
+        path: 'relatorios',
+        loadComponent: () =>
+          import('./features/relatorios/relatorios-dashboard.page').then((m) => m.RelatoriosDashboardPage)
+      },
+      {
+        path: 'relatorios/:tipo',
+        loadComponent: () =>
+          import('./features/relatorios/relatorio-detalhe.page').then((m) => m.RelatorioDetalhePage)
+      },
+      {
         // Protótipo do fluxo de assinatura por toque — ver contrato-demo.page.ts.
         path: 'contrato-demo',
         loadComponent: () => import('./features/contrato-demo/contrato-demo.page').then((m) => m.ContratoDemoPage)

@@ -13,7 +13,8 @@ export const NAV_ITEMS: NavItem[] = [
   { rota: '/voluntarios', rotulo: 'Voluntários', icone: 'volunteer_activism' },
   { rota: '/emprestimos', rotulo: 'Empréstimos', icone: 'inventory_2' },
   { rota: '/materiais', rotulo: 'Materiais', icone: 'category' },
-  { rota: '/solicitacoes-cadastro', rotulo: 'Cadastros de pacientes', icone: 'how_to_reg' }
+  { rota: '/solicitacoes-cadastro', rotulo: 'Cadastros de pacientes', icone: 'how_to_reg' },
+  { rota: '/relatorios', rotulo: 'Relatórios', icone: 'summarize' }
 ];
 
 /** Itens visíveis diretamente na barra inferior do mobile; o restante fica em "Mais". */

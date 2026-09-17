@@ -1,0 +1,63 @@
+<div class="relatorio-detalhe">
+  <a class="relatorio-detalhe__voltar" routerLink="/relatorios">
+    <mat-icon>arrow_back</mat-icon>
+    Relatórios
+  </a>
+
+  <div class="relatorio-detalhe__cabecalho">
+    <mat-icon class="relatorio-detalhe__icone">{{ relatorio.icone }}</mat-icon>
+    <div>
+      <h1>{{ relatorio.titulo }}</h1>
+      <p>{{ relatorio.descricao }}</p>
+    </div>
+  </div>
+
+  @if (relatorio.suportaPeriodo) {
+    <div class="relatorio-detalhe__periodo">
+      <span class="relatorio-detalhe__periodo-rotulo">Período</span>
+      <app-filtro-pills [opcoes]="opcoesPeriodo" [valor]="periodo()" (mudanca)="alterarPeriodo($event)" />
+    </div>
+  }
+
+  <div class="relatorio-detalhe__resumo">
+    @if (carregandoResumo()) {
+      <div class="relatorio-detalhe__resumo-estado">
+        <mat-spinner diameter="24" />
+      </div>
+    } @else if (erroResumo()) {
+      <p class="relatorio-detalhe__resumo-estado relatorio-detalhe__resumo-estado--erro">{{ erroResumo() }}</p>
+    } @else {
+      @for (item of resumo(); track item.rotulo) {
+        <div class="relatorio-detalhe__resumo-item">
+          <span class="relatorio-detalhe__resumo-valor">{{ item.valor }}</span>
+          <span class="relatorio-detalhe__resumo-rotulo">{{ item.rotulo }}</span>
+        </div>
+      }
+    }
+  </div>
+
+  @if (erro()) {
+    <p class="relatorio-detalhe__erro">{{ erro() }}</p>
+  }
+
+  <div class="relatorio-detalhe__acoes">
+    <button mat-flat-button type="button" [disabled]="gerando()" (click)="gerarPdf()">
+      @if (gerando()) {
+        <mat-spinner diameter="18" />
+        Gerando...
+      } @else {
+        <ng-container>
+          <mat-icon>picture_as_pdf</mat-icon>
+          Gerar PDF
+        </ng-container>
+      }
+    </button>
+
+    @if (pdfUrl(); as url) {
+      <a class="relatorio-detalhe__link-pdf" mat-stroked-button [href]="url" target="_blank" rel="noopener">
+        <mat-icon>open_in_new</mat-icon>
+        Abrir relatório gerado
+      </a>
+    }
+  </div>
+</div>
