@@ -32,6 +32,7 @@ export class RelatorioDetalhePage {
   protected readonly relatorio: RelatorioDisponivel;
   protected readonly opcoesPeriodo = OPCOES_PERIODO_RELATORIO;
   protected readonly periodo = signal<PeriodoRelatorio>('mensal');
+  protected readonly situacao = signal<string>('todos');
 
   protected readonly carregandoResumo = signal(true);
   protected readonly resumo = signal<RelatorioResumoItem[]>([]);
@@ -53,25 +54,40 @@ export class RelatorioDetalhePage {
       return;
     }
     this.relatorio = encontrado;
+    this.situacao.set(this.relatorio.opcoesSituacao?.[0]?.valor ?? 'todos');
     this.destroyRef.onDestroy(() => this.revogarUrlAnterior());
     this.carregarResumo();
   }
 
   protected alterarPeriodo(periodo: string): void {
     this.periodo.set(periodo as PeriodoRelatorio);
-    // Trocar o período invalida o PDF já gerado (era de outra janela de
-    // tempo) — some com o link "Abrir relatório gerado" até o usuário
-    // gerar de novo pro período atual.
+    this.invalidarPdfGerado();
+    this.carregarResumo();
+  }
+
+  protected alterarSituacao(situacao: string): void {
+    this.situacao.set(situacao);
+    this.invalidarPdfGerado();
+    this.carregarResumo();
+  }
+
+  // Trocar qualquer filtro invalida o PDF já gerado (era de outra
+  // seleção) — some com o link "Abrir relatório gerado" até o usuário
+  // gerar de novo pros filtros atuais.
+  private invalidarPdfGerado(): void {
     this.revogarUrlAnterior();
     this.pdfUrl.set(null);
-    this.carregarResumo();
   }
 
   private carregarResumo(): void {
     this.carregandoResumo.set(true);
     this.erroResumo.set(null);
     this.relatorioService
-      .buscarResumo(this.relatorio.tipo, this.relatorio.suportaPeriodo ? this.periodo() : undefined)
+      .buscarResumo(
+        this.relatorio.tipo,
+        this.relatorio.suportaPeriodo ? this.periodo() : undefined,
+        this.relatorio.opcoesSituacao ? this.situacao() : undefined
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resposta) => {
@@ -88,11 +104,14 @@ export class RelatorioDetalhePage {
   protected gerarPdf(): void {
     this.erro.set(null);
     this.gerando.set(true);
-    this.revogarUrlAnterior();
-    this.pdfUrl.set(null);
+    this.invalidarPdfGerado();
 
     this.relatorioService
-      .gerarPdf(this.relatorio.tipo, this.relatorio.suportaPeriodo ? this.periodo() : undefined)
+      .gerarPdf(
+        this.relatorio.tipo,
+        this.relatorio.suportaPeriodo ? this.periodo() : undefined,
+        this.relatorio.opcoesSituacao ? this.situacao() : undefined
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (blob) => {

@@ -1,5 +1,10 @@
 .relatorios {
   padding: 8px 4px;
+  max-width: 860px;
+  // Centraliza em telas grandes em vez de deixar a lista colada à
+  // esquerda com espaço vazio sobrando — sem efeito em telas estreitas,
+  // onde o max-width já ocupa a largura toda.
+  margin: 0 auto;
 
   h1 {
     margin: 0 0 8px;
@@ -12,10 +17,9 @@
   }
 
   &__lista {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-width: 520px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 10px;
   }
 
   &__item {

@@ -12,10 +12,20 @@
     </div>
   </div>
 
-  @if (relatorio.suportaPeriodo) {
-    <div class="relatorio-detalhe__periodo">
-      <span class="relatorio-detalhe__periodo-rotulo">Período</span>
-      <app-filtro-pills [opcoes]="opcoesPeriodo" [valor]="periodo()" (mudanca)="alterarPeriodo($event)" />
+  @if (relatorio.suportaPeriodo || relatorio.opcoesSituacao) {
+    <div class="relatorio-detalhe__filtros">
+      @if (relatorio.suportaPeriodo) {
+        <div class="relatorio-detalhe__filtro-grupo">
+          <span class="relatorio-detalhe__filtro-rotulo">Período</span>
+          <app-filtro-pills [opcoes]="opcoesPeriodo" [valor]="periodo()" (mudanca)="alterarPeriodo($event)" />
+        </div>
+      }
+      @if (relatorio.opcoesSituacao; as opcoesSituacao) {
+        <div class="relatorio-detalhe__filtro-grupo">
+          <span class="relatorio-detalhe__filtro-rotulo">Situação</span>
+          <app-filtro-pills [opcoes]="opcoesSituacao" [valor]="situacao()" (mudanca)="alterarSituacao($event)" />
+        </div>
+      }
     </div>
   }
 

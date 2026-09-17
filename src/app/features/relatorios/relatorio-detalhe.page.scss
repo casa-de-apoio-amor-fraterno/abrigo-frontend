@@ -1,6 +1,11 @@
 .relatorio-detalhe {
   padding: 8px 4px;
-  max-width: 640px;
+  max-width: 860px;
+  // Centraliza o conteúdo em telas grandes (monitor) em vez de deixar
+  // tudo colado à esquerda com uma faixa enorme de espaço vazio à
+  // direita — em telas estreitas o max-width já ocupa a largura toda,
+  // então o auto não move nada.
+  margin: 0 auto;
 
   &__voltar {
     display: inline-flex;
@@ -47,11 +52,19 @@
     height: 32px;
   }
 
-  &__periodo {
+  &__filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 32px;
     margin-bottom: 20px;
   }
 
-  &__periodo-rotulo {
+  &__filtro-grupo {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__filtro-rotulo {
     display: block;
     margin-bottom: 6px;
     font-size: 12px;
@@ -108,9 +121,9 @@
 
   &__acoes {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 12px;
-    align-items: flex-start;
+    align-items: center;
 
     button,
     a {

@@ -8,6 +8,11 @@ export type TipoRelatorio = 'pessoas' | 'estadias' | 'materiais' | 'emprestimos'
 
 export type PeriodoRelatorio = 'semanal' | 'quinzenal' | 'mensal' | 'semestral' | 'anual';
 
+export interface OpcaoSituacaoRelatorio {
+  valor: string;
+  rotulo: string;
+}
+
 export interface RelatorioDisponivel {
   tipo: TipoRelatorio;
   titulo: string;
@@ -17,12 +22,28 @@ export interface RelatorioDisponivel {
    * `app/features/relatorios/schemas.py` no backend) — não faz sentido
    * filtrar por período. */
   suportaPeriodo: boolean;
+  /** Opções do filtro de situação, quando o relatório tiver um (Estadias:
+   * todos/em acompanhamento; Empréstimos: todos/alugados/vencidos) — a
+   * primeira opção é o valor padrão ao abrir a tela. `undefined` pra
+   * relatórios sem esse filtro (Pessoas, Materiais). */
+  opcoesSituacao?: OpcaoSituacaoRelatorio[];
 }
 
 export interface RelatorioResumoItem {
   rotulo: string;
   valor: string;
 }
+
+const OPCOES_SITUACAO_ESTADIA: OpcaoSituacaoRelatorio[] = [
+  { valor: 'todos', rotulo: 'Todas' },
+  { valor: 'em_acompanhamento', rotulo: 'Em acompanhamento' }
+];
+
+const OPCOES_SITUACAO_EMPRESTIMO: OpcaoSituacaoRelatorio[] = [
+  { valor: 'todos', rotulo: 'Todos' },
+  { valor: 'alugados', rotulo: 'Alugados' },
+  { valor: 'vencidos', rotulo: 'Vencidos' }
+];
 
 /** Metadados dos relatórios disponíveis — usado tanto pela lista
  * (`relatorios-dashboard.page`) quanto pela tela de detalhe/geração
@@ -40,7 +61,8 @@ export const RELATORIOS_DISPONIVEIS: RelatorioDisponivel[] = [
     titulo: 'Estadias',
     descricao: 'Estadias registradas nos quartos.',
     icone: 'hotel',
-    suportaPeriodo: true
+    suportaPeriodo: true,
+    opcoesSituacao: OPCOES_SITUACAO_ESTADIA
   },
   {
     tipo: 'materiais',
@@ -54,7 +76,8 @@ export const RELATORIOS_DISPONIVEIS: RelatorioDisponivel[] = [
     titulo: 'Empréstimos',
     descricao: 'Empréstimos e seus itens.',
     icone: 'inventory_2',
-    suportaPeriodo: true
+    suportaPeriodo: true,
+    opcoesSituacao: OPCOES_SITUACAO_EMPRESTIMO
   }
 ];
 
@@ -75,20 +98,31 @@ export class RelatorioService {
   private readonly http = inject(HttpClient);
   private readonly resource = `${environment.apiBaseUrl}/relatorios`;
 
-  gerarPdf(tipo: TipoRelatorio, periodo?: PeriodoRelatorio): Observable<Blob> {
+  gerarPdf(tipo: TipoRelatorio, periodo?: PeriodoRelatorio, situacao?: string): Observable<Blob> {
     return this.http.get(`${this.resource}/${tipo}/pdf`, {
       responseType: 'blob',
-      params: this.paramsPeriodo(periodo)
+      params: this.params(periodo, situacao)
     });
   }
 
-  buscarResumo(tipo: TipoRelatorio, periodo?: PeriodoRelatorio): Observable<{ itens: RelatorioResumoItem[] }> {
+  buscarResumo(
+    tipo: TipoRelatorio,
+    periodo?: PeriodoRelatorio,
+    situacao?: string
+  ): Observable<{ itens: RelatorioResumoItem[] }> {
     return this.http.get<{ itens: RelatorioResumoItem[] }>(`${this.resource}/${tipo}/resumo`, {
-      params: this.paramsPeriodo(periodo)
+      params: this.params(periodo, situacao)
     });
   }
 
-  private paramsPeriodo(periodo?: PeriodoRelatorio): HttpParams {
-    return periodo ? new HttpParams().set('periodo', periodo) : new HttpParams();
+  private params(periodo?: PeriodoRelatorio, situacao?: string): HttpParams {
+    let params = new HttpParams();
+    if (periodo) {
+      params = params.set('periodo', periodo);
+    }
+    if (situacao) {
+      params = params.set('situacao', situacao);
+    }
+    return params;
   }
 }
