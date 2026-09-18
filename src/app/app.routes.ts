@@ -29,123 +29,154 @@ export const routes: Routes = [
       {
         path: 'pessoas',
         loadComponent: () =>
-          import('./features/pessoas/consulta/pessoa-consulta.page').then((m) => m.PessoaConsultaPage)
-      },
-      {
-        path: 'pessoas/novo',
-        loadComponent: () =>
-          import('./features/pessoas/cadastro/pessoa-cadastro-dialog.page').then((m) => m.PessoaCadastroDialogPage)
-      },
-      {
-        path: 'pessoas/:id/editar',
-        loadComponent: () =>
-          import('./features/pessoas/cadastro/pessoa-cadastro-dialog.page').then((m) => m.PessoaCadastroDialogPage)
+          import('./features/pessoas/consulta/pessoa-consulta.page').then((m) => m.PessoaConsultaPage),
+        // Cadastro/edição são rotas filhas em vez de irmãs: assim a consulta
+        // (busca, página, itens) fica montada por trás do popup — só o
+        // router-outlet filho troca. Rota irmã destruiria a consulta ao
+        // navegar pra /pessoas/:id/editar, perdendo a busca (ver
+        // cadastro-dialog-host.base.ts).
+        children: [
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/pessoas/cadastro/pessoa-cadastro-dialog.page').then(
+                (m) => m.PessoaCadastroDialogPage
+              )
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/pessoas/cadastro/pessoa-cadastro-dialog.page').then(
+                (m) => m.PessoaCadastroDialogPage
+              )
+          }
+        ]
       },
       {
         path: 'quartos',
         loadComponent: () =>
-          import('./features/quartos/consulta/quarto-consulta.page').then((m) => m.QuartoConsultaPage)
-      },
-      {
-        path: 'quartos/novo',
-        loadComponent: () =>
-          import('./features/quartos/cadastro/quarto-cadastro-dialog.page').then((m) => m.QuartoCadastroDialogPage)
-      },
-      {
-        path: 'quartos/:id/editar',
-        loadComponent: () =>
-          import('./features/quartos/cadastro/quarto-cadastro-dialog.page').then((m) => m.QuartoCadastroDialogPage)
+          import('./features/quartos/consulta/quarto-consulta.page').then((m) => m.QuartoConsultaPage),
+        children: [
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/quartos/cadastro/quarto-cadastro-dialog.page').then(
+                (m) => m.QuartoCadastroDialogPage
+              )
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/quartos/cadastro/quarto-cadastro-dialog.page').then(
+                (m) => m.QuartoCadastroDialogPage
+              )
+          }
+        ]
       },
       {
         path: 'hospitais',
         loadComponent: () =>
-          import('./features/hospitais/consulta/hospital-consulta.page').then((m) => m.HospitalConsultaPage)
-      },
-      {
-        path: 'hospitais/novo',
-        loadComponent: () =>
-          import('./features/hospitais/cadastro/hospital-cadastro-dialog.page').then(
-            (m) => m.HospitalCadastroDialogPage
-          )
-      },
-      {
-        path: 'hospitais/:id/editar',
-        loadComponent: () =>
-          import('./features/hospitais/cadastro/hospital-cadastro-dialog.page').then(
-            (m) => m.HospitalCadastroDialogPage
-          )
+          import('./features/hospitais/consulta/hospital-consulta.page').then((m) => m.HospitalConsultaPage),
+        children: [
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/hospitais/cadastro/hospital-cadastro-dialog.page').then(
+                (m) => m.HospitalCadastroDialogPage
+              )
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/hospitais/cadastro/hospital-cadastro-dialog.page').then(
+                (m) => m.HospitalCadastroDialogPage
+              )
+          }
+        ]
       },
       {
         path: 'estadias',
         loadComponent: () =>
-          import('./features/estadias/consulta/estadia-consulta.page').then((m) => m.EstadiaConsultaPage)
-      },
-      {
-        path: 'estadias/novo',
-        loadComponent: () =>
-          import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then((m) => m.EstadiaCadastroDialogPage)
-      },
-      {
-        path: 'estadias/:id/editar',
-        loadComponent: () =>
-          import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then((m) => m.EstadiaCadastroDialogPage)
+          import('./features/estadias/consulta/estadia-consulta.page').then((m) => m.EstadiaConsultaPage),
+        children: [
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then(
+                (m) => m.EstadiaCadastroDialogPage
+              )
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/estadias/cadastro/estadia-cadastro-dialog.page').then(
+                (m) => m.EstadiaCadastroDialogPage
+              )
+          }
+        ]
       },
       {
         path: 'voluntarios',
         loadComponent: () =>
-          import('./features/voluntarios/consulta/voluntario-consulta.page').then((m) => m.VoluntarioConsultaPage)
-      },
-      {
-        path: 'voluntarios/novo',
-        loadComponent: () =>
-          import('./features/voluntarios/cadastro/voluntario-cadastro-dialog.page').then(
-            (m) => m.VoluntarioCadastroDialogPage
-          )
-      },
-      {
-        path: 'voluntarios/:id/editar',
-        loadComponent: () =>
-          import('./features/voluntarios/cadastro/voluntario-cadastro-dialog.page').then(
-            (m) => m.VoluntarioCadastroDialogPage
-          )
+          import('./features/voluntarios/consulta/voluntario-consulta.page').then((m) => m.VoluntarioConsultaPage),
+        children: [
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/voluntarios/cadastro/voluntario-cadastro-dialog.page').then(
+                (m) => m.VoluntarioCadastroDialogPage
+              )
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/voluntarios/cadastro/voluntario-cadastro-dialog.page').then(
+                (m) => m.VoluntarioCadastroDialogPage
+              )
+          }
+        ]
       },
       {
         path: 'emprestimos',
         loadComponent: () =>
-          import('./features/emprestimos/consulta/emprestimo-consulta.page').then((m) => m.EmprestimoConsultaPage)
-      },
-      {
-        path: 'emprestimos/novo',
-        loadComponent: () =>
-          import('./features/emprestimos/cadastro/emprestimo-cadastro-dialog.page').then(
-            (m) => m.EmprestimoCadastroDialogPage
-          )
-      },
-      {
-        path: 'emprestimos/:id/editar',
-        loadComponent: () =>
-          import('./features/emprestimos/cadastro/emprestimo-cadastro-dialog.page').then(
-            (m) => m.EmprestimoCadastroDialogPage
-          )
+          import('./features/emprestimos/consulta/emprestimo-consulta.page').then((m) => m.EmprestimoConsultaPage),
+        children: [
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/emprestimos/cadastro/emprestimo-cadastro-dialog.page').then(
+                (m) => m.EmprestimoCadastroDialogPage
+              )
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/emprestimos/cadastro/emprestimo-cadastro-dialog.page').then(
+                (m) => m.EmprestimoCadastroDialogPage
+              )
+          }
+        ]
       },
       {
         path: 'materiais',
         loadComponent: () =>
-          import('./features/materiais/consulta/material-consulta.page').then((m) => m.MaterialConsultaPage)
-      },
-      {
-        path: 'materiais/novo',
-        loadComponent: () =>
-          import('./features/materiais/cadastro/material-cadastro-dialog.page').then(
-            (m) => m.MaterialCadastroDialogPage
-          )
-      },
-      {
-        path: 'materiais/:id/editar',
-        loadComponent: () =>
-          import('./features/materiais/cadastro/material-cadastro-dialog.page').then(
-            (m) => m.MaterialCadastroDialogPage
-          )
+          import('./features/materiais/consulta/material-consulta.page').then((m) => m.MaterialConsultaPage),
+        children: [
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/materiais/cadastro/material-cadastro-dialog.page').then(
+                (m) => m.MaterialCadastroDialogPage
+              )
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/materiais/cadastro/material-cadastro-dialog.page').then(
+                (m) => m.MaterialCadastroDialogPage
+              )
+          }
+        ]
       },
       {
         path: 'busca',

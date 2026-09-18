@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +15,7 @@ const ITENS_POR_PAGINA = 20;
 
 @Component({
   selector: 'app-voluntario-consulta-page',
-  imports: [FormsModule, RouterLink, MatButtonModule, MatIconModule, PaginaConsultaComponent],
+  imports: [FormsModule, RouterLink, RouterOutlet, MatButtonModule, MatIconModule, PaginaConsultaComponent],
   templateUrl: './voluntario-consulta.page.html'
 })
 export class VoluntarioConsultaPage {

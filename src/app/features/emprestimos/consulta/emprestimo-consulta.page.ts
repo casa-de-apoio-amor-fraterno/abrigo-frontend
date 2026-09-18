@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,7 +23,7 @@ const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
 
 @Component({
   selector: 'app-emprestimo-consulta-page',
-  imports: [RouterLink, MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
+  imports: [RouterLink, RouterOutlet, MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
   templateUrl: './emprestimo-consulta.page.html'
 })
 export class EmprestimoConsultaPage {

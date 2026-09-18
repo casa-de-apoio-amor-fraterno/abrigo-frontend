@@ -1,7 +1,7 @@
 import { DatePipe, formatDate } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +18,16 @@ const ITENS_POR_PAGINA = 20;
 
 @Component({
   selector: 'app-pessoa-consulta-page',
-  imports: [DatePipe, FormsModule, RouterLink, MatButtonModule, MatIconModule, MatTooltipModule, PaginaConsultaComponent],
+  imports: [
+    DatePipe,
+    FormsModule,
+    RouterLink,
+    RouterOutlet,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    PaginaConsultaComponent
+  ],
   templateUrl: './pessoa-consulta.page.html'
 })
 export class PessoaConsultaPage {

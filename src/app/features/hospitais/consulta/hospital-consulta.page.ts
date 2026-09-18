@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,7 +13,7 @@ import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalh
 
 @Component({
   selector: 'app-hospital-consulta-page',
-  imports: [RouterLink, MatButtonModule, MatIconModule, MatSlideToggleModule, PaginaConsultaComponent],
+  imports: [RouterLink, RouterOutlet, MatButtonModule, MatIconModule, MatSlideToggleModule, PaginaConsultaComponent],
   templateUrl: './hospital-consulta.page.html',
   styleUrl: './hospital-consulta.page.scss'
 })

@@ -1,6 +1,6 @@
 import { DatePipe, formatDate } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -26,7 +26,15 @@ const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
 
 @Component({
   selector: 'app-estadia-consulta-page',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
+  imports: [
+    DatePipe,
+    RouterLink,
+    RouterOutlet,
+    MatButtonModule,
+    MatIconModule,
+    PaginaConsultaComponent,
+    FiltroPillsComponent
+  ],
   templateUrl: './estadia-consulta.page.html'
 })
 export class EstadiaConsultaPage {
