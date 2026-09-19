@@ -71,28 +71,6 @@
                   >
                     Finalizar
                   </button>
-
-                  @if (estadiaFinalizarAberta() === estadia.id) {
-                    <app-acao-popover
-                      icone="event_available"
-                      titulo="Finalizar estadia"
-                      subtitulo="Informe a data de saída"
-                      [erro]="erroFinalizar()"
-                      [confirmando]="finalizando()"
-                      (cancelar)="fecharFinalizar()"
-                      (confirmar)="confirmarFinalizar(estadia)"
-                    >
-                      <mat-form-field appearance="outline">
-                        <mat-label>Data/hora de saída</mat-label>
-                        <input
-                          matInput
-                          type="datetime-local"
-                          [value]="dataSaidaFinalizar()"
-                          (input)="dataSaidaFinalizar.set($any($event.target).value)"
-                        />
-                      </mat-form-field>
-                    </app-acao-popover>
-                  }
                 </div>
               }
             </li>
@@ -214,4 +192,6 @@
       }
     </section>
   }
+
+  <app-finalizar-estadia-popover (finalizado)="aoFinalizarEstadia($event)" />
 </div>

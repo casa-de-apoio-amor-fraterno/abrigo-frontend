@@ -1,0 +1,37 @@
+@if (idEstadiaAberta() !== null) {
+  <app-acao-popover
+    icone="event_available"
+    titulo="Finalizar estadia"
+    [subtitulo]="nomePessoa() ? nomePessoa() + ' — informe a data de saída' : 'Informe a data de saída'"
+    [erro]="erro()"
+    [confirmando]="finalizando()"
+    (cancelar)="fechar()"
+    (confirmar)="confirmar()"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>Data/hora de saída</mat-label>
+      <input
+        matInput
+        type="datetime-local"
+        [value]="dataSaida()"
+        (input)="alterarDataSaida($any($event.target).value)"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="campo-tempo-estadia">
+      <mat-label>Tempo estadia</mat-label>
+      <input
+        matInput
+        type="number"
+        min="0"
+        [value]="tempoValor()"
+        (input)="alterarTempoValor($any($event.target).valueAsNumber || null)"
+      />
+      <span matSuffix>{{ rotuloUnidadeTempo(tempoUnidade()) }}</span>
+    </mat-form-field>
+    <app-filtro-pills
+      [opcoes]="opcoesUnidadeTempo"
+      [valor]="tempoUnidade()"
+      (mudanca)="alterarTempoUnidade($any($event))"
+    />
+  </app-acao-popover>
+}

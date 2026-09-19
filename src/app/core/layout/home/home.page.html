@@ -51,44 +51,6 @@
                 >
                   <mat-icon>bed</mat-icon>
                 </button>
-
-                @if (estadiaFinalizarAberta() === ocupante.idEstadia) {
-                  <app-acao-popover
-                    icone="event_available"
-                    titulo="Finalizar estadia"
-                    [subtitulo]="ocupante.nomePessoa + ' — informe a data de saída'"
-                    [erro]="erroFinalizar()"
-                    [confirmando]="finalizando()"
-                    (cancelar)="fecharFinalizar()"
-                    (confirmar)="confirmarFinalizar(ocupante.idEstadia)"
-                  >
-                    <mat-form-field appearance="outline">
-                      <mat-label>Data/hora de saída</mat-label>
-                      <input
-                        matInput
-                        type="datetime-local"
-                        [value]="dataSaidaFinalizar()"
-                        (input)="alterarDataSaidaFinalizar($any($event.target).value)"
-                      />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="campo-tempo-estadia">
-                      <mat-label>Tempo estadia</mat-label>
-                      <input
-                        matInput
-                        type="number"
-                        min="0"
-                        [value]="tempoEstadiaValorFinalizar()"
-                        (input)="alterarTempoEstadiaValorFinalizar($any($event.target).valueAsNumber || null)"
-                      />
-                      <span matSuffix>{{ rotuloUnidadeTempo(tempoEstadiaUnidadeFinalizar()) }}</span>
-                    </mat-form-field>
-                    <app-filtro-pills
-                      [opcoes]="opcoesUnidadeTempo"
-                      [valor]="tempoEstadiaUnidadeFinalizar()"
-                      (mudanca)="alterarTempoEstadiaUnidadeFinalizar($any($event))"
-                    />
-                  </app-acao-popover>
-                }
               }
               @for (vaga of leitosVagos(quarto); track $index) {
                 <button
@@ -181,4 +143,6 @@
       </div>
     }
   </section>
+
+  <app-finalizar-estadia-popover (finalizado)="aoFinalizarEstadia()" />
 </div>

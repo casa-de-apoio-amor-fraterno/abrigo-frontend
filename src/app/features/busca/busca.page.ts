@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
@@ -15,7 +15,7 @@ import { descreverErroHttp } from '../../core/http/api-error';
 import { PessoaService } from '../pessoas/pessoa.service';
 import { PessoaResumo } from '../pessoas/pessoa.model';
 import { EstadiaService } from '../estadias/estadia.service';
-import { EstadiaResumo } from '../estadias/estadia.model';
+import { Estadia, EstadiaResumo } from '../estadias/estadia.model';
 import { EmprestimoService } from '../emprestimos/emprestimo.service';
 import { EmprestimoItem, EmprestimoResumo } from '../emprestimos/emprestimo.model';
 import { MaterialService } from '../materiais/material.service';
@@ -23,7 +23,7 @@ import { MaterialResumo } from '../materiais/material.model';
 import { VoluntarioService } from '../voluntarios/voluntario.service';
 import { VoluntarioResumo } from '../voluntarios/voluntario.model';
 import { AcaoPopoverComponent } from '../../shared/ui/acao-popover/acao-popover.component';
-import { agoraDatetimeLocal } from '../../shared/util/data';
+import { FinalizarEstadiaPopoverComponent } from '../../shared/ui/finalizar-estadia-popover/finalizar-estadia-popover.component';
 
 const LIMITE_RESULTADOS = 10;
 const LIMITE_PESSOAS_PARA_ESTADIAS = 5;
@@ -56,6 +56,7 @@ interface EmprestimoComPessoa extends EmprestimoResumo {
     FormsModule,
     RouterLink,
     AcaoPopoverComponent,
+    FinalizarEstadiaPopoverComponent,
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
@@ -84,10 +85,7 @@ export class BuscaPage {
   protected readonly materiais = signal<MaterialResumo[]>([]);
   protected readonly voluntarios = signal<VoluntarioResumo[]>([]);
 
-  protected readonly estadiaFinalizarAberta = signal<number | null>(null);
-  protected readonly dataSaidaFinalizar = signal('');
-  protected readonly finalizando = signal(false);
-  protected readonly erroFinalizar = signal<string | null>(null);
+  protected readonly finalizarPopover = viewChild.required(FinalizarEstadiaPopoverComponent);
 
   protected readonly emprestimoDevolverAberto = signal<number | null>(null);
   protected readonly dataDevolucao = signal('');
@@ -239,43 +237,17 @@ export class BuscaPage {
     event.preventDefault();
     event.stopPropagation();
     this.fecharDevolver();
-    this.erroFinalizar.set(null);
-    this.dataSaidaFinalizar.set(agoraDatetimeLocal());
-    this.estadiaFinalizarAberta.set(estadia.id);
+    this.finalizarPopover().abrir(estadia.id, estadia.dataEntrada, estadia.nomePessoa);
   }
 
-  protected fecharFinalizar(): void {
-    this.estadiaFinalizarAberta.set(null);
-    this.erroFinalizar.set(null);
-  }
-
-  protected confirmarFinalizar(estadia: EstadiaComPessoa): void {
-    const dataSaida = this.dataSaidaFinalizar();
-    if (!dataSaida) {
-      this.erroFinalizar.set('Informe a data de saída.');
-      return;
-    }
-
-    this.finalizando.set(true);
-    this.erroFinalizar.set(null);
-
-    this.estadiaService.encerrar(estadia.id, dataSaida).subscribe({
-      next: (atualizada) => {
-        this.estadias.update((lista) =>
-          lista.map((item) =>
-            item.id === estadia.id
-              ? { ...item, situacao: atualizada.situacao, dataSaida: atualizada.dataSaida }
-              : item
-          )
-        );
-        this.finalizando.set(false);
-        this.estadiaFinalizarAberta.set(null);
-      },
-      error: (error) => {
-        this.finalizando.set(false);
-        this.erroFinalizar.set(descreverErroHttp(error.error));
-      }
-    });
+  protected aoFinalizarEstadia(estadiaAtualizada: Estadia): void {
+    this.estadias.update((lista) =>
+      lista.map((item) =>
+        item.id === estadiaAtualizada.id
+          ? { ...item, situacao: estadiaAtualizada.situacao, dataSaida: estadiaAtualizada.dataSaida }
+          : item
+      )
+    );
   }
 
   protected estaDevolvido(emprestimo: EmprestimoComPessoa): boolean {
@@ -285,7 +257,7 @@ export class BuscaPage {
   protected abrirDevolver(emprestimo: EmprestimoComPessoa, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.fecharFinalizar();
+    this.finalizarPopover().fechar();
     this.erroDevolver.set(null);
     this.dataDevolucao.set(new Date().toISOString().slice(0, 10));
     this.emprestimoDevolverAberto.set(emprestimo.id);
@@ -337,8 +309,8 @@ export class BuscaPage {
   @HostListener('document:click', ['$event'])
   protected aoClicarFora(event: MouseEvent): void {
     const alvo = event.target as HTMLElement;
-    if (this.estadiaFinalizarAberta() !== null && !alvo.closest('.busca__acao-finalizar')) {
-      this.fecharFinalizar();
+    if (this.finalizarPopover().aberta() !== null && !alvo.closest('.busca__acao-finalizar')) {
+      this.finalizarPopover().fechar();
     }
     if (this.emprestimoDevolverAberto() !== null && !alvo.closest('.busca__acao-devolver')) {
       this.fecharDevolver();
