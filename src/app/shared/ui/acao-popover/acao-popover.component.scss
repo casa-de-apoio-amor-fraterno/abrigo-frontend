@@ -5,10 +5,13 @@
   z-index: 1000;
   width: 320px;
   max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 48px);
   background: var(--abrigo-surface);
   border-radius: 12px;
   box-shadow: 0 12px 32px var(--abrigo-sombra), 0 0 0 1px var(--abrigo-border);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: acao-popover-entrada 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: bottom right;
 
@@ -16,8 +19,52 @@
     right: 16px;
     left: 16px;
     bottom: 76px;
-    width: auto;
+    width: auto !important;
+    height: auto !important;
     max-width: none;
+  }
+
+  // Alça de redimensionar (ver iniciarRedimensionamento no .ts): só o
+  // canto superior esquerdo, porque o popover é ancorado embaixo/direita —
+  // arrastar esse canto cresce a janela sem mover a âncora. Desenhada como
+  // duas bordas em L (mesma linguagem visual do resize nativo do navegador,
+  // só que espelhada pro canto oposto).
+  &__redimensionar {
+    position: absolute;
+    // Área de toque maior que o traço visível (::before) — 18px é pouco
+    // pra mirar um drag com precisão, principalmente no touch. Fica dentro
+    // do painel (não pode "vazar" pra fora com offset negativo — o
+    // `overflow: hidden` do `.acao-popover` cortaria a parte fora).
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    cursor: nwse-resize;
+    touch-action: none;
+    z-index: 1;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--abrigo-border-forte);
+      border-left: 2px solid var(--abrigo-border-forte);
+      border-radius: 3px 0 0 0;
+      opacity: 0.7;
+      transition: opacity 0.15s ease;
+    }
+
+    &:hover::before {
+      opacity: 1;
+      border-color: var(--abrigo-primary);
+    }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   &__cabecalho {
@@ -25,6 +72,7 @@
     align-items: flex-start;
     gap: 10px;
     padding: 14px 16px 0;
+    flex-shrink: 0;
 
     mat-icon {
       color: var(--abrigo-primary);
@@ -46,6 +94,8 @@
     padding: 8px 16px 16px;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    min-height: 0;
     // 4px deixava a label flutuante do mat-form-field (outline) colada —
     // às vezes sobreposta — no elemento anterior quando ele não é outro
     // mat-form-field (ex.: as pills de "Paciente/Acompanhante" acima do
@@ -72,6 +122,8 @@
     display: flex;
     justify-content: flex-end;
     gap: 8px;
+    flex-shrink: 0;
+    padding: 4px 16px 16px;
   }
 
   &__confirmar {
