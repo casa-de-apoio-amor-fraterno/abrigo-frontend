@@ -4,29 +4,22 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 
 const CONFIG_PADRAO: MatDialogConfig = {
   panelClass: 'cadastro-dialog-panel',
-  // Backdrop transparente (built-in do CDK): continua clicável — clicar
-  // fora ainda fecha o painel — mas não escurece a lista atrás, já que o
-  // popup agora é um drawer encostado na direita, não um modal centralizado.
-  backdropClass: 'cdk-overlay-transparent-backdrop',
-  position: { top: '0', right: '0' },
   width: '720px',
   maxWidth: '95vw',
-  height: '100dvh',
-  maxHeight: '100dvh',
+  maxHeight: '90vh',
   autoFocus: false
 };
 
 /**
  * Base pra rotas de cadastro (ex.: /pessoas/novo, /pessoas/:id/editar) que
- * abrem o formulário como painel flutuante encostado na borda direita da
- * tela (drawer), em vez de página cheia ou modal centralizado. A rota
+ * abrem o formulário num modal centralizado, em vez de página cheia. A rota
  * carrega essa classe (via loadComponent) em vez do formulário direto; ela
- * abre o formulário de verdade dentro de um MatDialog posicionado à direita
- * e devolve pra lista quando ele fecha — seja pelo próprio formulário
- * navegando (Salvar/Cancelar, que já usam routerLink/router.navigateByUrl)
- * ou pelo usuário fechando o popup (X, ESC, clique fora), caso em que a URL
- * fica desatualizada com /novo ou /:id/editar se a gente não corrigir
- * explicitamente.
+ * abre o formulário de verdade dentro de um MatDialog centralizado
+ * (posição/backdrop padrão do CDK) e devolve pra lista quando ele fecha —
+ * seja pelo próprio formulário navegando (Salvar/Cancelar, que já usam
+ * routerLink/router.navigateByUrl) ou pelo usuário fechando o popup (X, ESC,
+ * clique fora), caso em que a URL fica desatualizada com /novo ou
+ * /:id/editar se a gente não corrigir explicitamente.
  */
 @Directive()
 export abstract class CadastroDialogHostBase implements OnInit, OnDestroy {

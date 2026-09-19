@@ -400,7 +400,7 @@ input[matInput][type='datetime-local'] {
       gap: 24px;
       align-items: flex-start;
 
-      // Mesmo breakpoint do drawer virar tela cheia no mobile (ver
+      // Mesmo breakpoint do popup virar tela cheia no mobile (ver
       // `.cadastro-dialog-panel`, styles.scss) — abaixo dele o popup já
       // não tem largura sobrando pra foto (160px fixos) ficar ao lado dos
       // campos sem espremer a coluna de dados.
@@ -602,18 +602,15 @@ input[matInput][type='datetime-local'] {
 // em <body>, fora da árvore de componentes, então component styles
 // (encapsulados) não alcançam esse painel.
 //
-// É um drawer encostado na borda direita da tela (não um modal
-// centralizado): o CadastroDialogHostBase já posiciona o painel com
-// position:{top:0,right:0} e height:100dvh; aqui só cuidamos da aparência
-// (sem cantos arredondados nas bordas que encostam na tela, sombra só do
-// lado esquerdo, entrada deslizando) e da animação de entrada.
+// Modal centralizado (posição/backdrop padrão do CDK, configurado em
+// CadastroDialogHostBase); aqui só cuidamos da animação de entrada.
 @keyframes cadastro-dialog-entrada {
   from {
-    transform: translateX(32px);
+    transform: scale(0.96);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: scale(1);
     opacity: 1;
   }
 }
@@ -654,11 +651,7 @@ input[matInput][type='datetime-local'] {
   }
 
   .mdc-dialog__surface {
-    border-radius: 0 !important;
-    box-shadow:
-      -12px 0 32px rgba(0, 0, 0, 0.16),
-      -2px 0 8px rgba(0, 0, 0, 0.08) !important;
-    animation: cadastro-dialog-entrada 0.22s ease-out;
+    animation: cadastro-dialog-entrada 0.18s ease-out;
   }
 
   @media (max-width: 680px) {
