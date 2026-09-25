@@ -2,6 +2,8 @@ import { Directive, Injector, OnDestroy, OnInit, Type, inject } from '@angular/c
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 
+import { ListaRefreshService } from './lista-refresh.service';
+
 const CONFIG_PADRAO: MatDialogConfig = {
   panelClass: 'cadastro-dialog-panel',
   width: '720px',
@@ -26,6 +28,7 @@ export abstract class CadastroDialogHostBase implements OnInit, OnDestroy {
   protected readonly dialog = inject(MatDialog);
   protected readonly router = inject(Router);
   protected readonly injector = inject(Injector);
+  private readonly listaRefresh = inject(ListaRefreshService);
 
   private dialogRef?: MatDialogRef<unknown>;
   private fechandoPelaRota = false;
@@ -48,6 +51,10 @@ export abstract class CadastroDialogHostBase implements OnInit, OnDestroy {
       if (!this.fechandoPelaRota) {
         void this.router.navigateByUrl(this.listaUrl);
       }
+      // Fecha por Salvar, Cancelar ou X/ESC/backdrop — em todos os casos a
+      // consulta por trás precisa recarregar (registro criado/editado ou
+      // não, o dado pode ter mudado desde que o dialog abriu).
+      this.listaRefresh.notificar(this.listaUrl);
     });
   }
 

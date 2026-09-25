@@ -10,6 +10,7 @@ import { Quarto } from '../quarto.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 @Component({
   selector: 'app-quarto-consulta-page',
@@ -42,6 +43,7 @@ export class QuartoConsultaPage {
 
   constructor() {
     this.consultar();
+    escutarRefrescoDaLista('/quartos', () => this.consultar());
   }
 
   protected visualizar(quarto: Quarto): void {

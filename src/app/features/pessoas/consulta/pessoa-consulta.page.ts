@@ -13,6 +13,7 @@ import { mascararCpf } from '../../../shared/util/cpf';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -49,6 +50,7 @@ export class PessoaConsultaPage {
 
   constructor() {
     this.consultar();
+    escutarRefrescoDaLista('/pessoas', () => this.consultar());
   }
 
   protected visualizar(pessoa: PessoaResumo): void {

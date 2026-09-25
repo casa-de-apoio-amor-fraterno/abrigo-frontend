@@ -10,6 +10,7 @@ import { VoluntarioResumo } from '../voluntario.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -35,6 +36,7 @@ export class VoluntarioConsultaPage {
 
   constructor() {
     this.consultar();
+    escutarRefrescoDaLista('/voluntarios', () => this.consultar());
   }
 
   protected visualizar(voluntario: VoluntarioResumo): void {

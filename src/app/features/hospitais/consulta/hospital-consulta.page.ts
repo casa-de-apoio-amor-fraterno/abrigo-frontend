@@ -10,6 +10,7 @@ import { Hospital } from '../hospital.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 @Component({
   selector: 'app-hospital-consulta-page',
@@ -37,6 +38,7 @@ export class HospitalConsultaPage {
 
   constructor() {
     this.consultar();
+    escutarRefrescoDaLista('/hospitais', () => this.consultar());
   }
 
   protected visualizar(hospital: Hospital): void {
