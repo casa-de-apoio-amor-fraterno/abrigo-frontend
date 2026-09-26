@@ -5,10 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { ComposicaoFamiliarCreateDto } from './composicao-familiar.dto';
+import { GRAUS_PARENTESCO, GrauParentesco } from './grau-parentesco';
 import { ComposicaoFamiliar } from './composicao-familiar.model';
 import { ComposicaoFamiliarService } from './composicao-familiar.service';
 
@@ -24,6 +26,7 @@ import { ComposicaoFamiliarService } from './composicao-familiar.service';
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
     MatTableModule
   ],
   templateUrl: './composicao-familiar-tab.component.html',
@@ -44,6 +47,7 @@ export class ComposicaoFamiliarTabComponent {
   protected readonly modoLocal = computed(() => this.pessoaId() === null);
 
   protected readonly colunas = ['nome', 'idade', 'grauParentesco', 'estadoCivil', 'renda', 'ocupacao', 'acoes'];
+  protected readonly grausParentesco = GRAUS_PARENTESCO;
 
   protected readonly membros = signal<ComposicaoFamiliar[]>([]);
   protected readonly carregando = signal(true);
@@ -57,7 +61,7 @@ export class ComposicaoFamiliarTabComponent {
   protected readonly form = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
     idade: [''],
-    grauParentesco: ['', [Validators.required]],
+    grauParentesco: this.fb.nonNullable.control<GrauParentesco | ''>('', Validators.required),
     estadoCivil: [''],
     renda: [''],
     ocupacao: ['']
@@ -137,7 +141,8 @@ export class ComposicaoFamiliarTabComponent {
     const dados: ComposicaoFamiliarCreateDto = {
       nome: valores.nome,
       idade: valores.idade || null,
-      grau_parentesco: valores.grauParentesco,
+      // Garantido não-vazio pelo Validators.required checado acima.
+      grau_parentesco: valores.grauParentesco as GrauParentesco,
       estado_civil: valores.estadoCivil || null,
       renda: valores.renda || null,
       ocupacao: valores.ocupacao || null

@@ -100,20 +100,10 @@
       </section>
     }
 
-    @if (abaAtiva() === 'atendimento') {
+    @if (abaAtiva() === 'observacao') {
       <section class="cadastro__secao">
-        <h2>Atendimento</h2>
+        <h2>Observação</h2>
         <div class="cadastro__grade">
-          <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Hospital</mat-label>
-            <mat-select formControlName="idHospital">
-              <mat-option [value]="null">—</mat-option>
-              @for (hospital of hospitais(); track hospital.id) {
-                <mat-option [value]="hospital.id">{{ hospital.nome }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
           <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
             <mat-label>Observação</mat-label>
             <textarea matInput formControlName="observacao" rows="3"></textarea>

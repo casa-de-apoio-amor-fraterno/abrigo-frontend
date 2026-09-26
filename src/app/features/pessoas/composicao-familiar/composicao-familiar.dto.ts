@@ -1,10 +1,12 @@
+import { GrauParentesco } from './grau-parentesco';
+
 /** Espelha os schemas de abrigo-backend, app/features/composicao_familiar/schemas.py. */
 export interface ComposicaoFamiliarDto {
   id: number;
   id_pessoa: number;
   nome: string;
   idade: string | null;
-  grau_parentesco: string;
+  grau_parentesco: GrauParentesco;
   estado_civil: string | null;
   renda: string | null;
   ocupacao: string | null;

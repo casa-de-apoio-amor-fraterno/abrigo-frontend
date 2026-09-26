@@ -13,8 +13,6 @@ import { ComposicaoFamiliarCreateDto } from '../composicao-familiar/composicao-f
 import { ContatoFormulario } from '../../../shared/data/contato/contato.model';
 import { EstadoService } from '../../estados/estado.service';
 import { Estado } from '../../estados/estado.model';
-import { HospitalService } from '../../hospitais/hospital.service';
-import { Hospital } from '../../hospitais/hospital.model';
 import { MunicipioService } from '../../municipios/municipio.service';
 import { Municipio } from '../../municipios/municipio.model';
 import { PessoaService } from '../pessoa.service';
@@ -47,7 +45,6 @@ export class PessoaCadastroPage {
   private readonly pessoaService = inject(PessoaService);
   private readonly estadoService = inject(EstadoService);
   private readonly municipioService = inject(MunicipioService);
-  private readonly hospitalService = inject(HospitalService);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -57,11 +54,13 @@ export class PessoaCadastroPage {
     : null;
   protected readonly modoEdicao = this.pessoaId !== null;
 
-  // Avaliação Social/Composição Familiar são dados sensíveis (ver
-  // `avaliacao_social.legacy.md`) — o backend já restringe os endpoints a
-  // `Usuario.perfil == 'Assistente Social'` (`exigir_perfil`); aqui só
-  // escondemos as abas de quem não tem esse perfil, pra não mostrar uma UI
-  // que resultaria em 403.
+  // Avaliação Social é dado sensível (ver `avaliacao_social.legacy.md`) —
+  // o backend restringe os endpoints a `Usuario.perfil == 'Assistente
+  // Social'` (`exigir_perfil`); aqui só escondemos a aba de quem não tem
+  // esse perfil, pra não mostrar uma UI que resultaria em 403.
+  // Composição Familiar não tem mais essa restrição (decisão do time —
+  // não é dado sensível o bastante pra justificar a trava, e é a provável
+  // causa da aba ter parado de ser usada a partir de 2025).
   protected readonly podeVerAssistenteSocial = this.auth.temPerfil('Assistente Social');
 
   // Avaliação Social continua só em edição (registro próprio, não dá pra
@@ -72,9 +71,9 @@ export class PessoaCadastroPage {
   protected readonly abas: CadastroDialogAba[] = [
     { id: 'dados', rotulo: 'Dados pessoais' },
     { id: 'endereco', rotulo: 'Endereço' },
-    { id: 'atendimento', rotulo: 'Atendimento' },
+    { id: 'observacao', rotulo: 'Observação' },
     ...(this.modoEdicao && this.podeVerAssistenteSocial ? [{ id: 'avaliacao', rotulo: 'Avaliação Social' }] : []),
-    ...(this.podeVerAssistenteSocial ? [{ id: 'composicao', rotulo: 'Composição Familiar' }] : []),
+    { id: 'composicao', rotulo: 'Composição Familiar' },
     { id: 'contatos', rotulo: 'Contatos' }
   ];
   protected readonly abaAtiva = signal('dados');
@@ -102,7 +101,6 @@ export class PessoaCadastroPage {
 
   protected readonly estados = signal<Estado[]>([]);
   protected readonly municipios = signal<Municipio[]>([]);
-  protected readonly hospitais = signal<Hospital[]>([]);
 
   protected readonly form = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
@@ -115,7 +113,6 @@ export class PessoaCadastroPage {
     idMunicipio: this.fb.control<number | null>(null),
     endereco: [''],
     pontoReferencia: [''],
-    idHospital: this.fb.control<number | null>(null),
     observacao: ['']
   });
 
@@ -132,7 +129,6 @@ export class PessoaCadastroPage {
     });
 
     this.estadoService.listar().subscribe((estados) => this.estados.set(estados));
-    this.hospitalService.listar().subscribe((hospitais) => this.hospitais.set(hospitais));
 
     this.form.controls.idEstado.valueChanges.subscribe((idEstado) => {
       this.form.controls.idMunicipio.setValue(null);
@@ -162,7 +158,6 @@ export class PessoaCadastroPage {
             idMunicipio: pessoa.id_municipio,
             endereco: pessoa.endereco ?? '',
             pontoReferencia: pessoa.ponto_referencia ?? '',
-            idHospital: pessoa.id_hospital,
             observacao: pessoa.observacao ?? ''
           });
           this.temFoto.set(pessoa.tem_foto);
@@ -193,7 +188,11 @@ export class PessoaCadastroPage {
       cartao_sus: valores.cartaoSus || null,
       endereco: valores.endereco || null,
       ponto_referencia: valores.pontoReferencia || null,
-      id_hospital: valores.idHospital,
+      // idHospital não existe mais no cadastro de pessoa — quem vem de
+      // hospital é registrado na Estadia (ver EstadiaCadastroPage), esse
+      // campo aqui era duplicado. Sempre null pra não sobrescrever nada
+      // relevante no PUT (substituição completa, ver PessoaUpdate).
+      id_hospital: null,
       id_municipio: valores.idMunicipio,
       id_estado: valores.idEstado,
       observacao: valores.observacao || null

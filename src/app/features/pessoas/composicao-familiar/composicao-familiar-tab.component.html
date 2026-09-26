@@ -85,7 +85,11 @@
 
           <mat-form-field appearance="outline" class="composicao__campo">
             <mat-label>Parentesco</mat-label>
-            <input matInput formControlName="grauParentesco" />
+            <mat-select formControlName="grauParentesco">
+              @for (grau of grausParentesco; track grau) {
+                <mat-option [value]="grau">{{ grau }}</mat-option>
+              }
+            </mat-select>
             @if (form.controls.grauParentesco.touched && form.controls.grauParentesco.invalid) {
               <mat-error>Informe o parentesco</mat-error>
             }
