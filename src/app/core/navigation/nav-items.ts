@@ -4,14 +4,15 @@ export interface NavItem {
   icone: string;
 }
 
+// Ordem por uso real (decisão do time, 2026-09-26): mais usados primeiro.
 export const NAV_ITEMS: NavItem[] = [
   { rota: '/inicio', rotulo: 'Início', icone: 'home' },
+  { rota: '/emprestimos', rotulo: 'Empréstimos', icone: 'inventory_2' },
+  { rota: '/estadias', rotulo: 'Estadias', icone: 'hotel' },
   { rota: '/pessoas', rotulo: 'Pessoas', icone: 'groups' },
   { rota: '/quartos', rotulo: 'Quartos', icone: 'meeting_room' },
-  { rota: '/estadias', rotulo: 'Estadias', icone: 'hotel' },
   { rota: '/hospitais', rotulo: 'Hospitais', icone: 'local_hospital' },
   { rota: '/voluntarios', rotulo: 'Voluntários', icone: 'volunteer_activism' },
-  { rota: '/emprestimos', rotulo: 'Empréstimos', icone: 'inventory_2' },
   { rota: '/materiais', rotulo: 'Materiais', icone: 'category' },
   { rota: '/solicitacoes-cadastro', rotulo: 'Cadastros de pacientes', icone: 'how_to_reg' },
   { rota: '/relatorios', rotulo: 'Relatórios', icone: 'summarize' }
