@@ -17,21 +17,5 @@
         (input)="alterarDataSaida($any($event.target).value)"
       />
     </mat-form-field>
-    <mat-form-field appearance="outline" class="campo-tempo-estadia">
-      <mat-label>Tempo estadia</mat-label>
-      <input
-        matInput
-        type="number"
-        min="0"
-        [value]="tempoValor()"
-        (input)="alterarTempoValor($any($event.target).valueAsNumber || null)"
-      />
-      <span matSuffix>{{ rotuloUnidadeTempo(tempoUnidade()) }}</span>
-    </mat-form-field>
-    <app-filtro-pills
-      [opcoes]="opcoesUnidadeTempo"
-      [valor]="tempoUnidade()"
-      (mudanca)="alterarTempoUnidade($any($event))"
-    />
   </app-acao-popover>
 }

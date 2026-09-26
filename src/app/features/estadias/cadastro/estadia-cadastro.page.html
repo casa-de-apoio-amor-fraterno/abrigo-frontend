@@ -2,7 +2,7 @@
   [titulo]="modoEdicao ? 'Editar estadia' : 'Nova estadia'"
   subtitulo="Ocupação de quarto/leito no Abrigo."
   [carregando]="carregando()"
-  [abas]="abas"
+  [abas]="abas()"
   [(abaAtiva)]="abaAtiva"
 >
   @if (abaAtiva() === 'dados') {
@@ -10,12 +10,19 @@
       <section class="cadastro__secao">
         <h2>Dados da estadia</h2>
 
-        <app-filtro-pills
-          class="cadastro__situacao"
-          [opcoes]="opcoesSituacao"
-          [valor]="form.controls.situacao.value"
-          (mudanca)="form.controls.situacao.setValue($any($event))"
-        />
+        @if (modoEdicao && situacaoAtual() !== 'Finalizada') {
+          <app-filtro-pills
+            class="cadastro__situacao"
+            [opcoes]="opcoesSituacaoAtiva"
+            [valor]="form.controls.situacao.value"
+            (mudanca)="form.controls.situacao.setValue($any($event))"
+          />
+        } @else {
+          <!-- Situação só muda de "Em acompanhamento" (fixo na criação) pra
+               "Finalizada" pelo botão "Encerrar estadia" — nunca escolhida
+               manualmente aqui. -->
+          <p class="cadastro__situacao-leitura">Situação: <strong>{{ form.controls.situacao.value }}</strong></p>
+        }
 
         <div class="cadastro__grade">
           <div class="cadastro__campo cadastro__campo--largo">
@@ -58,22 +65,18 @@
 
           <mat-form-field appearance="outline" class="cadastro__campo">
             <mat-label>Data/hora de saída</mat-label>
-            <input matInput type="datetime-local" formControlName="dataSaida" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="cadastro__campo campo-tempo-estadia">
-            <mat-label>Tempo estadia</mat-label>
-            <input matInput type="number" min="0" formControlName="tempoEstadiaValor" />
-            <span matSuffix>{{ rotuloUnidadeTempo(form.controls.tempoEstadiaUnidade.value) }}</span>
-          </mat-form-field>
-
-          <div class="cadastro__campo cadastro__campo--pills">
-            <app-filtro-pills
-              [opcoes]="opcoesUnidadeTempo"
-              [valor]="form.controls.tempoEstadiaUnidade.value"
-              (mudanca)="form.controls.tempoEstadiaUnidade.setValue($any($event))"
+            <input
+              matInput
+              disabled
+              readonly
+              [value]="(form.controls.dataSaida.value | date: 'dd/MM/yyyy HH:mm') || '—'"
             />
-          </div>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Tempo de estadia</mat-label>
+            <input matInput disabled readonly [value]="tempoEstadiaTexto()" />
+          </mat-form-field>
 
           <mat-form-field appearance="outline" class="cadastro__campo">
             <mat-label>Hospital</mat-label>
@@ -120,6 +123,9 @@
                 <div>
                   <strong>{{ nomesAcompanhantes()[acompanhante.idPessoa] || 'Carregando...' }}</strong>
                   <span>{{ acompanhante.grauParentesco || 'Parentesco não informado' }}</span>
+                  @if (acompanhante.ocupaLeito) {
+                    <span class="consulta__badge">Ocupa leito</span>
+                  }
                 </div>
                 <div class="cadastro__lista-datas">
                   <span>{{ acompanhante.dataEntrada | date: 'dd/MM/yyyy' }}</span>
@@ -155,6 +161,10 @@
               <mat-label>Grau de parentesco</mat-label>
               <input matInput formControlName="grauParentesco" />
             </mat-form-field>
+
+            <mat-checkbox formControlName="ocupaLeito" class="cadastro__campo cadastro__campo--largo">
+              Também ocupa uma cama neste quarto (opcional)
+            </mat-checkbox>
           </div>
 
           <app-cadastro-acoes

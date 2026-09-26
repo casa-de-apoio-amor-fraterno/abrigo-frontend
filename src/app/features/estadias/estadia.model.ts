@@ -39,6 +39,10 @@ export interface EstadiaAcompanhante {
   dataEntrada: string;
   dataSaida: string | null;
   grauParentesco: string | null;
+  /** Opcional — o acompanhante também ocupa um dos leitos do quarto do
+   * paciente (diferente de tipoPessoa === 'Acompanhante', que é uma
+   * Estadia própria com leito próprio). */
+  ocupaLeito: boolean;
 }
 
 /** Roadmap de eventos da estadia (Inclusão/Alteração/Encerramento) — mesmo

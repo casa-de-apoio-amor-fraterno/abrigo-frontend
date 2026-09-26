@@ -83,6 +83,10 @@
       background: var(--abrigo-surface-alt);
       border: 1px solid var(--abrigo-border-forte);
     }
+
+    &--acompanhante {
+      background: #6d28d9;
+    }
   }
 
   &__grade {
@@ -152,6 +156,20 @@
       background: var(--abrigo-surface-alt);
       border: 1px dashed var(--abrigo-border-forte);
       color: var(--abrigo-texto-terciario);
+    }
+
+    // Leito ocupado por acompanhante (EstadiaAcompanhante.ocupaLeito), não
+    // pelo titular da estadia — ver home.page.ts `abrirFinalizar`, esse
+    // leito navega pra editar a estadia do paciente em vez de abrir o
+    // popover de finalizar (encerrar ali finalizaria a estadia errada).
+    &--acompanhante {
+      background: #6d28d9;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background: #5b21b6;
+      }
     }
   }
 

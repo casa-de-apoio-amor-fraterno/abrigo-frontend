@@ -20,6 +20,9 @@ export interface QuartoOcupanteDto {
   id_pessoa: number;
   nome_pessoa: string;
   data_entrada: string;
+  /** Leito ocupado por um acompanhante (EstadiaAcompanhante.ocupa_leito),
+   * não pelo titular da estadia — ver quartos/schemas.py. */
+  acompanhante: boolean;
 }
 
 /** Espelha QuartoOcupacaoResponse — ver o comentário do schema no backend

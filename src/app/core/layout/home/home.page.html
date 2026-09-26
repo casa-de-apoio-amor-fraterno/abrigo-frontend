@@ -28,6 +28,7 @@
     } @else {
       <div class="ocupacao__legenda">
         <span><span class="ocupacao__amostra ocupacao__amostra--ocupado"></span> Ocupado</span>
+        <span><span class="ocupacao__amostra ocupacao__amostra--acompanhante"></span> Acompanhante</span>
         <span><span class="ocupacao__amostra ocupacao__amostra--livre"></span> Livre</span>
       </div>
 
@@ -42,15 +43,30 @@
             </div>
 
             <div class="ocupacao__leitos">
-              @for (ocupante of quarto.ocupantes; track ocupante.idEstadia) {
-                <button
-                  type="button"
-                  class="ocupacao__leito ocupacao__leito--ocupado"
-                  [title]="ocupante.nomePessoa + ' — desde ' + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
-                  (click)="abrirFinalizar(ocupante, $event)"
-                >
-                  <mat-icon>bed</mat-icon>
-                </button>
+              @for (ocupante of quarto.ocupantes; track ocupante.idEstadia + '_' + ocupante.idPessoa) {
+                @if (ocupante.acompanhante) {
+                  <!-- Acompanhante que também ocupa leito — navega pra
+                       editar a estadia do paciente (aba Acompanhantes),
+                       em vez de abrir o popover de finalizar: encerrar
+                       por ali finalizaria a estadia do PACIENTE, não a
+                       presença do acompanhante. -->
+                  <a
+                    [routerLink]="['/estadias', ocupante.idEstadia, 'editar']"
+                    class="ocupacao__leito ocupacao__leito--acompanhante"
+                    [title]="ocupante.nomePessoa + ' — acompanhante, desde ' + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
+                  >
+                    <mat-icon>bed</mat-icon>
+                  </a>
+                } @else {
+                  <button
+                    type="button"
+                    class="ocupacao__leito ocupacao__leito--ocupado"
+                    [title]="ocupante.nomePessoa + ' — desde ' + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
+                    (click)="abrirFinalizar(ocupante, $event)"
+                  >
+                    <mat-icon>bed</mat-icon>
+                  </button>
+                }
               }
               @for (vaga of leitosVagos(quarto); track $index) {
                 <button
@@ -129,7 +145,7 @@
 
               @if (revisaoAberta() === quarto.id) {
                 <ul class="ocupacao__revisao">
-                  @for (pendente of quarto.pendentesRevisao; track pendente.idEstadia) {
+                  @for (pendente of quarto.pendentesRevisao; track pendente.idEstadia + '_' + pendente.idPessoa) {
                     <li>
                       <span>{{ pendente.nomePessoa }} — desde {{ pendente.dataEntrada | date: 'dd/MM/yyyy' }}</span>
                       <a [routerLink]="['/estadias', pendente.idEstadia, 'editar']">Revisar</a>

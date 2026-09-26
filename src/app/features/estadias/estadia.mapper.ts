@@ -51,7 +51,8 @@ export function paraAcompanhanteModel(dto: EstadiaAcompanhanteDto): EstadiaAcomp
     idPessoa: dto.id_pessoa,
     dataEntrada: dto.data_entrada,
     dataSaida: dto.data_saida,
-    grauParentesco: dto.grau_parentesco
+    grauParentesco: dto.grau_parentesco,
+    ocupaLeito: dto.ocupa_leito
   };
 }
 

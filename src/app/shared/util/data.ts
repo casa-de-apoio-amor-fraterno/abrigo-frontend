@@ -21,3 +21,21 @@ export function paraDatetimeLocal(data: Date): string {
 export function agoraDatetimeLocal(): string {
   return paraDatetimeLocal(new Date());
 }
+
+/** Tempo de estadia (valor + unidade), calculado a partir de entrada/saída
+ * — substitui o campo que antes era digitado manualmente ao encerrar (ver
+ * estadia.legacy.md). Menos de 1 dia (24h) vira horas; 1 dia ou mais vira
+ * dias. `dataEntrada`/`dataSaida` no formato de `paraDatetimeLocal`
+ * ("YYYY-MM-DDTHH:mm"), interpretado como hora local pelo próprio `Date`. */
+export function calcularTempoEstadia(
+  dataEntrada: string,
+  dataSaida: string
+): { valor: number; unidade: 'dias' | 'horas' } {
+  const diffMs = new Date(dataSaida).getTime() - new Date(dataEntrada).getTime();
+  const diffHoras = diffMs / (1000 * 60 * 60);
+
+  if (diffHoras < 24) {
+    return { valor: Math.max(1, Math.round(diffHoras)), unidade: 'horas' };
+  }
+  return { valor: Math.max(1, Math.round(diffHoras / 24)), unidade: 'dias' };
+}

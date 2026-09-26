@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,20 +21,14 @@ import { HospitalService } from '../../hospitais/hospital.service';
 import { Hospital } from '../../hospitais/hospital.model';
 import { EstadiaAcompanhanteCreateDto } from '../estadia.dto';
 import { EstadiaService } from '../estadia.service';
-import {
-  EstadiaAcompanhante,
-  EstadiaHistorico,
-  SituacaoEstadia,
-  TipoPessoaEstadia,
-  UnidadeTempoEstadia
-} from '../estadia.model';
+import { EstadiaAcompanhante, EstadiaHistorico, SituacaoEstadia, TipoPessoaEstadia } from '../estadia.model';
 import {
   CadastroDialogAba,
   CadastroDialogShellComponent
 } from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
-import { agoraDatetimeLocal } from '../../../shared/util/data';
+import { agoraDatetimeLocal, calcularTempoEstadia } from '../../../shared/util/data';
 
 const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
   { valor: 'Em acompanhamento', rotulo: 'Em acompanhamento' },
@@ -41,15 +36,17 @@ const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
   { valor: 'Finalizada', rotulo: 'Finalizada', variante: 'erro' }
 ];
 
+// "Finalizada" só é alcançável via `encerrar()` (botão "Encerrar
+// estadia") — nunca escolhida manualmente. Verificado contra o legado
+// (untFrmManutencaoEstadia.dfm/.pas): lá `situacao` é um radio group
+// livre sem nenhuma regra especial por trás de "Aguardando retorno" (é
+// só uma opção manual igual às outras); mantida editável só entre esses
+// dois estados ativos, pelo mesmo motivo que ela existia no legado.
+const OPCOES_SITUACAO_ATIVA: OpcaoFiltroPill[] = OPCOES_SITUACAO.filter((opcao) => opcao.valor !== 'Finalizada');
+
 const OPCOES_TIPO_PESSOA: OpcaoFiltroPill[] = [
   { valor: 'Paciente', rotulo: 'Paciente' },
   { valor: 'Acompanhante', rotulo: 'Acompanhante' }
-];
-
-const OPCOES_UNIDADE_TEMPO: OpcaoFiltroPill[] = [
-  { valor: 'dias', rotulo: 'Dias' },
-  { valor: 'noites', rotulo: 'Noites' },
-  { valor: 'horas', rotulo: 'Horas' }
 ];
 
 @Component({
@@ -65,6 +62,7 @@ const OPCOES_UNIDADE_TEMPO: OpcaoFiltroPill[] = [
     MatProgressSpinnerModule,
     MatRadioModule,
     MatSelectModule,
+    MatCheckboxModule,
     CadastroDialogShellComponent,
     CadastroAcoesComponent,
     FiltroPillsComponent
@@ -72,15 +70,9 @@ const OPCOES_UNIDADE_TEMPO: OpcaoFiltroPill[] = [
   templateUrl: './estadia-cadastro.page.html'
 })
 export class EstadiaCadastroPage {
-  protected readonly opcoesSituacao = OPCOES_SITUACAO;
+  protected readonly opcoesSituacaoAtiva = OPCOES_SITUACAO_ATIVA;
   protected readonly opcoesTipoPessoa = OPCOES_TIPO_PESSOA;
-  protected readonly opcoesUnidadeTempo = OPCOES_UNIDADE_TEMPO;
 
-  // Mostra a unidade escolhida na pill como sufixo dentro do próprio campo
-  // numérico (ex.: "4 Noites"), em vez de só a pill isolada ao lado.
-  protected rotuloUnidadeTempo(unidade: UnidadeTempoEstadia): string {
-    return OPCOES_UNIDADE_TEMPO.find((opcao) => opcao.valor === unidade)?.rotulo ?? '';
-  }
   private readonly fb = inject(FormBuilder);
   private readonly estadiaService = inject(EstadiaService);
   private readonly pessoaService = inject(PessoaService);
@@ -100,11 +92,17 @@ export class EstadiaCadastroPage {
   // (abrigo-backend/app/features/estadias/schemas.py). Histórico continua
   // exclusivo de edição (trilha de auditoria, só existe depois que a
   // estadia já foi criada — mesmo padrão de emprestimo-cadastro.page.ts).
-  protected readonly abas: CadastroDialogAba[] = [
+  //
+  // Aba só existe quando tipoPessoa === 'Paciente' — uma estadia que já é
+  // de um acompanhante (tem leito próprio) não tem sentido ter
+  // acompanhante dela mesma (regra do time, 2026-09-25; backend rejeita
+  // com 400 se tentar, ver estadias/router.py).
+  protected readonly tipoPessoaAtual = signal<TipoPessoaEstadia>('Paciente');
+  protected readonly abas = computed<CadastroDialogAba[]>(() => [
     { id: 'dados', rotulo: 'Dados' },
-    { id: 'acompanhantes', rotulo: 'Acompanhantes' },
+    ...(this.tipoPessoaAtual() === 'Paciente' ? [{ id: 'acompanhantes', rotulo: 'Acompanhantes' }] : []),
     ...(this.modoEdicao ? [{ id: 'historico', rotulo: 'Histórico' }] : [])
-  ];
+  ]);
   protected readonly abaAtiva = signal('dados');
 
   protected readonly carregando = signal(this.modoEdicao);
@@ -145,20 +143,32 @@ export class EstadiaCadastroPage {
     dataSaida: [''],
     tipoPessoa: this.fb.nonNullable.control<TipoPessoaEstadia>('Paciente'),
     situacao: this.fb.nonNullable.control<SituacaoEstadia>('Em acompanhamento', Validators.required),
-    tempoEstadiaValor: this.fb.control<number | null>(null),
-    tempoEstadiaUnidade: this.fb.nonNullable.control<UnidadeTempoEstadia>('dias'),
     observacao: ['']
   });
 
   protected readonly formAcompanhante = this.fb.nonNullable.group({
     dataEntrada: ['', [Validators.required]],
     dataSaida: [''],
-    grauParentesco: ['']
+    grauParentesco: [''],
+    ocupaLeito: this.fb.nonNullable.control(false)
   });
 
   constructor() {
     this.quartoService.listar(false).subscribe((quartos) => this.quartos.set(quartos));
     this.hospitalService.listar().subscribe((hospitais) => this.hospitais.set(hospitais));
+
+    this.form.controls.tipoPessoa.valueChanges.subscribe((tipoPessoa) => {
+      this.tipoPessoaAtual.set(tipoPessoa);
+      if (tipoPessoa !== 'Paciente') {
+        // Aba Acompanhantes some (ver `abas`) — sem isso, acompanhantes já
+        // adicionados localmente seriam mandados junto no POST e rejeitados
+        // pelo backend (400, ver estadias/router.py).
+        this.acompanhantesLocais.set([]);
+        if (this.abaAtiva() === 'acompanhantes') {
+          this.abaAtiva.set('dados');
+        }
+      }
+    });
 
     if (this.estadiaId !== null) {
       this.estadiaService.buscar(this.estadiaId).subscribe({
@@ -170,8 +180,6 @@ export class EstadiaCadastroPage {
             dataSaida: estadia.dataSaida?.slice(0, 16) ?? '',
             tipoPessoa: estadia.tipoPessoa,
             situacao: estadia.situacao,
-            tempoEstadiaValor: estadia.tempoEstadiaValor,
-            tempoEstadiaUnidade: estadia.tempoEstadiaUnidade ?? 'dias',
             observacao: estadia.observacao ?? ''
           });
           this.situacaoAtual.set(estadia.situacao);
@@ -211,6 +219,10 @@ export class EstadiaCadastroPage {
     }
 
     const valores = this.form.getRawValue();
+    // Tempo de estadia não é mais digitado — calculado a partir de
+    // entrada/saída (ver calcularTempoEstadia). Sem data de saída ainda
+    // não tem o que calcular.
+    const tempo = valores.dataSaida ? calcularTempoEstadia(valores.dataEntrada, valores.dataSaida) : null;
     const dados = {
       id_pessoa: this.pessoaSelecionada()!.id,
       id_quarto: valores.idQuarto!,
@@ -218,8 +230,8 @@ export class EstadiaCadastroPage {
       id_hospital: valores.idHospital,
       data_entrada: valores.dataEntrada,
       data_saida: valores.dataSaida || null,
-      tempo_estadia_valor: valores.tempoEstadiaValor,
-      tempo_estadia_unidade: valores.tempoEstadiaUnidade,
+      tempo_estadia_valor: tempo?.valor ?? null,
+      tempo_estadia_unidade: tempo?.unidade ?? null,
       tipo_pessoa: valores.tipoPessoa,
       situacao: valores.situacao,
       observacao: valores.observacao || null
@@ -253,7 +265,9 @@ export class EstadiaCadastroPage {
     this.erro.set(null);
 
     const idUsuario = this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id;
-    this.estadiaService.encerrar(this.estadiaId, undefined, undefined, undefined, idUsuario).subscribe({
+    const dataSaida = agoraDatetimeLocal();
+    const tempo = calcularTempoEstadia(this.form.controls.dataEntrada.value, dataSaida);
+    this.estadiaService.encerrar(this.estadiaId, dataSaida, tempo.valor, tempo.unidade, idUsuario).subscribe({
       next: () => {
         void this.router.navigateByUrl('/estadias');
       },
@@ -266,7 +280,7 @@ export class EstadiaCadastroPage {
 
   protected abrirFormAcompanhante(): void {
     this.pessoaAcompanhante.set(null);
-    this.formAcompanhante.reset({ dataEntrada: '', dataSaida: '', grauParentesco: '' });
+    this.formAcompanhante.reset({ dataEntrada: '', dataSaida: '', grauParentesco: '', ocupaLeito: false });
     this.formAcompanhanteAberto.set(true);
   }
 
@@ -293,7 +307,8 @@ export class EstadiaCadastroPage {
         idPessoa: pessoa.id,
         dataEntrada: valores.dataEntrada,
         dataSaida: valores.dataSaida || null,
-        grauParentesco: valores.grauParentesco || null
+        grauParentesco: valores.grauParentesco || null,
+        ocupaLeito: valores.ocupaLeito
       };
       this.acompanhantesLocais.update((atuais) => [...atuais, acompanhante]);
       this.nomesAcompanhantes.update((mapa) => ({ ...mapa, [pessoa.id]: pessoa.nome }));
@@ -308,7 +323,8 @@ export class EstadiaCadastroPage {
         id_pessoa: pessoa.id,
         data_entrada: valores.dataEntrada,
         data_saida: valores.dataSaida || null,
-        grau_parentesco: valores.grauParentesco || null
+        grau_parentesco: valores.grauParentesco || null,
+        ocupa_leito: valores.ocupaLeito
       })
       .subscribe({
         next: () => {
@@ -328,7 +344,8 @@ export class EstadiaCadastroPage {
       id_pessoa: acompanhante.idPessoa,
       data_entrada: acompanhante.dataEntrada,
       data_saida: acompanhante.dataSaida,
-      grau_parentesco: acompanhante.grauParentesco
+      grau_parentesco: acompanhante.grauParentesco,
+      ocupa_leito: acompanhante.ocupaLeito
     }));
   }
 
@@ -361,6 +378,18 @@ export class EstadiaCadastroPage {
       },
       error: () => this.carregandoHistorico.set(false)
     });
+  }
+
+  // Tempo de estadia não é mais um campo do form — só exibição, calculado
+  // ao vivo a partir de entrada/saída (mesma regra de `encerrar`/`salvar`).
+  protected tempoEstadiaTexto(): string {
+    const dataEntrada = this.form.controls.dataEntrada.value;
+    const dataSaida = this.form.controls.dataSaida.value;
+    if (!dataEntrada || !dataSaida) {
+      return '—';
+    }
+    const tempo = calcularTempoEstadia(dataEntrada, dataSaida);
+    return `${tempo.valor} ${tempo.unidade}`;
   }
 
   protected nomeUsuarioHistorico(idUsuario: number): string {

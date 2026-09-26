@@ -29,6 +29,7 @@ export interface ConsultaEstadiasQuery {
    * mutuamente exclusivo com `idPessoa`. */
   idPessoaAcompanhante?: number;
   situacao?: SituacaoEstadiaDto;
+  busca?: string;
   skip?: number;
   take?: number;
 }
@@ -51,6 +52,9 @@ export class EstadiaService {
     }
     if (query.situacao) {
       params['situacao'] = query.situacao;
+    }
+    if (query.busca) {
+      params['busca'] = query.busca;
     }
 
     return this.http.get<ListaEstadiasDto>(this.resource, { params }).pipe(map(paraListaModel));

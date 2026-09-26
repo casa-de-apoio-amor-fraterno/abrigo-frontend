@@ -11,6 +11,9 @@ export interface QuartoOcupante {
   idPessoa: number;
   nomePessoa: string;
   dataEntrada: string;
+  /** Leito ocupado por um acompanhante, não pelo titular da estadia (ver
+   * EstadiaAcompanhante.ocupaLeito) — usado pra colorir diferente. */
+  acompanhante: boolean;
 }
 
 /**

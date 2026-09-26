@@ -60,6 +60,7 @@ export interface EstadiaAcompanhanteDto {
   data_entrada: string;
   data_saida: string | null;
   grau_parentesco: string | null;
+  ocupa_leito: boolean;
 }
 
 export interface EstadiaAcompanhanteCreateDto {
@@ -67,6 +68,7 @@ export interface EstadiaAcompanhanteCreateDto {
   data_entrada: string;
   data_saida?: string | null;
   grau_parentesco?: string | null;
+  ocupa_leito?: boolean;
 }
 
 export interface EstadiaHistoricoDto {
