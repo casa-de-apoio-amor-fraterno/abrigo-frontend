@@ -1,5 +1,6 @@
 import { DatePipe, formatDate } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +15,7 @@ import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
+import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -28,6 +30,7 @@ const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
   selector: 'app-estadia-consulta-page',
   imports: [
     DatePipe,
+    FormsModule,
     RouterLink,
     RouterOutlet,
     MatButtonModule,
@@ -45,6 +48,7 @@ export class EstadiaConsultaPage {
 
   protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly situacao = signal<SituacaoEstadia | ''>('Em acompanhamento');
+  protected readonly termoBusca = signal('');
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);
   protected readonly itens = signal<EstadiaResumo[]>([]);
@@ -59,6 +63,7 @@ export class EstadiaConsultaPage {
 
   constructor() {
     this.consultar();
+    escutarRefrescoDaLista('/estadias', () => this.consultar());
   }
 
   protected visualizar(estadia: EstadiaResumo): void {
@@ -79,24 +84,35 @@ export class EstadiaConsultaPage {
     });
   }
 
+  protected buscar(): void {
+    this.pagina.set(0);
+    this.consultar();
+  }
+
   protected exportarCsv(): void {
     this.exportando.set(true);
-    this.estadiaService.listar({ situacao: this.situacao() || undefined, take: 2000 }).subscribe({
-      next: (resultado) => {
-        const idsPessoas = [...new Set(resultado.items.map((i) => i.idPessoa))].filter(
-          (id) => this.nomesPessoas()[id] === undefined
-        );
-        forkJoin(idsPessoas.map((id) => this.pessoaService.buscar(id))).subscribe({
-          next: (pessoas) => {
-            const mapa = { ...this.nomesPessoas() };
-            pessoas.forEach((p) => (mapa[p.id] = p.nome));
-            this.gerarCsvEstadias(resultado.items, mapa);
-          },
-          error: () => this.gerarCsvEstadias(resultado.items, this.nomesPessoas())
-        });
-      },
-      error: () => this.exportando.set(false)
-    });
+    this.estadiaService
+      .listar({
+        situacao: this.situacao() || undefined,
+        busca: this.termoBusca().trim() || undefined,
+        take: 2000
+      })
+      .subscribe({
+        next: (resultado) => {
+          const idsPessoas = [...new Set(resultado.items.map((i) => i.idPessoa))].filter(
+            (id) => this.nomesPessoas()[id] === undefined
+          );
+          forkJoin(idsPessoas.map((id) => this.pessoaService.buscar(id))).subscribe({
+            next: (pessoas) => {
+              const mapa = { ...this.nomesPessoas() };
+              pessoas.forEach((p) => (mapa[p.id] = p.nome));
+              this.gerarCsvEstadias(resultado.items, mapa);
+            },
+            error: () => this.gerarCsvEstadias(resultado.items, this.nomesPessoas())
+          });
+        },
+        error: () => this.exportando.set(false)
+      });
   }
 
   private gerarCsvEstadias(itens: EstadiaResumo[], nomesPessoas: Record<number, string>): void {
@@ -145,6 +161,7 @@ export class EstadiaConsultaPage {
     this.estadiaService
       .listar({
         situacao: this.situacao() || undefined,
+        busca: this.termoBusca().trim() || undefined,
         skip: this.pagina() * ITENS_POR_PAGINA,
         take: ITENS_POR_PAGINA
       })

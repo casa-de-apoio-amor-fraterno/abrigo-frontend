@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,7 +27,7 @@ const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
  */
 @Component({
   selector: 'app-solicitacao-cadastro-consulta-page',
-  imports: [MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
+  imports: [FormsModule, MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
   templateUrl: './solicitacao-cadastro-consulta.page.html',
   styleUrl: './solicitacao-cadastro-consulta.page.scss'
 })
@@ -36,6 +37,7 @@ export class SolicitacaoCadastroConsultaPage {
 
   protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly situacao = signal<SituacaoSolicitacaoCadastro | ''>('Pendente');
+  protected readonly termoBusca = signal('');
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);
   protected readonly itens = signal<SolicitacaoCadastro[]>([]);
@@ -56,6 +58,11 @@ export class SolicitacaoCadastroConsultaPage {
 
   protected filtrarPorSituacao(valor: SituacaoSolicitacaoCadastro | ''): void {
     this.situacao.set(valor);
+    this.pagina.set(0);
+    this.consultar();
+  }
+
+  protected buscar(): void {
     this.pagina.set(0);
     this.consultar();
   }
@@ -113,6 +120,7 @@ export class SolicitacaoCadastroConsultaPage {
     this.solicitacaoService
       .listar({
         situacao: this.situacao() || undefined,
+        busca: this.termoBusca().trim() || undefined,
         skip: this.pagina() * ITENS_POR_PAGINA,
         take: ITENS_POR_PAGINA
       })

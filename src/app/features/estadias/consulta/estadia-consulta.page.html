@@ -29,6 +29,15 @@
     [valor]="situacao()"
     (mudanca)="filtrarPorSituacao($any($event))"
   />
+  <form filtros class="consulta__busca" (ngSubmit)="buscar()">
+    <input
+      type="search"
+      placeholder="Buscar por nome da pessoa..."
+      [value]="termoBusca()"
+      (input)="termoBusca.set($any($event.target).value)"
+    />
+    <button mat-flat-button type="submit" class="consulta__busca-btn">Buscar</button>
+  </form>
 
   <table class="consulta__tabela">
     <thead>

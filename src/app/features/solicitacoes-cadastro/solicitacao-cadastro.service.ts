@@ -21,6 +21,7 @@ export interface NovaSolicitacaoCadastro {
 
 export interface ConsultaSolicitacoesCadastroQuery {
   situacao?: SituacaoSolicitacaoCadastro;
+  busca?: string;
   skip?: number;
   take?: number;
 }
@@ -55,6 +56,9 @@ export class SolicitacaoCadastroService {
     };
     if (query.situacao) {
       params['situacao'] = query.situacao;
+    }
+    if (query.busca) {
+      params['busca'] = query.busca;
     }
     return this.http
       .get<ListaSolicitacoesCadastroDto>(this.resource, { params })

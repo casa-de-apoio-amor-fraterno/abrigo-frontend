@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +13,7 @@ import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
 import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
+import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 const ITENS_POR_PAGINA = 20;
 
@@ -23,7 +25,15 @@ const OPCOES_SITUACAO: OpcaoFiltroPill[] = [
 
 @Component({
   selector: 'app-emprestimo-consulta-page',
-  imports: [RouterLink, RouterOutlet, MatButtonModule, MatIconModule, PaginaConsultaComponent, FiltroPillsComponent],
+  imports: [
+    FormsModule,
+    RouterLink,
+    RouterOutlet,
+    MatButtonModule,
+    MatIconModule,
+    PaginaConsultaComponent,
+    FiltroPillsComponent
+  ],
   templateUrl: './emprestimo-consulta.page.html'
 })
 export class EmprestimoConsultaPage {
@@ -33,6 +43,7 @@ export class EmprestimoConsultaPage {
 
   protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly situacao = signal('Pendente');
+  protected readonly termoBusca = signal('');
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);
   protected readonly itens = signal<EmprestimoResumo[]>([]);
@@ -46,6 +57,7 @@ export class EmprestimoConsultaPage {
 
   constructor() {
     this.consultar();
+    escutarRefrescoDaLista('/emprestimos', () => this.consultar());
   }
 
   protected visualizar(emprestimo: EmprestimoResumo): void {
@@ -63,24 +75,35 @@ export class EmprestimoConsultaPage {
     });
   }
 
+  protected buscar(): void {
+    this.pagina.set(0);
+    this.consultar();
+  }
+
   protected exportarCsv(): void {
     this.exportando.set(true);
-    this.emprestimoService.listar({ situacao: this.situacao() || undefined, take: 2000 }).subscribe({
-      next: (resultado) => {
-        const idsPessoas = [...new Set(resultado.items.map((i) => i.idPessoa))].filter(
-          (id) => this.nomesPessoas()[id] === undefined
-        );
-        forkJoin(idsPessoas.map((id) => this.pessoaService.buscar(id))).subscribe({
-          next: (pessoas) => {
-            const mapa = { ...this.nomesPessoas() };
-            pessoas.forEach((p) => (mapa[p.id] = p.nome));
-            this.gerarCsvEmprestimos(resultado.items, mapa);
-          },
-          error: () => this.gerarCsvEmprestimos(resultado.items, this.nomesPessoas())
-        });
-      },
-      error: () => this.exportando.set(false)
-    });
+    this.emprestimoService
+      .listar({
+        situacao: this.situacao() || undefined,
+        busca: this.termoBusca().trim() || undefined,
+        take: 2000
+      })
+      .subscribe({
+        next: (resultado) => {
+          const idsPessoas = [...new Set(resultado.items.map((i) => i.idPessoa))].filter(
+            (id) => this.nomesPessoas()[id] === undefined
+          );
+          forkJoin(idsPessoas.map((id) => this.pessoaService.buscar(id))).subscribe({
+            next: (pessoas) => {
+              const mapa = { ...this.nomesPessoas() };
+              pessoas.forEach((p) => (mapa[p.id] = p.nome));
+              this.gerarCsvEmprestimos(resultado.items, mapa);
+            },
+            error: () => this.gerarCsvEmprestimos(resultado.items, this.nomesPessoas())
+          });
+        },
+        error: () => this.exportando.set(false)
+      });
   }
 
   private gerarCsvEmprestimos(itens: EmprestimoResumo[], nomesPessoas: Record<number, string>): void {
@@ -121,6 +144,7 @@ export class EmprestimoConsultaPage {
     this.emprestimoService
       .listar({
         situacao: this.situacao() || undefined,
+        busca: this.termoBusca().trim() || undefined,
         skip: this.pagina() * ITENS_POR_PAGINA,
         take: ITENS_POR_PAGINA
       })

@@ -32,6 +32,7 @@ import {
 export interface ConsultaEmprestimosQuery {
   idPessoa?: number;
   situacao?: string;
+  busca?: string;
   skip?: number;
   take?: number;
 }
@@ -51,6 +52,9 @@ export class EmprestimoService {
     }
     if (query.situacao) {
       params['situacao'] = query.situacao;
+    }
+    if (query.busca) {
+      params['busca'] = query.busca;
     }
 
     return this.http.get<ListaEmprestimosDto>(this.resource, { params }).pipe(map(paraListaModel));
