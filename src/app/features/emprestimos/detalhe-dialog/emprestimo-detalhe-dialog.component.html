@@ -1,0 +1,102 @@
+<div class="emprestimo-detalhe__cabecalho" mat-dialog-title>
+  <h2>{{ pessoa()?.nome || 'Empréstimo' }}</h2>
+  @if (emprestimo(); as emp) {
+    <span
+      class="consulta__badge emprestimo-detalhe__pill"
+      [class.consulta__badge--aviso]="emp.situacao === 'Renovado'"
+      [class.consulta__badge--neutro]="emp.situacao === 'Devolvido'"
+    >
+      {{ emp.situacao }}
+    </span>
+  }
+</div>
+
+<mat-dialog-content class="emprestimo-detalhe__conteudo">
+  @if (carregando()) {
+    <div class="emprestimo-detalhe__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="emprestimo-detalhe__erro">{{ erro() }}</p>
+  } @else if (emprestimo(); as emp) {
+    <dl class="emprestimo-detalhe__campos">
+      <div class="emprestimo-detalhe__campo">
+        <dt>Nº contrato</dt>
+        <dd>{{ emp.numeroContrato || '—' }}</dd>
+      </div>
+      @if (pessoa(); as p) {
+        <div class="emprestimo-detalhe__campo">
+          <dt>Telefone</dt>
+          <dd>{{ p.telefone_principal || '—' }}</dd>
+        </div>
+        <div class="emprestimo-detalhe__campo">
+          <dt>CPF</dt>
+          <dd>{{ p.cpf ? cpfMascarado(p.cpf) : '—' }}</dd>
+        </div>
+      }
+      <div class="emprestimo-detalhe__campo emprestimo-detalhe__campo--largo">
+        <dt>Observação</dt>
+        <dd class="emprestimo-detalhe__observacao">{{ emp.observacao || '—' }}</dd>
+      </div>
+    </dl>
+
+    <h3 class="emprestimo-detalhe__subtitulo">Itens emprestados ({{ itens().length }})</h3>
+
+    @if (itens().length === 0) {
+      <p class="emprestimo-detalhe__vazio">Nenhum item registrado.</p>
+    } @else {
+      <ul class="cadastro__lista emprestimo-detalhe__itens">
+        @for (item of itens(); track item.id) {
+          <li>
+            <div>
+              <strong>{{ item.descricaoMaterial }}</strong>
+              <span>
+                Nº patrimônio: {{ item.numeroPatrimonioMaterial || '—' }}
+                @if (item.situacao) {
+                  ·
+                  <span
+                    class="consulta__badge emprestimo-detalhe__pill-item"
+                    [class.consulta__badge--aviso]="item.situacao === 'Renovado'"
+                    [class.consulta__badge--neutro]="item.situacao === 'Devolvido'"
+                  >
+                    {{ item.situacao }}
+                  </span>
+                }
+              </span>
+              <span>
+                {{ item.dataEmprestimo ? (item.dataEmprestimo | date: 'dd/MM/yyyy') : '-' }}
+                — Previsto: {{ item.dataDevolucao ? (item.dataDevolucao | date: 'dd/MM/yyyy') : '-' }}
+                @if (item.dataDevolucaoEfetiva) {
+                  · Devolvido em: {{ item.dataDevolucaoEfetiva | date: 'dd/MM/yyyy' }}
+                }
+              </span>
+              @if (item.renovacao) {
+                <span>Renovação: {{ item.renovacao }}</span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  @if (data.aoEditar) {
+    <button mat-flat-button type="button" class="emprestimo-detalhe__editar" (click)="editar()">
+      <mat-icon>edit</mat-icon>
+      Editar empréstimo
+    </button>
+  } @else {
+    <a
+      mat-flat-button
+      class="emprestimo-detalhe__editar"
+      [routerLink]="data.linkEditar"
+      (click)="dialogRef.close()"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar empréstimo
+    </a>
+  }
+</mat-dialog-actions>

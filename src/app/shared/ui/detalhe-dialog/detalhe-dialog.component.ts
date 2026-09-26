@@ -12,8 +12,15 @@ export interface DetalheDialogCampo {
 export interface DetalheDialogData {
   titulo: string;
   campos: DetalheDialogCampo[];
-  linkEditar: unknown[];
+  /** Ignorado quando `aoEditar` é informado (ver abaixo). */
+  linkEditar?: unknown[];
   labelEditar?: string;
+  /** Abre a edição sem navegar (ex.: um MatDialog aberto direto por cima
+   * da tela atual, como o popup "Ver" dos vencimentos na tela Início) —
+   * quando informada, o botão chama isso em vez de navegar por
+   * `linkEditar`. Só uma função comum passada no `data` do MAT_DIALOG_DATA,
+   * não serializada — funciona porque o dialog roda no mesmo runtime JS. */
+  aoEditar?: () => void;
   /** Exibida à direita dos campos, quando informada (ver Pessoa.tem_foto). */
   fotoUrl?: string | null;
 }
@@ -27,4 +34,9 @@ export interface DetalheDialogData {
 export class DetalheDialogComponent {
   protected readonly dialogRef = inject<MatDialogRef<DetalheDialogComponent>>(MatDialogRef);
   protected readonly data = inject<DetalheDialogData>(MAT_DIALOG_DATA);
+
+  protected editar(): void {
+    this.dialogRef.close();
+    this.data.aoEditar?.();
+  }
 }

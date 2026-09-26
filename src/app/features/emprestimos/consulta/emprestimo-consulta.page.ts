@@ -11,7 +11,8 @@ import { EmprestimoService } from '../emprestimo.service';
 import { EmprestimoResumo } from '../emprestimo.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
-import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { EmprestimoDetalheDialogComponent } from '../detalhe-dialog/emprestimo-detalhe-dialog.component';
+import { ContratosDialogComponent } from '../contratos-dialog/contratos-dialog.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
 import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
@@ -61,16 +62,21 @@ export class EmprestimoConsultaPage {
   }
 
   protected visualizar(emprestimo: EmprestimoResumo): void {
-    this.dialog.open(DetalheDialogComponent, {
-      width: '420px',
+    this.dialog.open(EmprestimoDetalheDialogComponent, {
+      width: '560px',
       data: {
-        titulo: this.nomesPessoas()[emprestimo.idPessoa] || `Pessoa #${emprestimo.idPessoa}`,
-        campos: [
-          { rotulo: 'Nº contrato', valor: emprestimo.numeroContrato || '—' },
-          { rotulo: 'Situação', valor: emprestimo.situacao }
-        ],
-        linkEditar: ['/emprestimos', emprestimo.id, 'editar'],
-        labelEditar: 'Editar empréstimo'
+        emprestimoId: emprestimo.id,
+        linkEditar: ['/emprestimos', emprestimo.id, 'editar']
+      }
+    });
+  }
+
+  protected verContratos(emprestimo: EmprestimoResumo): void {
+    this.dialog.open(ContratosDialogComponent, {
+      width: '480px',
+      data: {
+        emprestimoId: emprestimo.id,
+        nomePessoa: this.nomesPessoas()[emprestimo.idPessoa] || `Pessoa #${emprestimo.idPessoa}`
       }
     });
   }

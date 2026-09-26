@@ -1,0 +1,19 @@
+.contratos-dialog {
+  &__conteudo {
+    min-width: 380px;
+  }
+
+  &__estado {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  &__vazio {
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__erro {
+    color: #c62828;
+  }
+}

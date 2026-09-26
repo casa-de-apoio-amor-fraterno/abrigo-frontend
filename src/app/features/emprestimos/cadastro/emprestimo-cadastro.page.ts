@@ -2,8 +2,9 @@ import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -17,7 +18,7 @@ import { MaterialAutocompleteComponent } from '../../../shared/ui/material-autoc
 import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocomplete/pessoa-autocomplete.component';
 import { PessoaService } from '../../pessoas/pessoa.service';
 import { MaterialService } from '../../materiais/material.service';
-import { EmprestimoItemCreateDto } from '../emprestimo.dto';
+import { EmprestimoItemCreateDto, TipoContrato } from '../emprestimo.dto';
 import { EmprestimoService } from '../emprestimo.service';
 import {
   EmprestimoContrato,
@@ -58,12 +59,26 @@ export class EmprestimoCadastroPage {
   private readonly materialService = inject(MaterialService);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  // Este componente é sempre conteúdo de um MatDialog — tanto no fluxo
+  // roteado normal (CadastroDialogHostBase abre ele dentro do dialog a
+  // partir da rota /emprestimos/:id/editar) quanto quando é aberto direto
+  // por outra tela sem trocar de rota (ver home.page.ts, popup "Ver" dos
+  // vencimentos) — por isso fecha a si mesmo (`dialogRef.close()`) em vez
+  // de navegar: no fluxo roteado o host reage ao fechamento e navega pra
+  // lista (mesmo resultado de antes); no fluxo direto só fecha o popup,
+  // sem sair da tela de quem abriu.
+  private readonly dialogRef = inject(MatDialogRef<EmprestimoCadastroPage>);
+  // Só presente quando aberto direto (fora da rota) — no fluxo roteado
+  // normal o host não passa `data`, então isso fica `null` e o id vem do
+  // parâmetro da rota mesmo (ver `emprestimoId` abaixo).
+  private readonly dialogData = inject<{ emprestimoId?: number } | null>(MAT_DIALOG_DATA, {
+    optional: true
+  });
 
-  protected readonly emprestimoId = this.route.snapshot.paramMap.get('id')
-    ? Number(this.route.snapshot.paramMap.get('id'))
-    : null;
+  protected readonly emprestimoId =
+    this.dialogData?.emprestimoId ??
+    (this.route.snapshot.paramMap.get('id') ? Number(this.route.snapshot.paramMap.get('id')) : null);
   protected readonly modoEdicao = this.emprestimoId !== null;
 
   // Itens do empréstimo já dão pra adicionar na criação (ver `itensLocais`
@@ -99,9 +114,14 @@ export class EmprestimoCadastroPage {
   protected readonly itensLocais = signal<EmprestimoItem[]>([]);
   protected readonly itensExibidos = computed(() => (this.emprestimoId === null ? this.itensLocais() : this.itens()));
   protected readonly descricoesMateriais = signal<Record<number, string>>({});
+  protected readonly patrimoniosMateriais = signal<Record<number, string | null>>({});
   protected readonly formItemAberto = signal(false);
   protected readonly salvandoItem = signal(false);
-  protected readonly materialSelecionado = signal<{ id: number; descricao: string } | null>(null);
+  protected readonly materialSelecionado = signal<{
+    id: number;
+    descricao: string;
+    numeroPatrimonio: string | null;
+  } | null>(null);
   protected readonly itemEmEdicao = signal<EmprestimoItem | null>(null);
 
   private proximoIdItemLocal = -1;
@@ -115,15 +135,24 @@ export class EmprestimoCadastroPage {
   protected readonly carregandoHistorico = signal(false);
 
   protected readonly assinaturaCanvas = viewChild(AssinaturaCanvasComponent);
-  protected readonly contrato = signal<EmprestimoContrato | null>(null);
+  // Um empréstimo pode ter vários contratos: no máximo um "Comodato" (o
+  // original) + quantas "Renovação" forem assinadas (decisão do time,
+  // 2026-09-26 — ver emprestimo.legacy.md). `contratoOriginal` é o que
+  // libera o botão de assinar renovação.
+  protected readonly contratos = signal<EmprestimoContrato[]>([]);
+  protected readonly contratoOriginal = computed(
+    () => this.contratos().find((c) => c.tipo === 'Comodato') ?? null
+  );
   protected readonly carregandoContrato = signal(false);
   protected readonly assinandoContrato = signal(false);
   protected readonly erroContrato = signal<string | null>(null);
-  // URL local do PDF já assinado — carregada assim que o contrato é
-  // encontrado (ver `carregarContrato`) pra virar um link comum
-  // (`<a href target="_blank">`), não um `window.open()` disparado de
-  // dentro de um callback assíncrono (bloqueado como pop-up na maioria dos
-  // navegadores — mesmo padrão de `contrato-demo.page.ts`).
+  // Mostra o canvas de assinatura pra uma renovação nova — o comodato
+  // original é assinado direto (não tem outra ação antes) quando ainda não
+  // existe nenhum contrato.
+  protected readonly assinandoRenovacao = signal(false);
+  // URL local do último PDF aberto — só guardada pra poder revogar
+  // (`URL.revokeObjectURL`) antes de abrir a próxima, evitando vazar
+  // memória a cada contrato visualizado.
   protected readonly pdfContratoUrl = signal<string | null>(null);
 
   // Situação do cabeçalho não é digitada pelo usuário — calculada pelo
@@ -163,7 +192,7 @@ export class EmprestimoCadastroPage {
 
           this.carregarItens();
           this.carregarHistorico();
-          this.carregarContrato();
+          this.carregarContratos();
         },
         error: () => {
           this.erro.set('Não foi possível carregar os dados do empréstimo.');
@@ -177,7 +206,9 @@ export class EmprestimoCadastroPage {
     this.pessoaSelecionada.set(pessoa);
   }
 
-  protected selecionarMaterial(material: { id: number; descricao: string } | null): void {
+  protected selecionarMaterial(
+    material: { id: number; descricao: string; numeroPatrimonio: string | null } | null
+  ): void {
     this.materialSelecionado.set(material);
   }
 
@@ -209,13 +240,17 @@ export class EmprestimoCadastroPage {
 
     operacao.subscribe({
       next: () => {
-        void this.router.navigateByUrl('/emprestimos');
+        this.dialogRef.close(true);
       },
       error: (error) => {
         this.salvando.set(false);
         this.erro.set(descreverErroHttp(error.error));
       }
     });
+  }
+
+  protected fechar(): void {
+    this.dialogRef.close(false);
   }
 
   protected novoItem(): void {
@@ -229,7 +264,8 @@ export class EmprestimoCadastroPage {
   protected editarItem(item: EmprestimoItem): void {
     this.itemEmEdicao.set(item);
     const descricao = this.descricoesMateriais()[item.idMaterial];
-    this.materialSelecionado.set(descricao ? { id: item.idMaterial, descricao } : null);
+    const numeroPatrimonio = this.patrimoniosMateriais()[item.idMaterial] ?? null;
+    this.materialSelecionado.set(descricao ? { id: item.idMaterial, descricao, numeroPatrimonio } : null);
     this.formItem.reset({
       dataEmprestimo: item.dataEmprestimo ?? '',
       dataDevolucao: item.dataDevolucao ?? '',
@@ -265,6 +301,17 @@ export class EmprestimoCadastroPage {
     // em vez de chamar a API — mesmo padrão de `ComposicaoFamiliarTabComponent`.
     if (this.emprestimoId === null) {
       const emEdicao = this.itemEmEdicao();
+      // Mesma regra do backend (`_verificar_material_duplicado`): não dá
+      // pra emprestar o mesmo material duas vezes na mesma ficha — aqui
+      // ainda não existe round-trip pra API validar, então checa local.
+      const jaIncluido = this.itensLocais().some(
+        (i) => i.idMaterial === dados.id_material && i.situacao !== 'Devolvido' && i.id !== emEdicao?.id
+      );
+      if (jaIncluido) {
+        this.erro.set('Este material já está incluído neste empréstimo.');
+        return;
+      }
+
       const item: EmprestimoItem = {
         id: emEdicao?.id ?? this.proximoIdItemLocal--,
         idEmprestimo: 0,
@@ -277,12 +324,14 @@ export class EmprestimoCadastroPage {
         // Item ainda não persistido — descrição/foto reais só existem depois
         // que o empréstimo é salvo e os itens vêm da API (ver EmprestimoItem).
         descricaoMaterial: material.descricao,
-        temFotoMaterial: false
+        temFotoMaterial: false,
+        numeroPatrimonioMaterial: material.numeroPatrimonio
       };
       this.itensLocais.update((atuais) =>
         emEdicao ? atuais.map((i) => (i.id === item.id ? item : i)) : [...atuais, item]
       );
       this.descricoesMateriais.update((mapa) => ({ ...mapa, [material.id]: material.descricao }));
+      this.patrimoniosMateriais.update((mapa) => ({ ...mapa, [material.id]: material.numeroPatrimonio }));
       this.formItemAberto.set(false);
       return;
     }
@@ -337,6 +386,7 @@ export class EmprestimoCadastroPage {
       idsFaltantes.forEach((id) => {
         this.materialService.buscar(id).subscribe((material) => {
           this.descricoesMateriais.update((mapa) => ({ ...mapa, [material.id]: material.descricao }));
+          this.patrimoniosMateriais.update((mapa) => ({ ...mapa, [material.id]: material.numeroPatrimonio }));
         });
       });
     });
@@ -368,7 +418,16 @@ export class EmprestimoCadastroPage {
     return !!this.assinaturaCanvas()?.obterAssinatura();
   }
 
-  protected assinarContrato(): void {
+  protected iniciarRenovacao(): void {
+    this.erroContrato.set(null);
+    this.assinandoRenovacao.set(true);
+  }
+
+  protected cancelarRenovacao(): void {
+    this.assinandoRenovacao.set(false);
+  }
+
+  protected assinarContrato(tipo: TipoContrato): void {
     const assinatura = this.assinaturaCanvas()?.obterAssinatura();
     if (this.emprestimoId === null || !assinatura) {
       return;
@@ -378,13 +437,13 @@ export class EmprestimoCadastroPage {
     this.assinandoContrato.set(true);
 
     this.emprestimoService
-      .assinarContrato(this.emprestimoId, assinatura)
+      .assinarContrato(this.emprestimoId, assinatura, tipo)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (contrato) => {
+        next: () => {
           this.assinandoContrato.set(false);
-          this.contrato.set(contrato);
-          this.carregarPdfContrato();
+          this.assinandoRenovacao.set(false);
+          this.carregarContratos();
         },
         error: (error) => {
           this.assinandoContrato.set(false);
@@ -393,39 +452,41 @@ export class EmprestimoCadastroPage {
       });
   }
 
-  private carregarContrato(): void {
+  protected abrirPdfContrato(contrato: EmprestimoContrato): void {
+    if (this.emprestimoId === null) {
+      return;
+    }
+    this.emprestimoService
+      .obterPdfContrato(this.emprestimoId, contrato.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blob) => {
+          this.revogarPdfContratoUrl();
+          const url = URL.createObjectURL(blob);
+          this.pdfContratoUrl.set(url);
+          window.open(url, '_blank');
+        },
+        error: () => this.erroContrato.set('Não foi possível carregar o PDF do contrato.')
+      });
+  }
+
+  private carregarContratos(): void {
     if (this.emprestimoId === null) {
       return;
     }
     this.carregandoContrato.set(true);
     this.emprestimoService
-      .buscarContrato(this.emprestimoId)
+      .listarContratos(this.emprestimoId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        // 404 aqui é o caso normal "ainda não assinado" (ver
-        // EmprestimoService.buscarContrato), não um erro de carregamento.
-        next: (contrato) => {
-          this.contrato.set(contrato);
+        next: (contratos) => {
+          this.contratos.set(contratos);
           this.carregandoContrato.set(false);
-          this.carregarPdfContrato();
         },
         error: () => {
-          this.contrato.set(null);
+          this.contratos.set([]);
           this.carregandoContrato.set(false);
         }
-      });
-  }
-
-  private carregarPdfContrato(): void {
-    if (this.emprestimoId === null) {
-      return;
-    }
-    this.emprestimoService
-      .obterPdfContrato(this.emprestimoId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (blob) => this.pdfContratoUrl.set(URL.createObjectURL(blob)),
-        error: () => this.erroContrato.set('Não foi possível carregar o PDF do contrato.')
       });
   }
 

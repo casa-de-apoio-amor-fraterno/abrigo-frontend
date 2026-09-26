@@ -11,6 +11,11 @@
  */
 export type SituacaoEmprestimo = 'Pendente' | 'Renovado' | 'Devolvido';
 
+/** "Comodato" é o termo original (assinado uma vez); "Renovação" é um
+ * termo aditivo assinado a cada prorrogação de prazo — pode haver vários
+ * por empréstimo. Ver EmprestimoContrato no backend. */
+export type TipoContrato = 'Comodato' | 'Renovação';
+
 export interface EmprestimoResumoDto {
   id: number;
   id_pessoa: number;
@@ -63,6 +68,7 @@ export interface EmprestimoItemDto {
    * abrigo-backend/app/features/emprestimos/schemas.py). */
   descricao_material: string;
   tem_foto_material: boolean;
+  numero_patrimonio_material: string | null;
 }
 
 export interface EmprestimoItemCreateDto {
@@ -87,9 +93,25 @@ export interface EmprestimoHistoricoDto {
   data_cadastro: string;
 }
 
+/** Espelha AlertaVencimentoEmprestimo (abrigo-backend,
+ * app/features/emprestimos/schemas.py) — item ainda não devolvido com a
+ * devolução prevista perto ou já passada, usado no painel da tela Início. */
+export interface AlertaVencimentoEmprestimoDto {
+  id_emprestimo: number;
+  id_item: number;
+  id_pessoa: number;
+  nome_pessoa: string;
+  telefone_pessoa: string | null;
+  descricao_material: string;
+  numero_patrimonio_material: string | null;
+  data_devolucao: string;
+  dias_restantes: number;
+}
+
 export interface EmprestimoContratoDto {
   id: number;
   id_emprestimo: number;
   id_usuario: number;
+  tipo: TipoContrato;
   data_assinatura: string;
 }

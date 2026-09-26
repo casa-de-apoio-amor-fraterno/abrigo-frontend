@@ -4,7 +4,11 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 
 import { ListaRefreshService } from './lista-refresh.service';
 
-const CONFIG_PADRAO: MatDialogConfig = {
+/** Exportado pra quem abre um formulário de cadastro direto via
+ * `MatDialog.open()`, fora do fluxo roteado desta base (ver
+ * home.page.ts) — mesma aparência dos popups de cadastro abertos pela
+ * rota. */
+export const CONFIG_PADRAO_DIALOG_CADASTRO: MatDialogConfig = {
   panelClass: 'cadastro-dialog-panel',
   width: '720px',
   maxWidth: '95vw',
@@ -42,7 +46,7 @@ export abstract class CadastroDialogHostBase implements OnInit, OnDestroy {
     const componente = await this.carregarComponente();
 
     this.dialogRef = this.dialog.open(componente, {
-      ...CONFIG_PADRAO,
+      ...CONFIG_PADRAO_DIALOG_CADASTRO,
       ...this.config,
       injector: this.injector
     });

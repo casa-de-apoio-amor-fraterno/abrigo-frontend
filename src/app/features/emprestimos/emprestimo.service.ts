@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
+  AlertaVencimentoEmprestimoDto,
   EmprestimoContratoDto,
   EmprestimoCreateDto,
   EmprestimoDto,
@@ -12,9 +13,11 @@ import {
   EmprestimoItemDto,
   EmprestimoItemUpdateDto,
   EmprestimoUpdateDto,
-  ListaEmprestimosDto
+  ListaEmprestimosDto,
+  TipoContrato
 } from './emprestimo.dto';
 import {
+  paraAlertaVencimentoModel,
   paraContratoModel,
   paraHistoricoModel,
   paraItemModel,
@@ -22,6 +25,7 @@ import {
   paraModel
 } from './emprestimo.mapper';
 import {
+  AlertaVencimentoEmprestimo,
   Emprestimo,
   EmprestimoContrato,
   EmprestimoHistorico,
@@ -76,6 +80,16 @@ export class EmprestimoService {
     return this.http.delete<void>(`${this.resource}/${id}`);
   }
 
+  /** Itens ainda não devolvidos com devolução prevista dentro do
+   * horizonte (padrão 14 dias, backend `DIAS_HORIZONTE_ALERTA_VENCIMENTO`)
+   * ou já vencidos — painel da tela Início. */
+  listarAlertasVencimento(dias?: number): Observable<AlertaVencimentoEmprestimo[]> {
+    const params = dias !== undefined ? { dias: String(dias) } : undefined;
+    return this.http
+      .get<AlertaVencimentoEmprestimoDto[]>(`${this.resource}/alertas-vencimento`, { params })
+      .pipe(map((itens) => itens.map(paraAlertaVencimentoModel)));
+  }
+
   devolver(id: number, idUsuario: number, dataDevolucao?: string): Observable<Emprestimo> {
     const corpo: { id_usuario: number; data_devolucao?: string } = { id_usuario: idUsuario };
     if (dataDevolucao) {
@@ -112,27 +126,37 @@ export class EmprestimoService {
       .pipe(map((itens) => itens.map(paraHistoricoModel)));
   }
 
-  /** `404` quando o empréstimo ainda não tem contrato assinado — o
-   * componente que chama isso trata o erro como "ainda não assinado", não
-   * como falha de verdade. */
-  buscarContrato(emprestimoId: number): Observable<EmprestimoContrato> {
+  /** Todos os contratos do empréstimo (um "Comodato" + quantas
+   * "Renovação" tiverem sido assinadas), mais antigo primeiro — lista
+   * vazia se nada foi assinado ainda. */
+  listarContratos(emprestimoId: number): Observable<EmprestimoContrato[]> {
     return this.http
-      .get<EmprestimoContratoDto>(`${this.resource}/${emprestimoId}/contrato`)
-      .pipe(map(paraContratoModel));
+      .get<EmprestimoContratoDto[]>(`${this.resource}/${emprestimoId}/contratos`)
+      .pipe(map((itens) => itens.map(paraContratoModel)));
   }
 
-  obterPdfContrato(emprestimoId: number): Observable<Blob> {
-    return this.http.get(`${this.resource}/${emprestimoId}/contrato/pdf`, { responseType: 'blob' });
+  obterPdfContrato(emprestimoId: number, contratoId: number): Observable<Blob> {
+    return this.http.get(`${this.resource}/${emprestimoId}/contratos/${contratoId}/pdf`, {
+      responseType: 'blob'
+    });
   }
 
-  /** Assina o contrato (gera o PDF com o texto real do modelo — ver
+  /** Assina um contrato (gera o PDF — texto do comodato original ou do
+   * termo aditivo de renovação, conforme `tipo` — ver
    * `app/features/emprestimos/service.py` no backend — colando a
-   * assinatura capturada no canvas). Um contrato por empréstimo: assinar
-   * de novo retorna 409. */
-  assinarContrato(emprestimoId: number, assinaturaPngBase64: string): Observable<EmprestimoContrato> {
+   * assinatura capturada no canvas). Só pode haver um "Comodato" por
+   * empréstimo (assinar de novo retorna 409); "Renovação" pode ser
+   * assinada quantas vezes for preciso, mas exige que o "Comodato" já
+   * exista (senão também retorna 409). */
+  assinarContrato(
+    emprestimoId: number,
+    assinaturaPngBase64: string,
+    tipo: TipoContrato = 'Comodato'
+  ): Observable<EmprestimoContrato> {
     return this.http
       .post<EmprestimoContratoDto>(`${this.resource}/${emprestimoId}/contrato`, {
-        assinatura_png_base64: assinaturaPngBase64
+        assinatura_png_base64: assinaturaPngBase64,
+        tipo
       })
       .pipe(map(paraContratoModel));
   }

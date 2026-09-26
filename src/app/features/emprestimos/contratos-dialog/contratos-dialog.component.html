@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Contratos — {{ data.nomePessoa }}</h2>
+
+<mat-dialog-content class="contratos-dialog__conteudo">
+  @if (carregando()) {
+    <div class="contratos-dialog__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="contratos-dialog__erro">{{ erro() }}</p>
+  } @else if (contratos().length === 0) {
+    <p class="contratos-dialog__vazio">Nenhum contrato assinado ainda.</p>
+  } @else {
+    <ul class="cadastro__lista">
+      @for (contrato of contratos(); track contrato.id) {
+        <li>
+          <div>
+            <strong>{{ rotuloTipo(contrato) }}</strong>
+            <span>Assinado em {{ contrato.dataAssinatura | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <button mat-stroked-button type="button" (click)="abrirPdf(contrato)">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Abrir PDF
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+</mat-dialog-actions>

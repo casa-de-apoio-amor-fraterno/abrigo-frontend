@@ -1,4 +1,5 @@
 import {
+  AlertaVencimentoEmprestimoDto,
   EmprestimoContratoDto,
   EmprestimoDto,
   EmprestimoHistoricoDto,
@@ -7,6 +8,7 @@ import {
   ListaEmprestimosDto
 } from './emprestimo.dto';
 import {
+  AlertaVencimentoEmprestimo,
   Emprestimo,
   EmprestimoContrato,
   EmprestimoHistorico,
@@ -48,7 +50,8 @@ export function paraItemModel(dto: EmprestimoItemDto): EmprestimoItem {
     situacao: dto.situacao,
     renovacao: dto.renovacao,
     descricaoMaterial: dto.descricao_material,
-    temFotoMaterial: dto.tem_foto_material
+    temFotoMaterial: dto.tem_foto_material,
+    numeroPatrimonioMaterial: dto.numero_patrimonio_material
   };
 }
 
@@ -63,11 +66,26 @@ export function paraHistoricoModel(dto: EmprestimoHistoricoDto): EmprestimoHisto
   };
 }
 
+export function paraAlertaVencimentoModel(dto: AlertaVencimentoEmprestimoDto): AlertaVencimentoEmprestimo {
+  return {
+    idEmprestimo: dto.id_emprestimo,
+    idItem: dto.id_item,
+    idPessoa: dto.id_pessoa,
+    nomePessoa: dto.nome_pessoa,
+    telefonePessoa: dto.telefone_pessoa,
+    descricaoMaterial: dto.descricao_material,
+    numeroPatrimonioMaterial: dto.numero_patrimonio_material,
+    dataDevolucao: dto.data_devolucao,
+    diasRestantes: dto.dias_restantes
+  };
+}
+
 export function paraContratoModel(dto: EmprestimoContratoDto): EmprestimoContrato {
   return {
     id: dto.id,
     idEmprestimo: dto.id_emprestimo,
     idUsuario: dto.id_usuario,
+    tipo: dto.tipo,
     dataAssinatura: dto.data_assinatura
   };
 }
