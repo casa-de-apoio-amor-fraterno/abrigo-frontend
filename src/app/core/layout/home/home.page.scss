@@ -230,3 +230,243 @@
     }
   }
 }
+
+.vencimentos {
+  margin-top: 28px;
+
+  &__cabecalho {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--abrigo-ink);
+    }
+  }
+
+  &__resumo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__resumo-vencido {
+    color: #c62828;
+  }
+
+  &__resumo-urgente {
+    color: #b45309;
+  }
+
+  &__resumo-proximo {
+    color: #a16207;
+  }
+
+  &__estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 0;
+    color: var(--abrigo-texto-secundario);
+
+    &--erro {
+      color: #c62828;
+    }
+  }
+
+  &__vazio {
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__legenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--abrigo-texto-secundario);
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+
+  &__amostra {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+
+    &--proximo {
+      background: #eab308;
+    }
+
+    &--urgente {
+      background: #f97316;
+    }
+
+    &--vencido {
+      background: #dc2626;
+    }
+  }
+
+  &__grade {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  &__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--abrigo-surface);
+    border-radius: 12px;
+    border-left: 4px solid var(--abrigo-border-forte);
+    box-shadow: 0 1px 2px var(--abrigo-sombra);
+    padding: 14px;
+
+    &--proximo {
+      border-left-color: #eab308;
+    }
+
+    &--urgente {
+      border-left-color: #f97316;
+    }
+
+    &--vencido {
+      border-left-color: #dc2626;
+      background: color-mix(in srgb, #dc2626 6%, var(--abrigo-surface));
+    }
+  }
+
+  &__card-topo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--abrigo-texto-secundario);
+    }
+  }
+
+  &__card--proximo &__card-topo mat-icon {
+    color: #a16207;
+  }
+
+  &__card--urgente &__card-topo mat-icon {
+    color: #b45309;
+  }
+
+  &__card--vencido &__card-topo mat-icon {
+    color: #c62828;
+  }
+
+  &__prazo {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__card--proximo &__prazo {
+    color: #a16207;
+  }
+
+  &__card--urgente &__prazo {
+    color: #b45309;
+  }
+
+  &__card--vencido &__prazo {
+    color: #c62828;
+  }
+
+  &__pessoa {
+    color: var(--abrigo-ink);
+    font-size: 15px;
+  }
+
+  &__material {
+    font-size: 13px;
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__data {
+    font-size: 12px;
+    color: var(--abrigo-texto-terciario);
+  }
+
+  &__card-acoes {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--abrigo-border);
+  }
+
+  &__ligar {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--abrigo-primary-dark);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__ver {
+    border: none;
+    background: transparent;
+    color: var(--abrigo-primary-dark);
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__acao-finalizar {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    color: #c62828;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

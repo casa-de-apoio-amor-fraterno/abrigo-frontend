@@ -160,5 +160,95 @@
     }
   </section>
 
+  <section class="vencimentos">
+    <div class="vencimentos__cabecalho">
+      <h2>Empréstimos próximos ao vencimento</h2>
+      @if (!carregandoVencimentos() && !erroVencimentos() && alertasVencimento().length > 0) {
+        <span class="vencimentos__resumo">
+          @if (totalVencidos > 0) {
+            <span class="vencimentos__resumo-vencido">{{ totalVencidos }} vencido(s)</span>
+          }
+          @if (totalUrgentes > 0) {
+            <span class="vencimentos__resumo-urgente">{{ totalUrgentes }} muito próximo(s)</span>
+          }
+          @if (totalProximos > 0) {
+            <span class="vencimentos__resumo-proximo">{{ totalProximos }} próximo(s)</span>
+          }
+        </span>
+      }
+    </div>
+
+    @if (carregandoVencimentos()) {
+      <div class="vencimentos__estado">
+        <mat-spinner diameter="28" />
+      </div>
+    } @else if (erroVencimentos()) {
+      <p class="vencimentos__estado vencimentos__estado--erro">{{ erroVencimentos() }}</p>
+    } @else if (alertasVencimento().length === 0) {
+      <p class="vencimentos__vazio">Nenhum empréstimo vencendo nos próximos 14 dias.</p>
+    } @else {
+      <div class="vencimentos__legenda">
+        <span><span class="vencimentos__amostra vencimentos__amostra--proximo"></span> Próximo (até 14 dias)</span>
+        <span><span class="vencimentos__amostra vencimentos__amostra--urgente"></span> Muito próximo (até 7 dias)</span>
+        <span><span class="vencimentos__amostra vencimentos__amostra--vencido"></span> Vencido</span>
+      </div>
+
+      <div class="vencimentos__grade">
+        @for (alerta of alertasVencimento(); track alerta.idItem) {
+          <div
+            class="vencimentos__card"
+            [class.vencimentos__card--proximo]="nivelUrgencia(alerta) === 'proximo'"
+            [class.vencimentos__card--urgente]="nivelUrgencia(alerta) === 'urgente'"
+            [class.vencimentos__card--vencido]="nivelUrgencia(alerta) === 'vencido'"
+          >
+            <div class="vencimentos__card-topo">
+              <mat-icon>{{ nivelUrgencia(alerta) === 'vencido' ? 'error' : 'schedule' }}</mat-icon>
+              <span class="vencimentos__prazo">{{ textoPrazo(alerta) }}</span>
+            </div>
+
+            <strong class="vencimentos__pessoa">{{ alerta.nomePessoa }}</strong>
+            <span class="vencimentos__material">
+              {{ alerta.descricaoMaterial }}
+              @if (alerta.numeroPatrimonioMaterial) {
+                · Nº {{ alerta.numeroPatrimonioMaterial }}
+              }
+            </span>
+            <span class="vencimentos__data">Previsto p/ {{ alerta.dataDevolucao | date: 'dd/MM/yyyy' }}</span>
+
+            <div class="vencimentos__card-acoes">
+              @if (linkWhatsappAlerta(alerta); as urlWhatsapp) {
+                <a class="vencimentos__ligar" [href]="urlWhatsapp" target="_blank" rel="noopener">
+                  <mat-icon>chat</mat-icon>
+                  {{ alerta.telefonePessoa }}
+                </a>
+              }
+              <button type="button" class="vencimentos__ver" (click)="visualizarAlerta(alerta, $event)">Ver</button>
+              <button
+                type="button"
+                class="vencimentos__acao-finalizar"
+                (click)="abrirFinalizarEmprestimo(alerta, $event)"
+              >
+                Finalizar
+              </button>
+            </div>
+
+            @if (finalizarEmprestimoAberto() === alerta.idEmprestimo) {
+              <app-acao-popover
+                icone="inventory_2"
+                titulo="Finalizar empréstimo"
+                [subtitulo]="'Marca todos os itens pendentes de ' + alerta.nomePessoa + ' como devolvidos.'"
+                [erro]="erroFinalizarEmprestimo()"
+                [confirmando]="finalizandoEmprestimo()"
+                textoConfirmar="Finalizar"
+                (cancelar)="fecharFinalizarEmprestimo()"
+                (confirmar)="confirmarFinalizarEmprestimo()"
+              />
+            }
+          </div>
+        }
+      </div>
+    }
+  </section>
+
   <app-finalizar-estadia-popover (finalizado)="aoFinalizarEstadia()" />
 </div>
