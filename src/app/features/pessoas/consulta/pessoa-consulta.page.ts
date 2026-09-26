@@ -1,4 +1,4 @@
-import { DatePipe, formatDate } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
@@ -12,7 +12,7 @@ import { PessoaResumo } from '../pessoa.model';
 import { mascararCpf } from '../../../shared/util/cpf';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
-import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { PessoaDetalheDialogComponent } from '../detalhe-dialog/pessoa-detalhe-dialog.component';
 import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 const ITENS_POR_PAGINA = 20;
@@ -54,37 +54,13 @@ export class PessoaConsultaPage {
   }
 
   protected visualizar(pessoa: PessoaResumo): void {
-    const abrir = (fotoUrl: string | null): void => {
-      const dialogRef = this.dialog.open(DetalheDialogComponent, {
-        width: pessoa.tem_foto ? '480px' : '420px',
-        data: {
-          titulo: pessoa.nome,
-          campos: [
-            { rotulo: 'CPF', valor: pessoa.cpf ? mascararCpf(pessoa.cpf) : '—' },
-            { rotulo: 'Telefone', valor: pessoa.telefone_principal || '—' },
-            {
-              rotulo: 'Nascimento',
-              valor: pessoa.data_nascimento ? formatDate(pessoa.data_nascimento, 'dd/MM/yyyy', 'pt-BR') : '—'
-            }
-          ],
-          linkEditar: ['/pessoas', pessoa.id, 'editar'],
-          labelEditar: 'Editar pessoa',
-          fotoUrl
-        }
-      });
-      if (fotoUrl) {
-        dialogRef.afterClosed().subscribe(() => URL.revokeObjectURL(fotoUrl));
+    this.dialog.open(PessoaDetalheDialogComponent, {
+      width: '560px',
+      data: {
+        pessoaId: pessoa.id,
+        linkEditar: ['/pessoas', pessoa.id, 'editar']
       }
-    };
-
-    // GET /pessoas/{id}/foto exige autenticação — não dá pra usar a URL
-    // direto num <img [src]>, precisa buscar o blob via HttpClient (ver
-    // PessoaService.buscarFoto) e virar object URL.
-    if (pessoa.tem_foto) {
-      this.pessoaService.buscarFoto(pessoa.id).subscribe((blob) => abrir(URL.createObjectURL(blob)));
-    } else {
-      abrir(null);
-    }
+    });
   }
 
   protected exportarCsv(): void {

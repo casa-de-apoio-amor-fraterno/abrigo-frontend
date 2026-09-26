@@ -1,0 +1,42 @@
+.hospital-detalhe {
+  &__cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    // Material só dá 6px de padding-top por padrão no título do dialog —
+    // fica grudado na borda, então aumenta um pouco.
+    padding-top: 20px;
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  &__pill {
+    flex-shrink: 0;
+  }
+
+  &__conteudo {
+    min-width: 320px;
+  }
+
+  &__estado {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  &__erro {
+    color: #c62828;
+  }
+
+  &__editar {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+}

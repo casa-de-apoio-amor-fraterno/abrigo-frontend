@@ -9,7 +9,7 @@ import { VoluntarioService } from '../voluntario.service';
 import { VoluntarioResumo } from '../voluntario.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
-import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { VoluntarioDetalheDialogComponent } from '../detalhe-dialog/voluntario-detalhe-dialog.component';
 import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 const ITENS_POR_PAGINA = 20;
@@ -40,16 +40,11 @@ export class VoluntarioConsultaPage {
   }
 
   protected visualizar(voluntario: VoluntarioResumo): void {
-    this.dialog.open(DetalheDialogComponent, {
-      width: '420px',
+    this.dialog.open(VoluntarioDetalheDialogComponent, {
+      width: '520px',
       data: {
-        titulo: voluntario.nome,
-        campos: [
-          { rotulo: 'Telefone', valor: voluntario.telefonePrincipal || '—' },
-          { rotulo: 'Setor', valor: voluntario.setor || '—' }
-        ],
-        linkEditar: ['/voluntarios', voluntario.id, 'editar'],
-        labelEditar: 'Editar voluntário'
+        voluntarioId: voluntario.id,
+        linkEditar: ['/voluntarios', voluntario.id, 'editar']
       }
     });
   }

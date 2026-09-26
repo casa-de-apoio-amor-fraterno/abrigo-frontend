@@ -9,7 +9,7 @@ import { QuartoService } from '../quarto.service';
 import { Quarto } from '../quarto.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
-import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { QuartoDetalheDialogComponent } from '../detalhe-dialog/quarto-detalhe-dialog.component';
 import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 @Component({
@@ -47,17 +47,11 @@ export class QuartoConsultaPage {
   }
 
   protected visualizar(quarto: Quarto): void {
-    this.dialog.open(DetalheDialogComponent, {
-      width: '420px',
+    this.dialog.open(QuartoDetalheDialogComponent, {
+      width: '460px',
       data: {
-        titulo: quarto.numero,
-        campos: [
-          { rotulo: 'Leito(s)', valor: String(quarto.leito) },
-          { rotulo: 'Descrição', valor: quarto.descricao || '—' },
-          { rotulo: 'Status', valor: quarto.ativo ? 'Ativo' : 'Inativo' }
-        ],
-        linkEditar: ['/quartos', quarto.id, 'editar'],
-        labelEditar: 'Editar quarto'
+        quartoId: quarto.id,
+        linkEditar: ['/quartos', quarto.id, 'editar']
       }
     });
   }

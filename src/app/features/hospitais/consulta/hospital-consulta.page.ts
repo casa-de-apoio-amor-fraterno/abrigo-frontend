@@ -9,7 +9,7 @@ import { HospitalService } from '../hospital.service';
 import { Hospital } from '../hospital.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
-import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { HospitalDetalheDialogComponent } from '../detalhe-dialog/hospital-detalhe-dialog.component';
 import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 @Component({
@@ -42,13 +42,11 @@ export class HospitalConsultaPage {
   }
 
   protected visualizar(hospital: Hospital): void {
-    this.dialog.open(DetalheDialogComponent, {
-      width: '420px',
+    this.dialog.open(HospitalDetalheDialogComponent, {
+      width: '380px',
       data: {
-        titulo: hospital.nome,
-        campos: [{ rotulo: 'Status', valor: hospital.ativo ? 'Ativo' : 'Inativo' }],
-        linkEditar: ['/hospitais', hospital.id, 'editar'],
-        labelEditar: 'Editar hospital'
+        hospitalId: hospital.id,
+        linkEditar: ['/hospitais', hospital.id, 'editar']
       }
     });
   }

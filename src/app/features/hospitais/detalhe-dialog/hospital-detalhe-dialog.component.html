@@ -1,0 +1,38 @@
+<div class="hospital-detalhe__cabecalho" mat-dialog-title>
+  <h2>{{ hospital()?.nome || 'Hospital' }}</h2>
+  @if (hospital(); as h) {
+    <span class="consulta__badge hospital-detalhe__pill" [class.consulta__badge--neutro]="!h.ativo">
+      {{ h.ativo ? 'Ativo' : 'Inativo' }}
+    </span>
+  }
+</div>
+
+<mat-dialog-content class="hospital-detalhe__conteudo">
+  @if (carregando()) {
+    <div class="hospital-detalhe__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="hospital-detalhe__erro">{{ erro() }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  @if (data.aoEditar) {
+    <button mat-flat-button type="button" class="hospital-detalhe__editar" (click)="editar()">
+      <mat-icon>edit</mat-icon>
+      Editar hospital
+    </button>
+  } @else {
+    <a
+      mat-flat-button
+      class="hospital-detalhe__editar"
+      [routerLink]="data.linkEditar"
+      (click)="dialogRef.close()"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar hospital
+    </a>
+  }
+</mat-dialog-actions>

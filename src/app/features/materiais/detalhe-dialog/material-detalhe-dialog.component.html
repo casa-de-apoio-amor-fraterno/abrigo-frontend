@@ -1,0 +1,73 @@
+<div class="material-detalhe__cabecalho" mat-dialog-title>
+  <h2>{{ material()?.descricao || 'Material' }}</h2>
+  @if (material(); as mat) {
+    <span
+      class="consulta__badge material-detalhe__pill"
+      [class.consulta__badge--aviso]="mat.situacao === 'Alocado'"
+      [class.consulta__badge--erro]="mat.situacao === 'Emprestado'"
+      [class.consulta__badge--neutro]="mat.situacao === 'Inutilizado'"
+    >
+      {{ mat.situacao }}
+    </span>
+  }
+</div>
+
+<mat-dialog-content class="material-detalhe__conteudo">
+  @if (carregando()) {
+    <div class="material-detalhe__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="material-detalhe__erro">{{ erro() }}</p>
+  } @else if (material(); as mat) {
+    <div class="material-detalhe__principal">
+      @if (mat.tem_foto) {
+        <img class="material-detalhe__foto" [src]="fotoUrl(mat.id)" alt="" />
+      }
+      <dl class="material-detalhe__campos">
+        <div class="material-detalhe__campo">
+          <dt>Nº Patrimônio</dt>
+          <dd>{{ mat.numeroPatrimonio || '—' }}</dd>
+        </div>
+        <div class="material-detalhe__campo">
+          <dt>Disponível p/ empréstimo</dt>
+          <dd>{{ mat.disponivelEmprestimo ? 'Sim' : 'Não' }}</dd>
+        </div>
+        <div class="material-detalhe__campo">
+          <dt>Local</dt>
+          <dd>{{ mat.local || '—' }}</dd>
+        </div>
+        @if (mat.situacao === 'Inutilizado') {
+          <div class="material-detalhe__campo material-detalhe__campo--largo">
+            <dt>Motivo da inutilização</dt>
+            <dd class="material-detalhe__observacao">{{ mat.motivoBaixa || '—' }}</dd>
+          </div>
+        }
+        <div class="material-detalhe__campo material-detalhe__campo--largo">
+          <dt>Observação</dt>
+          <dd class="material-detalhe__observacao">{{ mat.observacao || '—' }}</dd>
+        </div>
+      </dl>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  @if (data.aoEditar) {
+    <button mat-flat-button type="button" class="material-detalhe__editar" (click)="editar()">
+      <mat-icon>edit</mat-icon>
+      Editar material
+    </button>
+  } @else {
+    <a
+      mat-flat-button
+      class="material-detalhe__editar"
+      [routerLink]="data.linkEditar"
+      (click)="dialogRef.close()"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar material
+    </a>
+  }
+</mat-dialog-actions>

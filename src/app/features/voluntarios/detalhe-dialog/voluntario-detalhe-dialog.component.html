@@ -1,0 +1,73 @@
+<div class="voluntario-detalhe__cabecalho" mat-dialog-title>
+  <h2>{{ voluntario()?.nome || 'Voluntário' }}</h2>
+  @if (voluntario(); as v) {
+    <span class="consulta__badge voluntario-detalhe__pill" [class.consulta__badge--neutro]="!v.ativo">
+      {{ v.ativo ? 'Ativo' : 'Inativo' }}
+    </span>
+  }
+</div>
+
+<mat-dialog-content class="voluntario-detalhe__conteudo">
+  @if (carregando()) {
+    <div class="voluntario-detalhe__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="voluntario-detalhe__erro">{{ erro() }}</p>
+  } @else if (voluntario(); as v) {
+    <dl class="voluntario-detalhe__campos">
+      <div class="voluntario-detalhe__campo">
+        <dt>Telefone</dt>
+        <dd>{{ v.telefonePrincipal || '—' }}</dd>
+      </div>
+      <div class="voluntario-detalhe__campo">
+        <dt>Setor</dt>
+        <dd>{{ v.setor || '—' }}</dd>
+      </div>
+      <div class="voluntario-detalhe__campo">
+        <dt>Data de nascimento</dt>
+        <dd>{{ v.dataNascimento ? (v.dataNascimento | date: 'dd/MM/yyyy') : '—' }}</dd>
+      </div>
+      <div class="voluntario-detalhe__campo">
+        <dt>Estado civil</dt>
+        <dd>{{ v.estadoCivil || '—' }}</dd>
+      </div>
+      <div class="voluntario-detalhe__campo">
+        <dt>CPF</dt>
+        <dd>{{ v.cpf ? cpfMascarado(v.cpf) : '—' }}</dd>
+      </div>
+      <div class="voluntario-detalhe__campo">
+        <dt>Formação</dt>
+        <dd>{{ v.formacao || '—' }}</dd>
+      </div>
+      <div class="voluntario-detalhe__campo voluntario-detalhe__campo--largo">
+        <dt>Endereço</dt>
+        <dd>{{ v.endereco || '—' }}</dd>
+      </div>
+      <div class="voluntario-detalhe__campo voluntario-detalhe__campo--largo">
+        <dt>Observação</dt>
+        <dd class="voluntario-detalhe__observacao">{{ v.observacao || '—' }}</dd>
+      </div>
+    </dl>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  @if (data.aoEditar) {
+    <button mat-flat-button type="button" class="voluntario-detalhe__editar" (click)="editar()">
+      <mat-icon>edit</mat-icon>
+      Editar voluntário
+    </button>
+  } @else {
+    <a
+      mat-flat-button
+      class="voluntario-detalhe__editar"
+      [routerLink]="data.linkEditar"
+      (click)="dialogRef.close()"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar voluntário
+    </a>
+  }
+</mat-dialog-actions>

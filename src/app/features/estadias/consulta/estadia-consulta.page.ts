@@ -1,4 +1,4 @@
-import { DatePipe, formatDate } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterOutlet } from '@angular/router';
@@ -13,7 +13,7 @@ import { EstadiaService } from '../estadia.service';
 import { EstadiaResumo, SituacaoEstadia } from '../estadia.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
-import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { EstadiaDetalheDialogComponent } from '../detalhe-dialog/estadia-detalhe-dialog.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
 import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
@@ -67,19 +67,11 @@ export class EstadiaConsultaPage {
   }
 
   protected visualizar(estadia: EstadiaResumo): void {
-    this.dialog.open(DetalheDialogComponent, {
-      width: '420px',
+    this.dialog.open(EstadiaDetalheDialogComponent, {
+      width: '560px',
       data: {
-        titulo: this.nomesPessoas()[estadia.idPessoa] || `Pessoa #${estadia.idPessoa}`,
-        campos: [
-          { rotulo: 'Tipo', valor: estadia.tipoPessoa },
-          { rotulo: 'Quarto', valor: this.numerosQuartos()[estadia.idQuarto] || '—' },
-          { rotulo: 'Entrada', valor: formatDate(estadia.dataEntrada, 'dd/MM/yyyy', 'pt-BR') },
-          { rotulo: 'Saída', valor: estadia.dataSaida ? formatDate(estadia.dataSaida, 'dd/MM/yyyy', 'pt-BR') : '—' },
-          { rotulo: 'Situação', valor: estadia.situacao }
-        ],
-        linkEditar: ['/estadias', estadia.id, 'editar'],
-        labelEditar: 'Editar estadia'
+        estadiaId: estadia.id,
+        linkEditar: ['/estadias', estadia.id, 'editar']
       }
     });
   }

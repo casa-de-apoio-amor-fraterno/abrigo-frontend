@@ -9,7 +9,7 @@ import { MaterialService } from '../material.service';
 import { MaterialResumo } from '../material.model';
 import { exportarCsv } from '../../../shared/util/csv';
 import { PaginaConsultaComponent } from '../../../shared/ui/pagina-consulta/pagina-consulta.component';
-import { DetalheDialogComponent } from '../../../shared/ui/detalhe-dialog/detalhe-dialog.component';
+import { MaterialDetalheDialogComponent } from '../detalhe-dialog/material-detalhe-dialog.component';
 import { escutarRefrescoDaLista } from '../../../shared/ui/cadastro-dialog-host/lista-refresh.service';
 
 const ITENS_POR_PAGINA = 20;
@@ -45,17 +45,11 @@ export class MaterialConsultaPage {
   }
 
   protected visualizar(material: MaterialResumo): void {
-    this.dialog.open(DetalheDialogComponent, {
-      width: '420px',
+    this.dialog.open(MaterialDetalheDialogComponent, {
+      width: '520px',
       data: {
-        titulo: material.descricao,
-        campos: [
-          { rotulo: 'Nº Patrimônio', valor: material.numeroPatrimonio || '—' },
-          { rotulo: 'Situação', valor: material.situacao },
-          { rotulo: 'Disponível p/ empréstimo', valor: material.disponivelEmprestimo ? 'Sim' : 'Não' }
-        ],
-        linkEditar: ['/materiais', material.id, 'editar'],
-        labelEditar: 'Editar material'
+        materialId: material.id,
+        linkEditar: ['/materiais', material.id, 'editar']
       }
     });
   }

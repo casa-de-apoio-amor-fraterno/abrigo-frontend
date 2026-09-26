@@ -1,4 +1,4 @@
-.emprestimo-detalhe {
+.voluntario-detalhe {
   &__cabecalho {
     display: flex;
     align-items: center;
@@ -32,7 +32,7 @@
   }
 
   &__campos {
-    margin: 0 0 20px;
+    margin: 0;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 14px 20px;
@@ -61,25 +61,6 @@
 
   &__observacao {
     white-space: pre-wrap;
-  }
-
-  &__subtitulo {
-    margin: 0 0 10px;
-    font-size: 14px;
-    color: var(--abrigo-ink);
-  }
-
-  &__vazio {
-    color: var(--abrigo-texto-secundario);
-  }
-
-  &__itens li {
-    align-items: flex-start;
-  }
-
-  &__pill-item {
-    font-size: 11px;
-    padding: 1px 8px;
   }
 
   &__editar {

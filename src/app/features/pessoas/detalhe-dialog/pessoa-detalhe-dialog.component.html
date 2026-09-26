@@ -1,0 +1,90 @@
+<div class="pessoa-detalhe__cabecalho" mat-dialog-title>
+  <h2>{{ pessoa()?.nome || 'Pessoa' }}</h2>
+  @if (pessoa(); as p) {
+    <span class="consulta__badge pessoa-detalhe__pill" [class.consulta__badge--neutro]="!p.ativo">
+      {{ p.ativo ? 'Ativo' : 'Inativo' }}
+    </span>
+  }
+</div>
+
+<mat-dialog-content class="pessoa-detalhe__conteudo">
+  @if (carregando()) {
+    <div class="pessoa-detalhe__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="pessoa-detalhe__erro">{{ erro() }}</p>
+  } @else if (pessoa(); as p) {
+    <div class="pessoa-detalhe__principal">
+      @if (fotoUrl(); as foto) {
+        <img class="pessoa-detalhe__foto" [src]="foto" alt="" />
+      }
+      <dl class="pessoa-detalhe__campos">
+        <div class="pessoa-detalhe__campo">
+          <dt>CPF</dt>
+          <dd>{{ p.cpf ? cpfMascarado(p.cpf) : '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo">
+          <dt>Telefone</dt>
+          <dd>{{ p.telefone_principal || '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo">
+          <dt>Nascimento</dt>
+          <dd>{{ p.data_nascimento ? (p.data_nascimento | date: 'dd/MM/yyyy') : '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo">
+          <dt>Profissão</dt>
+          <dd>{{ p.profissao || '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo">
+          <dt>Cartão SUS</dt>
+          <dd>{{ p.cartao_sus || '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo">
+          <dt>Hospital vinculado</dt>
+          <dd>{{ p.id_hospital ? (nomeHospital() ?? '…') : '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo">
+          <dt>Naturalidade</dt>
+          <dd>{{ p.id_municipio ? (naturalidade() ?? '…') : '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo">
+          <dt>Cadastrada em</dt>
+          <dd>{{ p.data_cadastro ? (p.data_cadastro | date: 'dd/MM/yyyy') : '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo pessoa-detalhe__campo--largo">
+          <dt>Endereço</dt>
+          <dd>{{ p.endereco || '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo pessoa-detalhe__campo--largo">
+          <dt>Ponto de referência</dt>
+          <dd>{{ p.ponto_referencia || '—' }}</dd>
+        </div>
+        <div class="pessoa-detalhe__campo pessoa-detalhe__campo--largo">
+          <dt>Observação</dt>
+          <dd class="pessoa-detalhe__observacao">{{ p.observacao || '—' }}</dd>
+        </div>
+      </dl>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  @if (data.aoEditar) {
+    <button mat-flat-button type="button" class="pessoa-detalhe__editar" (click)="editar()">
+      <mat-icon>edit</mat-icon>
+      Editar pessoa
+    </button>
+  } @else {
+    <a
+      mat-flat-button
+      class="pessoa-detalhe__editar"
+      [routerLink]="data.linkEditar"
+      (click)="dialogRef.close()"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar pessoa
+    </a>
+  }
+</mat-dialog-actions>

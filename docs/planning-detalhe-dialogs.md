@@ -15,6 +15,28 @@ entidade por vez (cada uma é um componente próprio, no padrão já usado por
 `emprestimo-detalhe-dialog` e `contratos-dialog`: arquivo `.ts` + `.html`
 + `.scss` dedicados, nunca vários componentes no mesmo arquivo).
 
+## Progresso
+
+- ✅ **Material** — `features/materiais/detalhe-dialog/material-detalhe-dialog.component.ts`
+  (2026-09-26).
+- ✅ **Estadia** — `features/estadias/detalhe-dialog/estadia-detalhe-dialog.component.ts`,
+  inclui acompanhantes e histórico (2026-09-26).
+- ✅ **Pessoa** — `features/pessoas/detalhe-dialog/pessoa-detalhe-dialog.component.ts`
+  (2026-09-26). Avaliação Social e Composição Familiar ficaram de fora de
+  propósito — já são abas da edição, resumo aqui só duplicaria.
+- ✅ **Voluntario** — `features/voluntarios/detalhe-dialog/voluntario-detalhe-dialog.component.ts`
+  (2026-09-26).
+- ✅ **Quarto** — `features/quartos/detalhe-dialog/quarto-detalhe-dialog.component.ts`,
+  inclui ocupantes atuais via `QuartoService.listarOcupacao()` (2026-09-26).
+- ✅ **Hospital** — `features/hospitais/detalhe-dialog/hospital-detalhe-dialog.component.ts`
+  (2026-09-26). Modelo enxuto — só a pill, sem pessoas/estadias vinculadas
+  (nice-to-have do plano original, não implementado).
+
+Todas as 6 telas migradas. Nenhuma tela de consulta usa mais o
+`DetalheDialogComponent` genérico — ele continua existindo em
+`shared/ui/detalhe-dialog/` só por enquanto, avaliar se vale remover numa
+limpeza futura se nenhum outro lugar passar a usá-lo.
+
 ## Padrão a repetir (referência: `EmprestimoDetalheDialogComponent`)
 
 1. Componente novo em `features/<entidade>/detalhe-dialog/`, recebendo só

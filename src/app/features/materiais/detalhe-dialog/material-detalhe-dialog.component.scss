@@ -1,4 +1,4 @@
-.emprestimo-detalhe {
+.material-detalhe {
   &__cabecalho {
     display: flex;
     align-items: center;
@@ -31,8 +31,23 @@
     color: #c62828;
   }
 
+  &__principal {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  &__foto {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
   &__campos {
-    margin: 0 0 20px;
+    flex: 1;
+    margin: 0;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 14px 20px;
@@ -61,25 +76,6 @@
 
   &__observacao {
     white-space: pre-wrap;
-  }
-
-  &__subtitulo {
-    margin: 0 0 10px;
-    font-size: 14px;
-    color: var(--abrigo-ink);
-  }
-
-  &__vazio {
-    color: var(--abrigo-texto-secundario);
-  }
-
-  &__itens li {
-    align-items: flex-start;
-  }
-
-  &__pill-item {
-    font-size: 11px;
-    padding: 1px 8px;
   }
 
   &__editar {

@@ -1,4 +1,4 @@
-.emprestimo-detalhe {
+.quarto-detalhe {
   &__cabecalho {
     display: flex;
     align-items: center;
@@ -18,7 +18,7 @@
   }
 
   &__conteudo {
-    min-width: 420px;
+    min-width: 380px;
   }
 
   &__estado {
@@ -53,14 +53,6 @@
       color: var(--abrigo-ink);
       font-size: 15px;
     }
-
-    &--largo {
-      grid-column: 1 / -1;
-    }
-  }
-
-  &__observacao {
-    white-space: pre-wrap;
   }
 
   &__subtitulo {
@@ -71,15 +63,11 @@
 
   &__vazio {
     color: var(--abrigo-texto-secundario);
+    margin: 0;
   }
 
-  &__itens li {
+  &__ocupantes li {
     align-items: flex-start;
-  }
-
-  &__pill-item {
-    font-size: 11px;
-    padding: 1px 8px;
   }
 
   &__editar {

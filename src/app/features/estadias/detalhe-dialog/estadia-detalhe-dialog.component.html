@@ -1,0 +1,123 @@
+<div class="estadia-detalhe__cabecalho" mat-dialog-title>
+  <h2>{{ nomePessoa() || 'Estadia' }}</h2>
+  @if (estadia(); as est) {
+    <span
+      class="consulta__badge estadia-detalhe__pill"
+      [class.consulta__badge--aviso]="est.situacao === 'Aguardando retorno'"
+      [class.consulta__badge--erro]="est.situacao === 'Finalizada'"
+    >
+      {{ est.situacao }}
+    </span>
+  }
+</div>
+
+<mat-dialog-content class="estadia-detalhe__conteudo">
+  @if (carregando()) {
+    <div class="estadia-detalhe__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="estadia-detalhe__erro">{{ erro() }}</p>
+  } @else if (estadia(); as est) {
+    <dl class="estadia-detalhe__campos">
+      <div class="estadia-detalhe__campo">
+        <dt>Tipo</dt>
+        <dd>{{ est.tipoPessoa }}</dd>
+      </div>
+      <div class="estadia-detalhe__campo">
+        <dt>Quarto</dt>
+        <dd>{{ quarto() ? quartoLabel(quarto()!) : '—' }}</dd>
+      </div>
+      <div class="estadia-detalhe__campo">
+        <dt>Entrada</dt>
+        <dd>{{ est.dataEntrada | date: 'dd/MM/yyyy' }}</dd>
+      </div>
+      <div class="estadia-detalhe__campo">
+        <dt>Saída</dt>
+        <dd>{{ est.dataSaida ? (est.dataSaida | date: 'dd/MM/yyyy') : '—' }}</dd>
+      </div>
+      <div class="estadia-detalhe__campo">
+        <dt>Hospital do atendimento</dt>
+        <dd>{{ est.idHospital ? (nomeHospital() ?? '…') : '—' }}</dd>
+      </div>
+      <div class="estadia-detalhe__campo">
+        <dt>Tempo de estadia</dt>
+        <dd>{{ est.tempoEstadiaValor ? est.tempoEstadiaValor + ' ' + est.tempoEstadiaUnidade : '—' }}</dd>
+      </div>
+      <div class="estadia-detalhe__campo">
+        <dt>Cadastrada por</dt>
+        <dd>Usuário #{{ est.idUsuario }}</dd>
+      </div>
+      <div class="estadia-detalhe__campo estadia-detalhe__campo--largo">
+        <dt>Observação</dt>
+        <dd class="estadia-detalhe__observacao">{{ est.observacao || '—' }}</dd>
+      </div>
+    </dl>
+
+    <h3 class="estadia-detalhe__subtitulo">Acompanhantes ({{ acompanhantes().length }})</h3>
+    @if (acompanhantes().length === 0) {
+      <p class="estadia-detalhe__vazio">Nenhum acompanhante registrado.</p>
+    } @else {
+      <ul class="cadastro__lista estadia-detalhe__acompanhantes">
+        @for (acompanhante of acompanhantes(); track acompanhante.id) {
+          <li>
+            <div>
+              <strong>{{ acompanhante.nomePessoa }}</strong>
+              <span>
+                {{ acompanhante.grauParentesco || 'Parentesco não informado' }}
+                @if (acompanhante.ocupaLeito) {
+                  · Ocupa leito
+                }
+              </span>
+              <span>
+                {{ acompanhante.dataEntrada | date: 'dd/MM/yyyy' }}
+                @if (acompanhante.dataSaida) {
+                  — Saída: {{ acompanhante.dataSaida | date: 'dd/MM/yyyy' }}
+                }
+              </span>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    <h3 class="estadia-detalhe__subtitulo">Histórico ({{ historico().length }})</h3>
+    @if (historico().length === 0) {
+      <p class="estadia-detalhe__vazio">Nenhum evento registrado.</p>
+    } @else {
+      <ul class="cadastro__lista estadia-detalhe__historico">
+        @for (evento of historico(); track evento.id) {
+          <li>
+            <div>
+              <strong>{{ evento.tipo }}</strong>
+              <span>{{ evento.dataCadastro | date: 'dd/MM/yyyy HH:mm' }}</span>
+              @if (evento.observacao) {
+                <span class="estadia-detalhe__observacao">{{ evento.observacao }}</span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  @if (data.aoEditar) {
+    <button mat-flat-button type="button" class="estadia-detalhe__editar" (click)="editar()">
+      <mat-icon>edit</mat-icon>
+      Editar estadia
+    </button>
+  } @else {
+    <a
+      mat-flat-button
+      class="estadia-detalhe__editar"
+      [routerLink]="data.linkEditar"
+      (click)="dialogRef.close()"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar estadia
+    </a>
+  }
+</mat-dialog-actions>

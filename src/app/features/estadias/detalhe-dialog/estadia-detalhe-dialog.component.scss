@@ -1,4 +1,4 @@
-.emprestimo-detalhe {
+.estadia-detalhe {
   &__cabecalho {
     display: flex;
     align-items: center;
@@ -18,7 +18,7 @@
   }
 
   &__conteudo {
-    min-width: 420px;
+    min-width: 460px;
   }
 
   &__estado {
@@ -71,15 +71,16 @@
 
   &__vazio {
     color: var(--abrigo-texto-secundario);
+    margin: 0 0 16px;
   }
 
-  &__itens li {
-    align-items: flex-start;
-  }
+  &__acompanhantes,
+  &__historico {
+    margin: 0 0 16px;
 
-  &__pill-item {
-    font-size: 11px;
-    padding: 1px 8px;
+    li {
+      align-items: flex-start;
+    }
   }
 
   &__editar {

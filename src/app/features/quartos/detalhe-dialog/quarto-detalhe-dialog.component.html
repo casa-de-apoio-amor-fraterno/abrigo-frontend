@@ -1,0 +1,70 @@
+<div class="quarto-detalhe__cabecalho" mat-dialog-title>
+  <h2>{{ quarto()?.numero || 'Quarto' }}</h2>
+  @if (quarto(); as q) {
+    <span class="consulta__badge quarto-detalhe__pill" [class.consulta__badge--neutro]="!q.ativo">
+      {{ q.ativo ? 'Ativo' : 'Inativo' }}
+    </span>
+  }
+</div>
+
+<mat-dialog-content class="quarto-detalhe__conteudo">
+  @if (carregando()) {
+    <div class="quarto-detalhe__estado">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (erro()) {
+    <p class="quarto-detalhe__erro">{{ erro() }}</p>
+  } @else if (quarto(); as q) {
+    <dl class="quarto-detalhe__campos">
+      <div class="quarto-detalhe__campo">
+        <dt>Leito(s)</dt>
+        <dd>{{ q.leito }}</dd>
+      </div>
+      <div class="quarto-detalhe__campo">
+        <dt>Descrição</dt>
+        <dd>{{ q.descricao || '—' }}</dd>
+      </div>
+    </dl>
+
+    <h3 class="quarto-detalhe__subtitulo">Ocupantes atuais ({{ ocupantes().length }}/{{ q.leito }})</h3>
+    @if (ocupantes().length === 0) {
+      <p class="quarto-detalhe__vazio">Nenhum leito ocupado no momento.</p>
+    } @else {
+      <ul class="cadastro__lista quarto-detalhe__ocupantes">
+        @for (ocupante of ocupantes(); track ocupante.idEstadia + '_' + ocupante.idPessoa) {
+          <li>
+            <div>
+              <strong>{{ ocupante.nomePessoa }}</strong>
+              <span>
+                Desde {{ ocupante.dataEntrada | date: 'dd/MM/yyyy' }}
+                @if (ocupante.acompanhante) {
+                  · Acompanhante
+                }
+              </span>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+  @if (data.aoEditar) {
+    <button mat-flat-button type="button" class="quarto-detalhe__editar" (click)="editar()">
+      <mat-icon>edit</mat-icon>
+      Editar quarto
+    </button>
+  } @else {
+    <a
+      mat-flat-button
+      class="quarto-detalhe__editar"
+      [routerLink]="data.linkEditar"
+      (click)="dialogRef.close()"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar quarto
+    </a>
+  }
+</mat-dialog-actions>
