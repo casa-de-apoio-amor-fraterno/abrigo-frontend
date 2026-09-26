@@ -38,6 +38,7 @@
       <tr>
         <th></th>
         <th>Descrição</th>
+        <th>Nº Patrimônio</th>
         <th>Situação</th>
         <th>Disponível p/ empréstimo</th>
         <th></th>
@@ -56,6 +57,7 @@
             }
           </td>
           <td class="consulta__coluna-principal">{{ material.descricao }}</td>
+          <td>{{ material.numeroPatrimonio || '—' }}</td>
           <td>{{ material.situacao }}</td>
           <td>{{ material.disponivelEmprestimo ? 'Sim' : 'Não' }}</td>
           <td class="consulta__coluna-acao">
@@ -76,6 +78,18 @@
             >
               <mat-icon>edit</mat-icon>
             </a>
+            @if (material.situacao !== 'Inutilizado') {
+              <button
+                mat-icon-button
+                type="button"
+                class="consulta__botao-perigo"
+                aria-label="Inutilizar material"
+                [disabled]="inutilizando() === material.id"
+                (click)="inutilizar(material)"
+              >
+                <mat-icon>delete_sweep</mat-icon>
+              </button>
+            }
           </td>
         </tr>
       }

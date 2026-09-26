@@ -50,6 +50,12 @@ export class MaterialService {
     return this.http.delete<void>(`${this.resource}/${id}`);
   }
 
+  inutilizar(id: number, motivoBaixa: string | null): Observable<Material> {
+    return this.http
+      .post<MaterialDto>(`${this.resource}/${id}/inutilizar`, { motivo_baixa: motivoBaixa })
+      .pipe(map(paraModel));
+  }
+
   /** URL direta da imagem (GET /api/materiais/{id}/foto) — sem endpoint próprio
    * pra baixar/pré-carregar, usada direto em `<img [src]>`. */
   fotoUrl(id: number): string {

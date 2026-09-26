@@ -31,6 +31,7 @@ export class MaterialConsultaPage {
   protected readonly total = signal(0);
   protected readonly pagina = signal(0);
   protected readonly exportando = signal(false);
+  protected readonly inutilizando = signal<number | null>(null);
 
   protected readonly itensPorPagina = ITENS_POR_PAGINA;
 
@@ -49,11 +50,34 @@ export class MaterialConsultaPage {
       data: {
         titulo: material.descricao,
         campos: [
+          { rotulo: 'Nº Patrimônio', valor: material.numeroPatrimonio || '—' },
           { rotulo: 'Situação', valor: material.situacao },
           { rotulo: 'Disponível p/ empréstimo', valor: material.disponivelEmprestimo ? 'Sim' : 'Não' }
         ],
         linkEditar: ['/materiais', material.id, 'editar'],
         labelEditar: 'Editar material'
+      }
+    });
+  }
+
+  protected inutilizar(material: MaterialResumo): void {
+    if (!confirm(`Inutilizar "${material.descricao}"? Ele deixa de ficar disponível para alocação/empréstimo.`)) {
+      return;
+    }
+    const motivo = prompt('Motivo da inutilização (opcional):');
+    if (motivo === null) {
+      return;
+    }
+
+    this.inutilizando.set(material.id);
+    this.materialService.inutilizar(material.id, motivo.trim() || null).subscribe({
+      next: () => {
+        this.inutilizando.set(null);
+        this.consultar();
+      },
+      error: () => {
+        this.inutilizando.set(null);
+        this.erro.set('Não foi possível inutilizar o material.');
       }
     });
   }
@@ -64,8 +88,13 @@ export class MaterialConsultaPage {
       next: (resultado) => {
         exportarCsv(
           'materiais.csv',
-          ['Descrição', 'Situação', 'Disponível p/ empréstimo'],
-          resultado.items.map((m) => [m.descricao, m.situacao, m.disponivelEmprestimo ? 'Sim' : 'Não'])
+          ['Descrição', 'Nº Patrimônio', 'Situação', 'Disponível p/ empréstimo'],
+          resultado.items.map((m) => [
+            m.descricao,
+            m.numeroPatrimonio ?? '',
+            m.situacao,
+            m.disponivelEmprestimo ? 'Sim' : 'Não'
+          ])
         );
         this.exportando.set(false);
       },

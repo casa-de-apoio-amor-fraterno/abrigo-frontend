@@ -21,7 +21,7 @@ import { MaterialResumo } from '../../../features/materiais/material.model';
 export class MaterialAutocompleteComponent {
   readonly label = input('Material');
   readonly valorInicial = input<{ id: number; descricao: string } | null>(null);
-  readonly selecionado = output<{ id: number; descricao: string } | null>();
+  readonly selecionado = output<{ id: number; descricao: string; numeroPatrimonio: string | null } | null>();
 
   private readonly materialService = inject(MaterialService);
 
@@ -57,6 +57,6 @@ export class MaterialAutocompleteComponent {
   protected selecionar(evento: MatAutocompleteSelectedEvent): void {
     const material = evento.option.value as MaterialResumo;
     this.termo.setValue(material.descricao, { emitEvent: false });
-    this.selecionado.emit({ id: material.id, descricao: material.descricao });
+    this.selecionado.emit({ id: material.id, descricao: material.descricao, numeroPatrimonio: material.numeroPatrimonio });
   }
 }

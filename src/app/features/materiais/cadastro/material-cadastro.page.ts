@@ -5,10 +5,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { MaterialService } from '../material.service';
-import { CadastroDialogShellComponent } from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
+import { SituacaoMaterial } from '../material.model';
+import {
+  CadastroDialogAba,
+  CadastroDialogShellComponent
+} from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 import { UploadFotoComponent } from '../../../shared/ui/upload-foto/upload-foto.component';
 
@@ -20,6 +25,7 @@ import { UploadFotoComponent } from '../../../shared/ui/upload-foto/upload-foto.
     MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     CadastroDialogShellComponent,
     CadastroAcoesComponent,
     UploadFotoComponent
@@ -37,11 +43,20 @@ export class MaterialCadastroPage {
     : null;
   protected readonly modoEdicao = this.materialId !== null;
 
+  protected readonly abas: CadastroDialogAba[] = [
+    { id: 'dados', rotulo: 'Dados' },
+    { id: 'observacoes', rotulo: 'Observações' }
+  ];
+  protected readonly abaAtiva = signal('dados');
+
   protected readonly carregando = signal(this.modoEdicao);
   protected readonly salvando = signal(false);
   protected readonly inativando = signal(false);
+  protected readonly inutilizando = signal(false);
   protected readonly erro = signal<string | null>(null);
   protected readonly ativo = signal(true);
+
+  protected readonly situacoes: SituacaoMaterial[] = ['Disponível', 'Alocado', 'Emprestado', 'Inutilizado'];
 
   // Foto: mesmo padrão de pessoa-cadastro.page.ts — na criação ainda não
   // existe `id_material` pra usar `PUT /materiais/{id}/foto`, então a foto
@@ -55,8 +70,8 @@ export class MaterialCadastroPage {
 
   protected readonly form = this.fb.nonNullable.group({
     descricao: ['', [Validators.required]],
-    codigoIdentificacao: [''],
-    situacao: ['', [Validators.required]],
+    numeroPatrimonio: [''],
+    situacao: ['Disponível' as SituacaoMaterial, [Validators.required]],
     local: ['', [Validators.required]],
     disponivelEmprestimo: [false],
     observacao: [''],
@@ -76,7 +91,7 @@ export class MaterialCadastroPage {
         next: (material) => {
           this.form.patchValue({
             descricao: material.descricao,
-            codigoIdentificacao: material.codigoIdentificacao ?? '',
+            numeroPatrimonio: material.numeroPatrimonio ?? '',
             situacao: material.situacao,
             local: material.local,
             disponivelEmprestimo: material.disponivelEmprestimo,
@@ -104,7 +119,7 @@ export class MaterialCadastroPage {
     const valores = this.form.getRawValue();
     const dados = {
       descricao: valores.descricao,
-      codigo_identificacao: valores.codigoIdentificacao || null,
+      numero_patrimonio: valores.numeroPatrimonio || null,
       situacao: valores.situacao,
       local: valores.local,
       disponivel_emprestimo: valores.disponivelEmprestimo,
@@ -166,6 +181,30 @@ export class MaterialCadastroPage {
       },
       error: (error) => {
         this.inativando.set(false);
+        this.erro.set(descreverErroHttp(error.error));
+      }
+    });
+  }
+
+  protected inutilizar(): void {
+    if (this.materialId === null) {
+      return;
+    }
+    const motivo = prompt('Motivo da inutilização (opcional):');
+    if (motivo === null) {
+      return;
+    }
+
+    this.inutilizando.set(true);
+    this.erro.set(null);
+
+    this.materialService.inutilizar(this.materialId, motivo.trim() || null).subscribe({
+      next: (material) => {
+        this.inutilizando.set(false);
+        this.form.patchValue({ situacao: material.situacao, motivoBaixa: material.motivoBaixa ?? '' });
+      },
+      error: (error) => {
+        this.inutilizando.set(false);
         this.erro.set(descreverErroHttp(error.error));
       }
     });

@@ -3,67 +3,81 @@
     [titulo]="modoEdicao ? 'Editar material' : 'Novo material'"
     subtitulo="Cadastro de materiais e equipamentos do Abrigo."
     [carregando]="carregando()"
+    [abas]="abas"
+    [(abaAtiva)]="abaAtiva"
   >
     @if (modoEdicao && !ativo()) {
       <p class="cadastro__aviso">Este material está inativo.</p>
     }
 
-    <section class="cadastro__secao cadastro__secao--linha">
-      <div class="cadastro__foto-coluna">
-        <h2>Foto</h2>
-        <app-upload-foto [fotoUrl]="fotoUrlAtual" (capturada)="salvarFoto($event)" (removida)="removerFoto()" />
-        @if (erroFoto()) {
-          <p class="cadastro__erro">{{ erroFoto() }}</p>
-        }
-      </div>
+    @if (abaAtiva() === 'dados') {
+      <section class="cadastro__secao cadastro__secao--linha">
+        <div class="cadastro__foto-coluna">
+          <h2>Foto</h2>
+          <app-upload-foto [fotoUrl]="fotoUrlAtual" (capturada)="salvarFoto($event)" (removida)="removerFoto()" />
+          @if (erroFoto()) {
+            <p class="cadastro__erro">{{ erroFoto() }}</p>
+          }
+        </div>
 
-      <div class="cadastro__dados-coluna">
+        <div class="cadastro__dados-coluna">
+          <div class="cadastro__grade">
+            <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
+              <mat-label>Descrição / Nome</mat-label>
+              <input matInput formControlName="descricao" />
+              @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
+                <mat-error>Informe a descrição</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>Número do patrimônio</mat-label>
+              <input matInput formControlName="numeroPatrimonio" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>Local</mat-label>
+              <input matInput formControlName="local" placeholder="ex.: Casa, Empréstimo" />
+              @if (form.controls.local.touched && form.controls.local.invalid) {
+                <mat-error>Informe o local</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="cadastro__campo">
+              <mat-label>Situação</mat-label>
+              <mat-select formControlName="situacao">
+                @for (opcao of situacoes; track opcao) {
+                  <mat-option [value]="opcao">{{ opcao }}</mat-option>
+                }
+              </mat-select>
+              @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
+                <mat-error>Informe a situação</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="cadastro__campo cadastro__checkbox">
+              <mat-checkbox formControlName="disponivelEmprestimo">Disponível para empréstimo</mat-checkbox>
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+
+    @if (abaAtiva() === 'observacoes') {
+      <section class="cadastro__secao">
         <div class="cadastro__grade">
           <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-            <mat-label>Descrição / Nome</mat-label>
-            <input matInput formControlName="descricao" />
-            @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
-              <mat-error>Informe a descrição</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Código identificação</mat-label>
-            <input matInput formControlName="codigoIdentificacao" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Local</mat-label>
-            <input matInput formControlName="local" placeholder="ex.: Casa, Empréstimo" />
-            @if (form.controls.local.touched && form.controls.local.invalid) {
-              <mat-error>Informe o local</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Situação</mat-label>
-            <input matInput formControlName="situacao" placeholder="ex.: Disponível, Emprestado" />
-            @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
-              <mat-error>Informe a situação</mat-error>
-            }
-          </mat-form-field>
-
-          <div class="cadastro__campo cadastro__checkbox">
-            <mat-checkbox formControlName="disponivelEmprestimo">Disponível para empréstimo</mat-checkbox>
-          </div>
-
-          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
             <mat-label>Observação</mat-label>
-            <textarea matInput formControlName="observacao" rows="3"></textarea>
+            <textarea matInput formControlName="observacao" rows="10"></textarea>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-            <mat-label>Motivo baixa</mat-label>
-            <textarea matInput formControlName="motivoBaixa" rows="2"></textarea>
+            <mat-label>Motivo da inutilização</mat-label>
+            <textarea matInput formControlName="motivoBaixa" rows="4"></textarea>
           </mat-form-field>
         </div>
-      </div>
-    </section>
+      </section>
+    }
 
     @if (erro()) {
       <p class="cadastro__erro">{{ erro() }}</p>
@@ -71,6 +85,18 @@
 
     <ng-container acoes>
       <app-cadastro-acoes voltarPara="/materiais" [salvando]="salvando()">
+        @if (modoEdicao && ativo() && form.controls.situacao.value !== 'Inutilizado') {
+          <button
+            extra
+            mat-button
+            type="button"
+            class="cadastro__acao-perigo"
+            [disabled]="inutilizando()"
+            (click)="inutilizar()"
+          >
+            Inutilizar
+          </button>
+        }
         @if (modoEdicao && ativo()) {
           <button
             extra
