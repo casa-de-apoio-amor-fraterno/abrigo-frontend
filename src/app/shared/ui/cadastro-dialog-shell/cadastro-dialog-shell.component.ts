@@ -35,21 +35,7 @@ export class CadastroDialogShellComponent {
 
   protected readonly mostrarPills = computed(() => this.abas().length > 1);
 
-  protected readonly mostrarProximo = computed(() => {
-    const abas = this.abas();
-    const indice = abas.findIndex((aba) => aba.id === this.abaAtiva());
-    return abas.length > 1 && indice >= 0 && indice < abas.length - 1;
-  });
-
   protected selecionarAba(id: string): void {
     this.abaAtiva.set(id);
-  }
-
-  protected proximaAba(): void {
-    const abas = this.abas();
-    const indice = abas.findIndex((aba) => aba.id === this.abaAtiva());
-    if (indice >= 0 && indice < abas.length - 1) {
-      this.abaAtiva.set(abas[indice + 1].id);
-    }
   }
 }

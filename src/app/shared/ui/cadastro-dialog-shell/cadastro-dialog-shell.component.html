@@ -36,11 +36,5 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="cadastro-dialog__rodape">
-  @if (mostrarProximo()) {
-    <button mat-button type="button" class="cadastro-dialog__proximo" (click)="proximaAba()">
-      Próximo
-      <mat-icon>arrow_forward</mat-icon>
-    </button>
-  }
   <ng-content select="[acoes]" />
 </mat-dialog-actions>

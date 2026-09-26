@@ -5,8 +5,8 @@
   [abas]="abas"
   [(abaAtiva)]="abaAtiva"
 >
-  @if (abaAtiva() === 'dados') {
-    <form id="voluntario-form" [formGroup]="form" (ngSubmit)="salvar()">
+  <form id="voluntario-form" [formGroup]="form" (ngSubmit)="salvar()">
+    @if (abaAtiva() === 'dados') {
       @if (modoEdicao && !ativo()) {
         <p class="cadastro__aviso">Este voluntário está inativo.</p>
       }
@@ -59,8 +59,8 @@
       @if (erro()) {
         <p class="cadastro__erro">{{ erro() }}</p>
       }
-    </form>
-  }
+    }
+  </form>
 
   @if (abaAtiva() === 'contatos') {
     <div class="cadastro__aba-conteudo">
@@ -73,21 +73,19 @@
   }
 
   <ng-container acoes>
-    @if (abaAtiva() === 'dados') {
-      <app-cadastro-acoes voltarPara="/voluntarios" formularioId="voluntario-form" [salvando]="salvando()">
-        @if (modoEdicao && ativo()) {
-          <button
-            extra
-            mat-button
-            type="button"
-            class="cadastro__acao-perigo"
-            [disabled]="inativando()"
-            (click)="inativar()"
-          >
-            Inativar
-          </button>
-        }
-      </app-cadastro-acoes>
-    }
+    <app-cadastro-acoes voltarPara="/voluntarios" formularioId="voluntario-form" [salvando]="salvando()">
+      @if (modoEdicao && ativo()) {
+        <button
+          extra
+          mat-button
+          type="button"
+          class="cadastro__acao-perigo"
+          [disabled]="inativando()"
+          (click)="inativar()"
+        >
+          Inativar
+        </button>
+      }
+    </app-cadastro-acoes>
   </ng-container>
 </app-cadastro-dialog-shell>

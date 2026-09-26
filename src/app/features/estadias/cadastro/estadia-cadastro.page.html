@@ -5,8 +5,8 @@
   [abas]="abas()"
   [(abaAtiva)]="abaAtiva"
 >
-  @if (abaAtiva() === 'dados') {
-    <form id="estadia-form" [formGroup]="form" (ngSubmit)="salvar()">
+  <form id="estadia-form" [formGroup]="form" (ngSubmit)="salvar()">
+    @if (abaAtiva() === 'dados') {
       <section class="cadastro__secao">
         <h2>Dados da estadia</h2>
 
@@ -98,8 +98,8 @@
       @if (erro()) {
         <p class="cadastro__erro">{{ erro() }}</p>
       }
-    </form>
-  }
+    }
+  </form>
 
   @if (abaAtiva() === 'acompanhantes') {
     <section class="cadastro__secao">
@@ -201,21 +201,19 @@
   }
 
   <ng-container acoes>
-    @if (abaAtiva() === 'dados') {
-      <app-cadastro-acoes voltarPara="/estadias" formularioId="estadia-form" [salvando]="salvando()">
-        @if (modoEdicao && situacaoAtual() !== 'Finalizada') {
-          <button
-            extra
-            mat-button
-            type="button"
-            class="cadastro__acao-perigo"
-            [disabled]="encerrando()"
-            (click)="encerrar()"
-          >
-            Encerrar estadia
-          </button>
-        }
-      </app-cadastro-acoes>
-    }
+    <app-cadastro-acoes voltarPara="/estadias" formularioId="estadia-form" [salvando]="salvando()">
+      @if (modoEdicao && situacaoAtual() !== 'Finalizada') {
+        <button
+          extra
+          mat-button
+          type="button"
+          class="cadastro__acao-perigo"
+          [disabled]="encerrando()"
+          (click)="encerrar()"
+        >
+          Encerrar estadia
+        </button>
+      }
+    </app-cadastro-acoes>
   </ng-container>
 </app-cadastro-dialog-shell>
