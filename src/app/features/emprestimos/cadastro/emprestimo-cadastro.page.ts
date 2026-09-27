@@ -167,6 +167,9 @@ export class EmprestimoCadastroPage {
 
   protected readonly formItem = this.fb.nonNullable.group({
     dataEmprestimo: [''],
+    // Não é enviado ao backend — só um atalho de UI pra calcular
+    // `dataDevolucao` (data emprestimo + N dias), ver `aplicarDiasEmprestimo`.
+    diasEmprestimo: [''],
     dataDevolucao: [''],
     situacao: ['Pendente'],
     renovacao: ['']
@@ -174,6 +177,10 @@ export class EmprestimoCadastroPage {
 
   constructor() {
     this.destroyRef.onDestroy(() => this.revogarPdfContratoUrl());
+
+    this.formItem.controls.diasEmprestimo.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((dias) => this.aplicarDiasEmprestimo(dias));
 
     if (this.emprestimoId !== null) {
       this.emprestimoService.buscar(this.emprestimoId).subscribe({
@@ -256,7 +263,13 @@ export class EmprestimoCadastroPage {
   protected novoItem(): void {
     this.itemEmEdicao.set(null);
     this.materialSelecionado.set(null);
-    this.formItem.reset({ dataEmprestimo: '', dataDevolucao: '', situacao: 'Pendente', renovacao: '' });
+    this.formItem.reset({
+      dataEmprestimo: '',
+      diasEmprestimo: '',
+      dataDevolucao: '',
+      situacao: 'Pendente',
+      renovacao: ''
+    });
     this.erro.set(null);
     this.formItemAberto.set(true);
   }
@@ -268,6 +281,7 @@ export class EmprestimoCadastroPage {
     this.materialSelecionado.set(descricao ? { id: item.idMaterial, descricao, numeroPatrimonio } : null);
     this.formItem.reset({
       dataEmprestimo: item.dataEmprestimo ?? '',
+      diasEmprestimo: '',
       dataDevolucao: item.dataDevolucao ?? '',
       situacao: item.situacao ?? 'Pendente',
       renovacao: item.renovacao ?? ''
@@ -278,6 +292,21 @@ export class EmprestimoCadastroPage {
 
   protected cancelarItem(): void {
     this.formItemAberto.set(false);
+  }
+
+  /** Preenche `dataDevolucao` a partir de `dataEmprestimo` (ou hoje, se
+   * vazia) + N dias — evita o usuário ter que somar a data manualmente
+   * (ex.: empréstimo de 30 dias). Só age com um número positivo válido;
+   * texto vazio ou inválido não mexe em `dataDevolucao`. */
+  private aplicarDiasEmprestimo(diasTexto: string): void {
+    const dias = Number(diasTexto);
+    if (!diasTexto || !Number.isFinite(dias) || dias <= 0) {
+      return;
+    }
+    const dataBaseTexto = this.formItem.controls.dataEmprestimo.value;
+    const dataBase = dataBaseTexto ? new Date(`${dataBaseTexto}T00:00:00`) : new Date();
+    dataBase.setDate(dataBase.getDate() + dias);
+    this.formItem.controls.dataDevolucao.setValue(dataBase.toISOString().slice(0, 10));
   }
 
   protected salvarItem(): void {

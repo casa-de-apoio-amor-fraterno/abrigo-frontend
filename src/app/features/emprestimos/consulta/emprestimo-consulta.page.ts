@@ -45,6 +45,8 @@ export class EmprestimoConsultaPage {
   protected readonly opcoesSituacao = OPCOES_SITUACAO;
   protected readonly situacao = signal('Pendente');
   protected readonly termoBusca = signal('');
+  protected readonly dataDevolucaoInicio = signal('');
+  protected readonly dataDevolucaoFim = signal('');
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);
   protected readonly itens = signal<EmprestimoResumo[]>([]);
@@ -92,6 +94,8 @@ export class EmprestimoConsultaPage {
       .listar({
         situacao: this.situacao() || undefined,
         busca: this.termoBusca().trim() || undefined,
+        dataDevolucaoInicio: this.dataDevolucaoInicio() || undefined,
+        dataDevolucaoFim: this.dataDevolucaoFim() || undefined,
         take: 2000
       })
       .subscribe({
@@ -151,6 +155,8 @@ export class EmprestimoConsultaPage {
       .listar({
         situacao: this.situacao() || undefined,
         busca: this.termoBusca().trim() || undefined,
+        dataDevolucaoInicio: this.dataDevolucaoInicio() || undefined,
+        dataDevolucaoFim: this.dataDevolucaoFim() || undefined,
         skip: this.pagina() * ITENS_POR_PAGINA,
         take: ITENS_POR_PAGINA
       })

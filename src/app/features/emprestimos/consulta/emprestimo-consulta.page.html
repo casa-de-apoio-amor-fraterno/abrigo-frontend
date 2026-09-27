@@ -31,6 +31,22 @@
       [value]="termoBusca()"
       (input)="termoBusca.set($any($event.target).value)"
     />
+    <label class="consulta__busca-data">
+      Devolução prevista de
+      <input
+        type="date"
+        [value]="dataDevolucaoInicio()"
+        (input)="dataDevolucaoInicio.set($any($event.target).value)"
+      />
+    </label>
+    <label class="consulta__busca-data">
+      até
+      <input
+        type="date"
+        [value]="dataDevolucaoFim()"
+        (input)="dataDevolucaoFim.set($any($event.target).value)"
+      />
+    </label>
     <button mat-flat-button type="submit" class="consulta__busca-btn">Buscar</button>
   </form>
 

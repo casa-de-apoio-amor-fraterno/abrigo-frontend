@@ -12,6 +12,11 @@ export const CONFIG_PADRAO_DIALOG_CADASTRO: MatDialogConfig = {
   panelClass: 'cadastro-dialog-panel',
   width: '720px',
   maxWidth: '95vw',
+  // Altura fixa (não só um teto) — trocar de aba ou abrir/fechar um
+  // subformulário (ex.: "Novo item") não pode fazer o popup crescer/encolher
+  // de novo a cada clique. O conteúdo (`.cadastro-dialog__conteudo`) rola
+  // internamente quando não couber, ver cadastro-dialog-shell.component.scss.
+  height: '90vh',
   maxHeight: '90vh',
   autoFocus: false
 };

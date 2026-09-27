@@ -106,8 +106,10 @@ input[matInput][type='datetime-local'] {
 
   &__busca {
     display: flex;
+    align-items: center;
     gap: 8px;
-    max-width: 480px;
+    flex-wrap: wrap;
+    max-width: 720px;
 
     input {
       flex: 1;
@@ -121,6 +123,20 @@ input[matInput][type='datetime-local'] {
       &:focus {
         border-color: var(--abrigo-primary);
       }
+    }
+  }
+
+  &__busca-data {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--abrigo-texto-secundario);
+    white-space: nowrap;
+
+    input {
+      flex: initial;
+      width: 150px;
     }
   }
 
@@ -640,10 +656,24 @@ input[matInput][type='datetime-local'] {
 .cadastro-dialog-panel {
   .mat-mdc-dialog-container {
     --mdc-dialog-container-color: var(--abrigo-surface);
+    height: 100%;
   }
 
   .mdc-dialog__surface {
     animation: cadastro-dialog-entrada 0.18s ease-out;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    // O componente aberto pelo dialog (ex.: `app-emprestimo-cadastro-page`)
+    // é o único filho direto daqui — precisa "desaparecer" (mesma ideia do
+    // `:host { display: contents }` de cadastro-dialog-shell.component.scss)
+    // pra cabeçalho/pills/conteúdo/rodapé virarem itens diretos deste flex
+    // column de altura fixa, em vez de ficarem presos dentro de um bloco
+    // que só cresce com o conteúdo.
+    > * {
+      display: contents;
+    }
   }
 
   @media (max-width: 680px) {

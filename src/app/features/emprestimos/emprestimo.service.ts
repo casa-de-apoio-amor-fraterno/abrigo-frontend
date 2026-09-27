@@ -37,6 +37,10 @@ export interface ConsultaEmprestimosQuery {
   idPessoa?: number;
   situacao?: string;
   busca?: string;
+  /** Faixa de datas da devolução prevista (`EmprestimoItem.data_devolucao`
+   * no backend) — filtra empréstimos com pelo menos um item nessa faixa. */
+  dataDevolucaoInicio?: string;
+  dataDevolucaoFim?: string;
   skip?: number;
   take?: number;
 }
@@ -59,6 +63,12 @@ export class EmprestimoService {
     }
     if (query.busca) {
       params['busca'] = query.busca;
+    }
+    if (query.dataDevolucaoInicio) {
+      params['data_devolucao_inicio'] = query.dataDevolucaoInicio;
+    }
+    if (query.dataDevolucaoFim) {
+      params['data_devolucao_fim'] = query.dataDevolucaoFim;
     }
 
     return this.http.get<ListaEmprestimosDto>(this.resource, { params }).pipe(map(paraListaModel));

@@ -93,6 +93,11 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="cadastro__campo">
+            <mat-label>Dias de empréstimo</mat-label>
+            <input matInput type="number" min="1" placeholder="Ex: 30" formControlName="diasEmprestimo" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="cadastro__campo">
             <mat-label>Data prevista de devolução</mat-label>
             <input matInput type="date" formControlName="dataDevolucao" />
           </mat-form-field>

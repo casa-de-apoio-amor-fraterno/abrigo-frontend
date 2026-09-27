@@ -1,3 +1,13 @@
+// O host deste componente (e o host de cada página de cadastro que o
+// projeta, ex. `app-emprestimo-cadastro-page`) não pode virar um bloco a
+// mais no fluxo normal — precisa "desaparecer" pra cabeçalho/pills/conteúdo/
+// rodapé ficarem irmãos diretos de `.mdc-dialog__surface` (ver
+// `.cadastro-dialog-panel` em styles.scss), senão o flex column de altura
+// fixa de lá não tem como distribuir espaço entre eles.
+:host {
+  display: contents;
+}
+
 .cadastro-dialog {
   &__cabecalho {
     display: flex !important;
@@ -51,16 +61,21 @@
   }
 
   &__conteudo {
-    // O Material define `max-height: 65vh` por padrão em
-    // `.mat-mdc-dialog-content`. O painel já tem seu próprio teto
-    // (`maxHeight: '90vh'` no `CONFIG_PADRAO` de `cadastro-dialog-host.base.ts`),
-    // então esse limite extra só sobra faixa vazia embaixo das ações em
-    // formulários curtos — o container (flex column) já cuida de conter o
-    // conteúdo e rolar quando precisar.
+    // O popup tem altura fixa (`height: '90vh'` no `CONFIG_PADRAO` de
+    // `cadastro-dialog-host.base.ts`) pra não crescer/encolher a cada troca
+    // de aba ou abertura de subformulário — esta é a única região que rola
+    // (`flex: 1` toma o espaço que sobra de cabeçalho/pills/rodapé,
+    // `min-height: 0` é o que permite ela encolher menor que o conteúdo
+    // dentro de um flex column, senão o overflow não tem efeito nenhum).
+    // O `max-height: 65vh` padrão do Material em `.mat-mdc-dialog-content`
+    // é zerado porque quem manda no teto agora é o container.
     max-height: none !important;
     padding: 20px 24px !important;
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
     gap: 20px;
 
     // O <form> de cada entidade não é autor de layout próprio (isso virou
