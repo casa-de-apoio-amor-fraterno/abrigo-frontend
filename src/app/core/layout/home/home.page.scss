@@ -439,6 +439,7 @@
   }
 
   &__ver {
+    margin-left: auto;
     border: none;
     background: transparent;
     color: var(--abrigo-primary-dark);
@@ -454,19 +455,4 @@
     }
   }
 
-  &__acao-finalizar {
-    margin-left: auto;
-    border: none;
-    background: transparent;
-    color: #c62828;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 }

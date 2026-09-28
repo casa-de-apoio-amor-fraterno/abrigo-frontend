@@ -12,6 +12,7 @@ import {
   EmprestimoItemCreateDto,
   EmprestimoItemDto,
   EmprestimoItemUpdateDto,
+  EmprestimoRenovarDto,
   EmprestimoUpdateDto,
   ListaEmprestimosDto,
   TipoContrato
@@ -37,8 +38,8 @@ export interface ConsultaEmprestimosQuery {
   idPessoa?: number;
   situacao?: string;
   busca?: string;
-  /** Faixa de datas da devolução prevista (`EmprestimoItem.data_devolucao`
-   * no backend) — filtra empréstimos com pelo menos um item nessa faixa. */
+  /** Faixa de datas da devolução prevista (`Emprestimo.data_devolucao`
+   * no backend, nível empréstimo). */
   dataDevolucaoInicio?: string;
   dataDevolucaoFim?: string;
   skip?: number;
@@ -106,6 +107,15 @@ export class EmprestimoService {
       corpo.data_devolucao = dataDevolucao;
     }
     return this.http.post<EmprestimoDto>(`${this.resource}/${id}/devolver`, corpo).pipe(map(paraModel));
+  }
+
+  /** Soma `dias` à data prevista de devolução atual (ou a partir de hoje,
+   * se o empréstimo ainda não tinha prazo) e marca os itens ainda não
+   * devolvidos como "Renovado" — ação rápida pedida pelo time (2026-09-28)
+   * na tela Início e na listagem de empréstimos. */
+  renovar(id: number, idUsuario: number, dias: number): Observable<Emprestimo> {
+    const corpo: EmprestimoRenovarDto = { id_usuario: idUsuario, dias };
+    return this.http.post<EmprestimoDto>(`${this.resource}/${id}/renovar`, corpo).pipe(map(paraModel));
   }
 
   listarItens(emprestimoId: number): Observable<EmprestimoItem[]> {

@@ -26,8 +26,6 @@ import { FinalizarEstadiaPopoverComponent } from '../../../shared/ui/finalizar-e
 import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocomplete/pessoa-autocomplete.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
 import { EmprestimoDetalheDialogComponent } from '../../../features/emprestimos/detalhe-dialog/emprestimo-detalhe-dialog.component';
-import { CONFIG_PADRAO_DIALOG_CADASTRO } from '../../../shared/ui/cadastro-dialog-host/cadastro-dialog-host.base';
-import { EmprestimoCadastroPage } from '../../../features/emprestimos/cadastro/emprestimo-cadastro.page';
 import { agoraDatetimeLocal } from '../../../shared/util/data';
 import { linkWhatsapp } from '../../../shared/util/whatsapp';
 
@@ -83,15 +81,6 @@ export class HomePage {
   protected readonly carregandoVencimentos = signal(true);
   protected readonly erroVencimentos = signal<string | null>(null);
   protected readonly alertasVencimento = signal<AlertaVencimentoEmprestimo[]>([]);
-
-  // Finalizar direto do card: marca TODOS os itens ainda pendentes/renovados
-  // desse empréstimo como devolvidos (mesmo endpoint usado em qualquer outro
-  // fluxo de devolução, ver EmprestimoService.devolver) — se o empréstimo
-  // tiver outros itens longe do vencimento, eles também são liberados
-  // junto, então o popover avisa isso no subtítulo.
-  protected readonly finalizarEmprestimoAberto = signal<number | null>(null);
-  protected readonly finalizandoEmprestimo = signal(false);
-  protected readonly erroFinalizarEmprestimo = signal<string | null>(null);
 
   // Clicar numa cama ocupada abre esse popover pra finalizar a estadia
   // direto da tela Início, sem precisar ir pra edição completa (mesmo
@@ -228,32 +217,19 @@ export class HomePage {
 
   // Popup leve de consulta (mesmo padrão de "visualizar" na listagem de
   // empréstimos) — abre por cima da própria tela Início, sem navegar pra
-  // lugar nenhum. "Editar" continua sendo a única ação que de fato sai
-  // daqui (link dentro do popup).
+  // lugar nenhum. Ação de edição completa foi tirada daqui (pedido do
+  // time, 2026-09-28) — só "Finalizar"/"Renovar empréstimo" ficam
+  // disponíveis (ver `acoesRapidas` em EmprestimoDetalheDialogData); edição
+  // completa continua acessível pela listagem de empréstimos. Recarrega os
+  // vencimentos ao fechar porque qualquer uma das duas ações muda o prazo
+  // ou a situação do empréstimo.
   protected visualizarAlerta(alerta: AlertaVencimentoEmprestimo, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.dialog.open(EmprestimoDetalheDialogComponent, {
-      width: '560px',
-      data: {
-        emprestimoId: alerta.idEmprestimo,
-        // Sem isso, o link padrão navegaria pra /emprestimos/:id/editar —
-        // como essa rota é filha da listagem, o usuário veria a tela de
-        // Empréstimos por trás do popup antes de fechar (bug reportado:
-        // "editar ainda redireciona pra listagem"). Abrindo o mesmo
-        // formulário direto num MatDialog (ver `abrirEdicaoEmprestimo`)
-        // evita trocar de rota — o usuário nunca sai do Início.
-        aoEditar: () => this.abrirEdicaoEmprestimo(alerta.idEmprestimo)
-      }
-    });
-  }
-
-  private abrirEdicaoEmprestimo(idEmprestimo: number): void {
     this.dialog
-      .open(EmprestimoCadastroPage, {
-        ...CONFIG_PADRAO_DIALOG_CADASTRO,
-        width: '760px',
-        data: { emprestimoId: idEmprestimo }
+      .open(EmprestimoDetalheDialogComponent, {
+        width: '560px',
+        data: { emprestimoId: alerta.idEmprestimo, acoesRapidas: true }
       })
       .afterClosed()
       .subscribe(() => this.carregarVencimentos());
@@ -287,41 +263,6 @@ export class HomePage {
     return this.alertasVencimento().filter((a) => this.nivelUrgencia(a) === 'proximo').length;
   }
 
-  protected abrirFinalizarEmprestimo(alerta: AlertaVencimentoEmprestimo, event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.erroFinalizarEmprestimo.set(null);
-    this.finalizarEmprestimoAberto.set(alerta.idEmprestimo);
-  }
-
-  protected fecharFinalizarEmprestimo(): void {
-    this.finalizarEmprestimoAberto.set(null);
-    this.erroFinalizarEmprestimo.set(null);
-  }
-
-  protected confirmarFinalizarEmprestimo(): void {
-    const idEmprestimo = this.finalizarEmprestimoAberto();
-    const idUsuario = this.auth.sessao()?.usuario_id;
-    if (idEmprestimo === null || idUsuario === undefined) {
-      return;
-    }
-
-    this.finalizandoEmprestimo.set(true);
-    this.erroFinalizarEmprestimo.set(null);
-
-    this.emprestimoService.devolver(idEmprestimo, idUsuario).subscribe({
-      next: () => {
-        this.finalizandoEmprestimo.set(false);
-        this.finalizarEmprestimoAberto.set(null);
-        this.carregarVencimentos();
-      },
-      error: (error) => {
-        this.finalizandoEmprestimo.set(false);
-        this.erroFinalizarEmprestimo.set(descreverErroHttp(error.error));
-      }
-    });
-  }
-
   protected get totalLeitos(): number {
     return this.quartos().reduce((soma, q) => soma + q.leito, 0);
   }
@@ -349,9 +290,6 @@ export class HomePage {
     }
     if (this.estadiaCriarAberta() !== null && !alvo.closest('.ocupacao__leito--livre')) {
       this.fecharCriarEstadia();
-    }
-    if (this.finalizarEmprestimoAberto() !== null && !alvo.closest('.vencimentos__acao-finalizar')) {
-      this.fecharFinalizarEmprestimo();
     }
   }
 

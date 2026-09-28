@@ -642,7 +642,7 @@ input[matInput][type='datetime-local'] {
   margin: 0 !important;
 
   .mat-mdc-dialog-container {
-    --mdc-dialog-container-color: #fff;
+    --mdc-dialog-container-color: var(--abrigo-surface);
     height: 100%;
     border-radius: 0;
   }

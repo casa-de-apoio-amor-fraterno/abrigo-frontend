@@ -63,14 +63,23 @@ export class EmprestimoConsultaPage {
     escutarRefrescoDaLista('/emprestimos', () => this.consultar());
   }
 
+  // "Finalizar"/"Renovar empréstimo" ficam lado a lado com "Editar" aqui
+  // (pedido do time, 2026-09-28 — mesmas ações rápidas já usadas na tela
+  // Início, ver EmprestimoDetalheDialogData.acoesRapidas). Recarrega a
+  // lista ao fechar porque qualquer uma das duas ações muda a situação
+  // (usada no filtro por pills) ou o prazo do empréstimo.
   protected visualizar(emprestimo: EmprestimoResumo): void {
-    this.dialog.open(EmprestimoDetalheDialogComponent, {
-      width: '560px',
-      data: {
-        emprestimoId: emprestimo.id,
-        linkEditar: ['/emprestimos', emprestimo.id, 'editar']
-      }
-    });
+    this.dialog
+      .open(EmprestimoDetalheDialogComponent, {
+        width: '560px',
+        data: {
+          emprestimoId: emprestimo.id,
+          linkEditar: ['/emprestimos', emprestimo.id, 'editar'],
+          acoesRapidas: true
+        }
+      })
+      .afterClosed()
+      .subscribe(() => this.consultar());
   }
 
   protected verContratos(emprestimo: EmprestimoResumo): void {

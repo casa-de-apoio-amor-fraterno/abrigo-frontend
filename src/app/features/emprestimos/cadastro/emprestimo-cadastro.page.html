@@ -28,6 +28,28 @@
           </div>
         }
 
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Data empréstimo</mat-label>
+          <input matInput type="date" formControlName="dataEmprestimo" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Dias de empréstimo</mat-label>
+          <input matInput type="number" min="1" placeholder="Ex: 30" formControlName="diasEmprestimo" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cadastro__campo">
+          <mat-label>Data prevista de devolução</mat-label>
+          <input matInput type="date" formControlName="dataDevolucao" />
+        </mat-form-field>
+
+        @if (dataDevolucaoEfetivaAtual()) {
+          <div class="cadastro__campo cadastro__radio">
+            <span class="cadastro__radio-label">Data efetiva da devolução</span>
+            <span>{{ dataDevolucaoEfetivaAtual() | date: 'dd/MM/yyyy' }}</span>
+          </div>
+        }
+
         <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
           <mat-label>Observação</mat-label>
           <textarea matInput formControlName="observacao" rows="3"></textarea>
@@ -61,17 +83,9 @@
                 <span>Nº patrimônio: {{ patrimoniosMateriais()[item.idMaterial] || '—' }}</span>
                 <span>{{ item.situacao || 'Sem situação' }}{{ item.renovacao ? ' · ' + item.renovacao : '' }}</span>
               </div>
-              <div class="cadastro__lista-datas">
-                <span>{{ item.dataEmprestimo ? (item.dataEmprestimo | date: 'dd/MM/yyyy') : '-' }}</span>
-                <span>—</span>
-                <span>Prevista: {{ item.dataDevolucao ? (item.dataDevolucao | date: 'dd/MM/yyyy') : '-' }}</span>
-                @if (item.dataDevolucaoEfetiva) {
-                  <span>Devolvido em: {{ item.dataDevolucaoEfetiva | date: 'dd/MM/yyyy' }}</span>
-                }
-                <button mat-icon-button type="button" aria-label="Editar item" (click)="editarItem(item)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-              </div>
+              <button mat-icon-button type="button" aria-label="Editar item" (click)="editarItem(item)">
+                <mat-icon>edit</mat-icon>
+              </button>
             </li>
           }
         </ul>
@@ -88,21 +102,6 @@
           </div>
 
           <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Data empréstimo</mat-label>
-            <input matInput type="date" formControlName="dataEmprestimo" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Dias de empréstimo</mat-label>
-            <input matInput type="number" min="1" placeholder="Ex: 30" formControlName="diasEmprestimo" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="cadastro__campo">
-            <mat-label>Data prevista de devolução</mat-label>
-            <input matInput type="date" formControlName="dataDevolucao" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="cadastro__campo">
             <mat-label>Situação</mat-label>
             <mat-select formControlName="situacao">
               <mat-option value="Pendente">Pendente</mat-option>
@@ -110,13 +109,6 @@
               <mat-option value="Devolvido">Devolvido</mat-option>
             </mat-select>
           </mat-form-field>
-
-          @if (itemEmEdicaoDataDevolucaoEfetiva()) {
-            <div class="cadastro__campo cadastro__radio">
-              <span class="cadastro__radio-label">Data efetiva da devolução</span>
-              <span>{{ itemEmEdicaoDataDevolucaoEfetiva() | date: 'dd/MM/yyyy' }}</span>
-            </div>
-          }
 
           <mat-form-field appearance="outline" class="cadastro__campo">
             <mat-label>Renovação</mat-label>

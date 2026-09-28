@@ -126,10 +126,10 @@ export class EmprestimoCadastroPage {
 
   private proximoIdItemLocal = -1;
   // Só leitura — gravada automaticamente pelo backend quando `situacao`
-  // vira "Devolvido" (ver emprestimo.legacy.md / service.py).
-  protected readonly itemEmEdicaoDataDevolucaoEfetiva = computed(
-    () => this.itemEmEdicao()?.dataDevolucaoEfetiva ?? null
-  );
+  // (calculada a partir dos itens) vira "Devolvido" (ver emprestimo.legacy.md
+  // / service.py). Nível empréstimo, não mais item (decisão do time,
+  // 2026-09-28 — ver emprestimo.legacy.md).
+  protected readonly dataDevolucaoEfetivaAtual = signal<string | null>(null);
 
   protected readonly historico = signal<EmprestimoHistorico[]>([]);
   protected readonly carregandoHistorico = signal(false);
@@ -162,15 +162,17 @@ export class EmprestimoCadastroPage {
 
   protected readonly form = this.fb.nonNullable.group({
     numeroContrato: [''],
-    observacao: ['']
-  });
-
-  protected readonly formItem = this.fb.nonNullable.group({
+    observacao: [''],
+    // Prazo do aluguel — nível empréstimo (não mais item, ver
+    // emprestimo.model.ts): um único prazo vale pra todos os itens.
     dataEmprestimo: [''],
     // Não é enviado ao backend — só um atalho de UI pra calcular
     // `dataDevolucao` (data emprestimo + N dias), ver `aplicarDiasEmprestimo`.
     diasEmprestimo: [''],
-    dataDevolucao: [''],
+    dataDevolucao: ['']
+  });
+
+  protected readonly formItem = this.fb.nonNullable.group({
     situacao: ['Pendente'],
     renovacao: ['']
   });
@@ -178,7 +180,7 @@ export class EmprestimoCadastroPage {
   constructor() {
     this.destroyRef.onDestroy(() => this.revogarPdfContratoUrl());
 
-    this.formItem.controls.diasEmprestimo.valueChanges
+    this.form.controls.diasEmprestimo.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((dias) => this.aplicarDiasEmprestimo(dias));
 
@@ -187,9 +189,12 @@ export class EmprestimoCadastroPage {
         next: (emprestimo) => {
           this.form.patchValue({
             numeroContrato: emprestimo.numeroContrato ?? '',
-            observacao: emprestimo.observacao ?? ''
+            observacao: emprestimo.observacao ?? '',
+            dataEmprestimo: emprestimo.dataEmprestimo ?? '',
+            dataDevolucao: emprestimo.dataDevolucao ?? ''
           });
           this.situacaoAtual.set(emprestimo.situacao);
+          this.dataDevolucaoEfetivaAtual.set(emprestimo.dataDevolucaoEfetiva);
           this.idUsuarioOriginal.set(emprestimo.idUsuario);
           this.carregando.set(false);
 
@@ -234,7 +239,9 @@ export class EmprestimoCadastroPage {
       id_pessoa: this.pessoaSelecionada()!.id,
       id_usuario: idUsuario,
       numero_contrato: valores.numeroContrato || null,
-      observacao: valores.observacao || null
+      observacao: valores.observacao || null,
+      data_emprestimo: valores.dataEmprestimo || null,
+      data_devolucao: valores.dataDevolucao || null
     };
 
     this.salvando.set(true);
@@ -264,9 +271,6 @@ export class EmprestimoCadastroPage {
     this.itemEmEdicao.set(null);
     this.materialSelecionado.set(null);
     this.formItem.reset({
-      dataEmprestimo: '',
-      diasEmprestimo: '',
-      dataDevolucao: '',
       situacao: 'Pendente',
       renovacao: ''
     });
@@ -280,9 +284,6 @@ export class EmprestimoCadastroPage {
     const numeroPatrimonio = this.patrimoniosMateriais()[item.idMaterial] ?? null;
     this.materialSelecionado.set(descricao ? { id: item.idMaterial, descricao, numeroPatrimonio } : null);
     this.formItem.reset({
-      dataEmprestimo: item.dataEmprestimo ?? '',
-      diasEmprestimo: '',
-      dataDevolucao: item.dataDevolucao ?? '',
       situacao: item.situacao ?? 'Pendente',
       renovacao: item.renovacao ?? ''
     });
@@ -303,10 +304,10 @@ export class EmprestimoCadastroPage {
     if (!diasTexto || !Number.isFinite(dias) || dias <= 0) {
       return;
     }
-    const dataBaseTexto = this.formItem.controls.dataEmprestimo.value;
+    const dataBaseTexto = this.form.controls.dataEmprestimo.value;
     const dataBase = dataBaseTexto ? new Date(`${dataBaseTexto}T00:00:00`) : new Date();
     dataBase.setDate(dataBase.getDate() + dias);
-    this.formItem.controls.dataDevolucao.setValue(dataBase.toISOString().slice(0, 10));
+    this.form.controls.dataDevolucao.setValue(dataBase.toISOString().slice(0, 10));
   }
 
   protected salvarItem(): void {
@@ -320,8 +321,6 @@ export class EmprestimoCadastroPage {
     const dados = {
       id_material: material.id,
       id_usuario: this.idUsuarioOriginal() ?? this.auth.sessao()!.usuario_id,
-      data_emprestimo: valores.dataEmprestimo || null,
-      data_devolucao: valores.dataDevolucao || null,
       situacao: valores.situacao as SituacaoEmprestimo,
       renovacao: valores.renovacao || null
     };
@@ -345,9 +344,6 @@ export class EmprestimoCadastroPage {
         id: emEdicao?.id ?? this.proximoIdItemLocal--,
         idEmprestimo: 0,
         idMaterial: dados.id_material,
-        dataEmprestimo: dados.data_emprestimo,
-        dataDevolucao: dados.data_devolucao,
-        dataDevolucaoEfetiva: null,
         situacao: dados.situacao,
         renovacao: dados.renovacao,
         // Item ainda não persistido — descrição/foto reais só existem depois
@@ -379,10 +375,12 @@ export class EmprestimoCadastroPage {
         this.formItemAberto.set(false);
         this.carregarItens();
         this.carregarHistorico();
-        // Situação do cabeçalho é recalculada pelo backend a cada item
-        // salvo (ver emprestimo.legacy.md) — busca de novo pra refletir.
+        // Situação (e data efetiva de devolução) do cabeçalho são
+        // recalculadas pelo backend a cada item salvo (ver
+        // emprestimo.legacy.md) — busca de novo pra refletir.
         this.emprestimoService.buscar(this.emprestimoId!).subscribe((emprestimo) => {
           this.situacaoAtual.set(emprestimo.situacao);
+          this.dataDevolucaoEfetivaAtual.set(emprestimo.dataDevolucaoEfetiva);
         });
       },
       error: (error) => {
@@ -396,8 +394,6 @@ export class EmprestimoCadastroPage {
     return this.itensLocais().map((item) => ({
       id_material: item.idMaterial,
       id_usuario: idUsuario,
-      data_emprestimo: item.dataEmprestimo,
-      data_devolucao: item.dataDevolucao,
       situacao: item.situacao,
       renovacao: item.renovacao
     }));

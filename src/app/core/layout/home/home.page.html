@@ -223,27 +223,7 @@
                 </a>
               }
               <button type="button" class="vencimentos__ver" (click)="visualizarAlerta(alerta, $event)">Ver</button>
-              <button
-                type="button"
-                class="vencimentos__acao-finalizar"
-                (click)="abrirFinalizarEmprestimo(alerta, $event)"
-              >
-                Finalizar
-              </button>
             </div>
-
-            @if (finalizarEmprestimoAberto() === alerta.idEmprestimo) {
-              <app-acao-popover
-                icone="inventory_2"
-                titulo="Finalizar empréstimo"
-                [subtitulo]="'Marca todos os itens pendentes de ' + alerta.nomePessoa + ' como devolvidos.'"
-                [erro]="erroFinalizarEmprestimo()"
-                [confirmando]="finalizandoEmprestimo()"
-                textoConfirmar="Finalizar"
-                (cancelar)="fecharFinalizarEmprestimo()"
-                (confirmar)="confirmarFinalizarEmprestimo()"
-              />
-            }
           </div>
         }
       </div>

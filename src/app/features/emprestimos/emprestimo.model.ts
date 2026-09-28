@@ -11,6 +11,7 @@ export interface EmprestimoResumo {
   idPessoa: number;
   situacao: SituacaoEmprestimo;
   numeroContrato: string | null;
+  dataDevolucao: string | null;
 }
 
 export interface ListaEmprestimos {
@@ -22,17 +23,17 @@ export interface Emprestimo extends EmprestimoResumo {
   idUsuario: number;
   observacao: string | null;
   ativo: boolean;
+  // Prazo do aluguel — nível empréstimo (não mais item, ver models.py no
+  // backend): um único prazo vale pra todos os itens do mesmo empréstimo.
+  dataEmprestimo: string | null;
+  /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
+  dataDevolucaoEfetiva: string | null;
 }
 
 export interface EmprestimoItem {
   id: number;
   idEmprestimo: number;
   idMaterial: number;
-  dataEmprestimo: string | null;
-  /** Prevista, não a data real da devolução — ver `dataDevolucaoEfetiva`. */
-  dataDevolucao: string | null;
-  /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
-  dataDevolucaoEfetiva: string | null;
   situacao: SituacaoEmprestimo | null;
   renovacao: string | null;
   /** Anexados pelo backend a partir do material — ver EmprestimoItemDto. */

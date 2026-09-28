@@ -90,4 +90,24 @@
     gap: 6px;
     text-decoration: none;
   }
+
+  &__renovar {
+    margin-top: 8px;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+}
+
+// Com "Renovar"/"Finalizar"/"Editar" juntos (acoesRapidas na listagem, ver
+// emprestimo-consulta.page.ts) 4 botões não cabem numa linha só nos 560px
+// do dialog — sem isso ficavam espremidos/sobrepostos. `flex-wrap` deixa
+// quebrar em duas linhas com respiro, e `justify-content: flex-end` mantém
+// tudo alinhado à direita mesmo quebrado (mesmo padrão dos outros dialogs
+// de detalhe do sistema).
+mat-dialog-actions {
+  flex-wrap: wrap;
+  row-gap: 8px;
+  justify-content: flex-end;
 }

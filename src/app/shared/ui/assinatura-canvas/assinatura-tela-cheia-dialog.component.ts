@@ -3,7 +3,6 @@ import {
   DestroyRef,
   ElementRef,
   computed,
-  effect,
   inject,
   signal,
   viewChild,
@@ -47,7 +46,19 @@ export class AssinaturaTelaCheiaDialogComponent {
   private desenhando = false;
 
   constructor() {
-    effect(() => {
+    // Não inicializa no primeiro tick da view (antes seria via `effect()`,
+    // assim que o `viewChild` do canvas resolvia): o `MatDialog` anima a
+    // entrada (o `.mat-mdc-dialog-container` cresce de uma escala menor até
+    // 1 em ~200ms) e `getBoundingClientRect()` durante essa animação
+    // retorna o tamanho *visual* intermediário, não o tamanho final —
+    // `dimensionarCanvas` gravava esse tamanho errado como resolução do
+    // raster (`canvas.width`/`height`), e o navegador então esticava esse
+    // raster pequeno pro tamanho CSS final (100%), deixando o traço
+    // desenhado dezenas/centenas de pixels distante do toque real (bug
+    // relatado: "apertando uns 200 pixels mais distante"). `afterOpened()`
+    // só emite depois que a animação de entrada termina, com o diálogo já
+    // no tamanho final — mede e inicializa o canvas correto a partir daí.
+    this.dialogRef.afterOpened().subscribe(() => {
       const referencia = this.canvas();
       if (referencia) {
         this.inicializarCanvas(referencia.nativeElement);

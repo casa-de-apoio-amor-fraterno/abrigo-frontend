@@ -22,7 +22,8 @@ export function paraResumoModel(dto: EmprestimoResumoDto): EmprestimoResumo {
     id: dto.id,
     idPessoa: dto.id_pessoa,
     situacao: dto.situacao,
-    numeroContrato: dto.numero_contrato
+    numeroContrato: dto.numero_contrato,
+    dataDevolucao: dto.data_devolucao
   };
 }
 
@@ -35,7 +36,9 @@ export function paraModel(dto: EmprestimoDto): Emprestimo {
     ...paraResumoModel(dto),
     idUsuario: dto.id_usuario,
     observacao: dto.observacao,
-    ativo: dto.ativo
+    ativo: dto.ativo,
+    dataEmprestimo: dto.data_emprestimo,
+    dataDevolucaoEfetiva: dto.data_devolucao_efetiva
   };
 }
 
@@ -44,9 +47,6 @@ export function paraItemModel(dto: EmprestimoItemDto): EmprestimoItem {
     id: dto.id,
     idEmprestimo: dto.id_emprestimo,
     idMaterial: dto.id_material,
-    dataEmprestimo: dto.data_emprestimo,
-    dataDevolucao: dto.data_devolucao,
-    dataDevolucaoEfetiva: dto.data_devolucao_efetiva,
     situacao: dto.situacao,
     renovacao: dto.renovacao,
     descricaoMaterial: dto.descricao_material,

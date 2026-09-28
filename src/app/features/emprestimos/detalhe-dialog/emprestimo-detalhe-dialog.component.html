@@ -24,6 +24,16 @@
         <dt>Nº contrato</dt>
         <dd>{{ emp.numeroContrato || '—' }}</dd>
       </div>
+      <div class="emprestimo-detalhe__campo">
+        <dt>Prazo</dt>
+        <dd>
+          {{ emp.dataEmprestimo ? (emp.dataEmprestimo | date: 'dd/MM/yyyy') : '-' }}
+          — Previsto: {{ emp.dataDevolucao ? (emp.dataDevolucao | date: 'dd/MM/yyyy') : '-' }}
+          @if (emp.dataDevolucaoEfetiva) {
+            · Devolvido em: {{ emp.dataDevolucaoEfetiva | date: 'dd/MM/yyyy' }}
+          }
+        </dd>
+      </div>
       @if (pessoa(); as p) {
         <div class="emprestimo-detalhe__campo">
           <dt>Telefone</dt>
@@ -63,13 +73,6 @@
                   </span>
                 }
               </span>
-              <span>
-                {{ item.dataEmprestimo ? (item.dataEmprestimo | date: 'dd/MM/yyyy') : '-' }}
-                — Previsto: {{ item.dataDevolucao ? (item.dataDevolucao | date: 'dd/MM/yyyy') : '-' }}
-                @if (item.dataDevolucaoEfetiva) {
-                  · Devolvido em: {{ item.dataDevolucaoEfetiva | date: 'dd/MM/yyyy' }}
-                }
-              </span>
               @if (item.renovacao) {
                 <span>Renovação: {{ item.renovacao }}</span>
               }
@@ -78,25 +81,97 @@
         }
       </ul>
     }
+
+    @if (data.acoesRapidas && renovarAberto()) {
+      <div class="emprestimo-detalhe__renovar">
+        @if (etapaRenovar() === 'dias') {
+          <mat-form-field appearance="outline">
+            <mat-label>Renovar por quantos dias?</mat-label>
+            <input
+              matInput
+              type="number"
+              min="1"
+              placeholder="Ex: 30"
+              [value]="diasRenovacao()"
+              (input)="diasRenovacao.set($any($event.target).value)"
+            />
+          </mat-form-field>
+        } @else {
+          <p class="emprestimo-detalhe__subtitulo">
+            @if (temContratoOriginal()) {
+              Peça pro responsável assinar abaixo pra gerar o termo de renovação.
+            } @else {
+              Peça pro responsável assinar abaixo pra gerar o contrato de comodato original.
+            }
+          </p>
+          <app-assinatura-canvas />
+        }
+      </div>
+    }
+
+    @if (erroAcao()) {
+      <p class="emprestimo-detalhe__erro">{{ erroAcao() }}</p>
+    }
   }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
-  @if (data.aoEditar) {
-    <button mat-flat-button type="button" class="emprestimo-detalhe__editar" (click)="editar()">
-      <mat-icon>edit</mat-icon>
-      Editar empréstimo
-    </button>
+  @if (renovarAberto()) {
+    <button mat-button type="button" [disabled]="renovando()" (click)="cancelarRenovar()">Cancelar</button>
+    @if (etapaRenovar() === 'dias') {
+      <button mat-flat-button type="button" (click)="continuarRenovar()">Continuar</button>
+    } @else {
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="renovando() || !podeAssinarRenovacao()"
+        (click)="confirmarRenovar()"
+      >
+        {{ renovando() ? 'Confirmando...' : (temContratoOriginal() ? 'Confirmar renovação' : 'Confirmar assinatura') }}
+      </button>
+    }
   } @else {
-    <a
-      mat-flat-button
-      class="emprestimo-detalhe__editar"
-      [routerLink]="data.linkEditar"
-      (click)="dialogRef.close()"
-    >
-      <mat-icon>edit</mat-icon>
-      Editar empréstimo
-    </a>
+    <button mat-button type="button" (click)="dialogRef.close()">Fechar</button>
+
+    @if (data.acoesRapidas) {
+      @if (temContratoOriginal()) {
+        <button mat-stroked-button type="button" [disabled]="finalizando()" (click)="abrirRenovar()">
+          <mat-icon>autorenew</mat-icon>
+          Renovar empréstimo
+        </button>
+      } @else {
+        <button mat-stroked-button type="button" [disabled]="finalizando()" (click)="abrirAssinarComodato()">
+          <mat-icon>draw</mat-icon>
+          Assinar contrato
+        </button>
+      }
+      <button
+        mat-flat-button
+        type="button"
+        class="emprestimo-detalhe__editar"
+        [disabled]="finalizando()"
+        (click)="finalizar()"
+      >
+        <mat-icon>inventory_2</mat-icon>
+        {{ finalizando() ? 'Finalizando...' : 'Finalizar' }}
+      </button>
+    }
+
+    @if (data.aoEditar) {
+      <button mat-flat-button type="button" class="emprestimo-detalhe__editar" (click)="editar()">
+        <mat-icon>edit</mat-icon>
+        Editar empréstimo
+      </button>
+    } @else if (data.linkEditar) {
+      <a
+        mat-flat-button
+        class="emprestimo-detalhe__editar"
+        [routerLink]="data.linkEditar"
+        (click)="dialogRef.close()"
+      >
+        <mat-icon>edit</mat-icon>
+        Editar empréstimo
+      </a>
+    }
   }
 </mat-dialog-actions>

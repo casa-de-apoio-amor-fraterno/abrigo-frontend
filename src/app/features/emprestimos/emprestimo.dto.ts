@@ -21,6 +21,7 @@ export interface EmprestimoResumoDto {
   id_pessoa: number;
   situacao: SituacaoEmprestimo;
   numero_contrato: string | null;
+  data_devolucao: string | null;
 }
 
 export interface ListaEmprestimosDto {
@@ -36,6 +37,13 @@ export interface EmprestimoDto {
   numero_contrato: string | null;
   observacao: string | null;
   ativo: boolean;
+  // Prazo do aluguel — nível empréstimo, não item (ver models.Emprestimo no
+  // backend): um único prazo vale pra todos os itens do mesmo empréstimo.
+  data_emprestimo: string | null;
+  /** Prevista, não a data real da devolução — ver `data_devolucao_efetiva`. */
+  data_devolucao: string | null;
+  /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
+  data_devolucao_efetiva: string | null;
 }
 
 export interface EmprestimoCreateDto {
@@ -43,6 +51,8 @@ export interface EmprestimoCreateDto {
   id_usuario: number;
   numero_contrato?: string | null;
   observacao?: string | null;
+  data_emprestimo?: string | null;
+  data_devolucao?: string | null;
   // Itens aninhados: o empréstimo ainda não existe pra usar o sub-recurso
   // próprio (POST /emprestimos/{id}/itens), então o front manda os itens
   // junto na criação (ver EmprestimoCreate.itens em
@@ -56,11 +66,6 @@ export interface EmprestimoItemDto {
   id: number;
   id_emprestimo: number;
   id_material: number;
-  data_emprestimo: string | null;
-  /** Prevista, não a data real da devolução — ver `data_devolucao_efetiva`. */
-  data_devolucao: string | null;
-  /** Gravada automaticamente pelo backend quando `situacao` vira "Devolvido". */
-  data_devolucao_efetiva: string | null;
   situacao: SituacaoEmprestimo | null;
   renovacao: string | null;
   /** Anexados pelo backend a partir de `Material` — não são colunas de
@@ -71,13 +76,16 @@ export interface EmprestimoItemDto {
   numero_patrimonio_material: string | null;
 }
 
+export interface EmprestimoRenovarDto {
+  id_usuario: number;
+  dias: number;
+}
+
 export interface EmprestimoItemCreateDto {
   id_material: number;
   // Quem registrou a inclusão/edição — só usado pelo backend pra gravar
   // `EmprestimoHistorico`, não é persistido no item em si.
   id_usuario: number;
-  data_emprestimo?: string | null;
-  data_devolucao?: string | null;
   situacao?: SituacaoEmprestimo | null;
   renovacao?: string | null;
 }

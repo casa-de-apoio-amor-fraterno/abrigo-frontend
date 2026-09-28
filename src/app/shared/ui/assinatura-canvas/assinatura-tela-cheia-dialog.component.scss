@@ -2,7 +2,15 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  // Fundo da "moldura" (aviso + rodapé de ações) segue o tema do app —
+  // antes era `#fff` fixo, o que deixava de acompanhar o dark mode (bug
+  // relatado: botões do rodapé ilegíveis no escuro, porque os tokens do
+  // Material reagem a `color-scheme: dark`, mas o fundo continuava claro
+  // por baixo). O canvas em si (`&__canvas` abaixo) continua branco de
+  // propósito — é "papel", vira parte do PDF assinado, não deve mudar de
+  // cor com o tema de quem está vendo a tela.
+  background: var(--abrigo-surface);
+  color: var(--abrigo-ink);
 
   &__aviso-retrato {
     display: none;
@@ -11,8 +19,11 @@
     gap: 8px;
     margin: 0;
     padding: 8px;
-    background: #fff3e0;
-    color: #7a4a00;
+    // Mesma paleta "aviso" alfa-transparente usada em `.consulta__badge--aviso`
+    // (styles.scss) — funciona em cima de qualquer fundo, claro ou escuro,
+    // sem precisar de uma variante dedicada pro tema escuro.
+    background: rgba(180, 83, 9, 0.14);
+    color: #b45309;
     font-size: 0.85rem;
 
     // Só aparece se o aparelho ainda estiver em retrato — a trava de
@@ -28,6 +39,10 @@
     flex: 1;
     width: 100%;
     min-height: 0;
+    // Sempre branco — é a "folha de papel" que vira parte do PDF assinado
+    // (ver `service._gerar_pdf_contrato`/`_gerar_pdf_termo_renovacao` no
+    // backend), não deve escurecer junto com o tema de quem está assinando.
+    background: #fff;
     // Sem isso, o gesto de assinar rola/dá zoom na página em vez de
     // desenhar — essencial em qualquer canvas de assinatura touch.
     touch-action: none;
@@ -41,6 +56,6 @@
     gap: 8px;
     padding: 12px;
     padding-bottom: max(12px, env(safe-area-inset-bottom));
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid var(--abrigo-border-forte);
   }
 }
