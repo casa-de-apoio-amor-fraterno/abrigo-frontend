@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal, viewChild } from '@angular/core';
+import { Component, HostListener, computed, inject, signal, viewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -78,9 +78,41 @@ export class HomePage {
   protected readonly revisaoAberta = signal<number | null>(null);
   protected readonly hospitais = signal<Hospital[]>([]);
 
+  protected readonly termoBuscaQuartos = signal('');
+  // Busca pelo número/descrição do quarto ou pelo nome de quem está
+  // ocupando — útil pra achar em qual quarto uma pessoa está, não só pra
+  // localizar o quarto em si.
+  protected readonly quartosFiltrados = computed(() => {
+    const termo = this.normalizarBusca(this.termoBuscaQuartos());
+    if (!termo) {
+      return this.quartos();
+    }
+    return this.quartos().filter((quarto) => {
+      const alvos = [
+        quarto.numero,
+        quarto.descricao ?? '',
+        ...quarto.ocupantes.map((o) => o.nomePessoa),
+        ...quarto.pendentesRevisao.map((o) => o.nomePessoa)
+      ];
+      return alvos.some((alvo) => this.normalizarBusca(alvo).includes(termo));
+    });
+  });
+
   protected readonly carregandoVencimentos = signal(true);
   protected readonly erroVencimentos = signal<string | null>(null);
   protected readonly alertasVencimento = signal<AlertaVencimentoEmprestimo[]>([]);
+
+  protected readonly termoBuscaVencimentos = signal('');
+  protected readonly alertasFiltrados = computed(() => {
+    const termo = this.normalizarBusca(this.termoBuscaVencimentos());
+    if (!termo) {
+      return this.alertasVencimento();
+    }
+    return this.alertasVencimento().filter((alerta) => {
+      const alvos = [alerta.nomePessoa, alerta.descricaoMaterial, alerta.numeroPatrimonioMaterial ?? ''];
+      return alvos.some((alvo) => this.normalizarBusca(alvo).includes(termo));
+    });
+  });
 
   // Clicar numa cama ocupada abre esse popover pra finalizar a estadia
   // direto da tela Início, sem precisar ir pra edição completa (mesmo
@@ -233,6 +265,14 @@ export class HomePage {
       })
       .afterClosed()
       .subscribe(() => this.carregarVencimentos());
+  }
+
+  private normalizarBusca(texto: string): string {
+    return texto
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .trim();
   }
 
   private formatarDataBr(dataIso: string): string {

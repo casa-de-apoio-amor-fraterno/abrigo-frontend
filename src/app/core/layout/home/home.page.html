@@ -4,16 +4,27 @@
 
   <section class="ocupacao">
     <div class="ocupacao__cabecalho">
-      <h2>Ocupação dos quartos</h2>
-      @if (!carregando() && !erro()) {
-        <span class="ocupacao__resumo">
-          {{ totalOcupados }} de {{ totalLeitos }} leitos ocupados
-          @if (totalPendentesRevisao > 0) {
-            <span class="ocupacao__resumo-aviso">
-              · {{ totalPendentesRevisao }} estadia(s) antiga(s) sem finalizar
-            </span>
-          }
-        </span>
+      <div class="ocupacao__titulo">
+        <h2>Ocupação dos quartos</h2>
+        @if (!carregando() && !erro()) {
+          <span class="ocupacao__resumo">
+            {{ totalOcupados }} de {{ totalLeitos }} leitos ocupados
+            @if (totalPendentesRevisao > 0) {
+              <span class="ocupacao__resumo-aviso">
+                · {{ totalPendentesRevisao }} estadia(s) antiga(s) sem finalizar
+              </span>
+            }
+          </span>
+        }
+      </div>
+      @if (!carregando() && !erro() && quartos().length > 0) {
+        <input
+          type="search"
+          class="ocupacao__busca"
+          placeholder="Buscar por quarto ou pessoa..."
+          [value]="termoBuscaQuartos()"
+          (input)="termoBuscaQuartos.set($any($event.target).value)"
+        />
       }
     </div>
 
@@ -25,6 +36,8 @@
       <p class="ocupacao__estado ocupacao__estado--erro">{{ erro() }}</p>
     } @else if (quartos().length === 0) {
       <p class="ocupacao__vazio">Nenhum quarto ativo cadastrado.</p>
+    } @else if (quartosFiltrados().length === 0) {
+      <p class="ocupacao__vazio">Nenhum quarto encontrado para a busca.</p>
     } @else {
       <div class="ocupacao__legenda">
         <span><span class="ocupacao__amostra ocupacao__amostra--ocupado"></span> Ocupado</span>
@@ -33,7 +46,7 @@
       </div>
 
       <div class="ocupacao__grade">
-        @for (quarto of quartos(); track quarto.id) {
+        @for (quarto of quartosFiltrados(); track quarto.id) {
           <div class="ocupacao__quarto">
             <div class="ocupacao__quarto-cabecalho">
               <strong>Quarto {{ quarto.numero }}</strong>
@@ -162,19 +175,30 @@
 
   <section class="vencimentos">
     <div class="vencimentos__cabecalho">
-      <h2>Empréstimos próximos ao vencimento</h2>
+      <div class="vencimentos__titulo">
+        <h2>Empréstimos próximos ao vencimento</h2>
+        @if (!carregandoVencimentos() && !erroVencimentos() && alertasVencimento().length > 0) {
+          <span class="vencimentos__resumo">
+            @if (totalVencidos > 0) {
+              <span class="vencimentos__resumo-vencido">{{ totalVencidos }} vencido(s)</span>
+            }
+            @if (totalUrgentes > 0) {
+              <span class="vencimentos__resumo-urgente">{{ totalUrgentes }} muito próximo(s)</span>
+            }
+            @if (totalProximos > 0) {
+              <span class="vencimentos__resumo-proximo">{{ totalProximos }} próximo(s)</span>
+            }
+          </span>
+        }
+      </div>
       @if (!carregandoVencimentos() && !erroVencimentos() && alertasVencimento().length > 0) {
-        <span class="vencimentos__resumo">
-          @if (totalVencidos > 0) {
-            <span class="vencimentos__resumo-vencido">{{ totalVencidos }} vencido(s)</span>
-          }
-          @if (totalUrgentes > 0) {
-            <span class="vencimentos__resumo-urgente">{{ totalUrgentes }} muito próximo(s)</span>
-          }
-          @if (totalProximos > 0) {
-            <span class="vencimentos__resumo-proximo">{{ totalProximos }} próximo(s)</span>
-          }
-        </span>
+        <input
+          type="search"
+          class="vencimentos__busca"
+          placeholder="Buscar por pessoa ou material..."
+          [value]="termoBuscaVencimentos()"
+          (input)="termoBuscaVencimentos.set($any($event.target).value)"
+        />
       }
     </div>
 
@@ -186,6 +210,8 @@
       <p class="vencimentos__estado vencimentos__estado--erro">{{ erroVencimentos() }}</p>
     } @else if (alertasVencimento().length === 0) {
       <p class="vencimentos__vazio">Nenhum empréstimo vencendo nos próximos 14 dias.</p>
+    } @else if (alertasFiltrados().length === 0) {
+      <p class="vencimentos__vazio">Nenhum empréstimo encontrado para a busca.</p>
     } @else {
       <div class="vencimentos__legenda">
         <span><span class="vencimentos__amostra vencimentos__amostra--proximo"></span> Próximo (até 14 dias)</span>
@@ -194,7 +220,7 @@
       </div>
 
       <div class="vencimentos__grade">
-        @for (alerta of alertasVencimento(); track alerta.idItem) {
+        @for (alerta of alertasFiltrados(); track alerta.idItem) {
           <div
             class="vencimentos__card"
             [class.vencimentos__card--proximo]="nivelUrgencia(alerta) === 'proximo'"
