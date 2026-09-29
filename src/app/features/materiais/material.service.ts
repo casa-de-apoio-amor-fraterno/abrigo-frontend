@@ -3,7 +3,13 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { ListaMateriaisDto, MaterialCreateDto, MaterialDto, MaterialUpdateDto } from './material.dto';
+import {
+  ListaMateriaisDto,
+  MaterialAlocarDto,
+  MaterialCreateDto,
+  MaterialDto,
+  MaterialUpdateDto
+} from './material.dto';
 import { paraListaModel, paraModel } from './material.mapper';
 import { ListaMateriais, Material } from './material.model';
 
@@ -54,6 +60,11 @@ export class MaterialService {
     return this.http
       .post<MaterialDto>(`${this.resource}/${id}/inutilizar`, { motivo_baixa: motivoBaixa })
       .pipe(map(paraModel));
+  }
+
+  alocar(id: number, idLocal: number): Observable<Material> {
+    const dados: MaterialAlocarDto = { id_local: idLocal };
+    return this.http.post<MaterialDto>(`${this.resource}/${id}/alocar`, dados).pipe(map(paraModel));
   }
 
   /** URL direta da imagem (GET /api/materiais/{id}/foto) — sem endpoint próprio

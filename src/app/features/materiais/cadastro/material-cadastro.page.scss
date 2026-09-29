@@ -1,0 +1,15 @@
+.material-cadastro {
+  &__local-linha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    button {
+      margin-left: auto;
+    }
+  }
+
+  &__alocar {
+    margin-top: 16px;
+  }
+}

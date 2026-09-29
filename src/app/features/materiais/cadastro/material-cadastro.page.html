@@ -1,4 +1,4 @@
-<form [formGroup]="form" (ngSubmit)="salvar()">
+<form class="cadastro-form-shell" [formGroup]="form" (ngSubmit)="salvar()">
   <app-cadastro-dialog-shell
     [titulo]="modoEdicao ? 'Editar material' : 'Novo material'"
     subtitulo="Cadastro de materiais e equipamentos do Abrigo."
@@ -35,47 +35,87 @@
               <input matInput formControlName="numeroPatrimonio" />
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="cadastro__campo">
-              <mat-label>Local</mat-label>
-              <input matInput formControlName="local" placeholder="ex.: Casa, Empréstimo" />
-              @if (form.controls.local.touched && form.controls.local.invalid) {
-                <mat-error>Informe o local</mat-error>
-              }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="cadastro__campo">
-              <mat-label>Situação</mat-label>
-              <mat-select formControlName="situacao">
-                @for (opcao of situacoes; track opcao) {
-                  <mat-option [value]="opcao">{{ opcao }}</mat-option>
-                }
-              </mat-select>
-              @if (form.controls.situacao.touched && form.controls.situacao.invalid) {
-                <mat-error>Informe a situação</mat-error>
-              }
-            </mat-form-field>
-
             <div class="cadastro__campo cadastro__checkbox">
               <mat-checkbox formControlName="disponivelEmprestimo">Disponível para empréstimo</mat-checkbox>
             </div>
+
+            <!-- Situação nunca é escolhida manualmente — reflete o que os
+                 eventos (empréstimo, "Alocar", "Inutilizar") já decidiram
+                 no backend (ver material-cadastro.page.ts). -->
+            <div class="cadastro__campo cadastro__radio">
+              <span class="cadastro__radio-label">Situação</span>
+              <span>
+                <span
+                  class="consulta__badge"
+                  [class.consulta__badge--aviso]="situacaoAtual() === 'Alocado' || situacaoAtual() === 'Emprestado'"
+                  [class.consulta__badge--erro]="situacaoAtual() === 'Inutilizado'"
+                >
+                  {{ situacaoAtual() }}
+                </span>
+              </span>
+            </div>
+
+            <div class="cadastro__campo cadastro__radio">
+              <span class="cadastro__radio-label">Local atual</span>
+              <span class="material-cadastro__local-linha">
+                {{ nomeLocalAtual() || '—' }}
+                @if (modoEdicao && situacaoAtual() !== 'Inutilizado' && situacaoAtual() !== 'Emprestado') {
+                  <button mat-button type="button" color="primary" (click)="abrirAlocar()">Alocar</button>
+                }
+              </span>
+            </div>
           </div>
+
+          @if (alocando()) {
+            <div class="cadastro__form-secundario material-cadastro__alocar">
+              <mat-form-field appearance="outline" class="cadastro__campo">
+                <mat-label>Novo local</mat-label>
+                <mat-select
+                  [value]="idLocalSelecionado()"
+                  (selectionChange)="idLocalSelecionado.set($event.value)"
+                >
+                  @for (local of locais(); track local.id) {
+                    <mat-option [value]="local.id">{{ local.nome }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              @if (erroAlocacao()) {
+                <p class="cadastro__erro">{{ erroAlocacao() }}</p>
+              }
+
+              <div class="cadastro__subsecao-cabecalho">
+                <button mat-button type="button" [disabled]="salvandoAlocacao()" (click)="cancelarAlocar()">
+                  Cancelar
+                </button>
+                <button
+                  mat-flat-button
+                  type="button"
+                  [disabled]="salvandoAlocacao()"
+                  (click)="confirmarAlocar()"
+                >
+                  Confirmar alocação
+                </button>
+              </div>
+            </div>
+          }
         </div>
       </section>
     }
 
     @if (abaAtiva() === 'observacoes') {
-      <section class="cadastro__secao">
-        <div class="cadastro__grade">
-          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-            <mat-label>Observação</mat-label>
-            <textarea matInput formControlName="observacao" rows="10"></textarea>
-          </mat-form-field>
+      <section class="cadastro__secao cadastro__secao--cresce">
+        @if (situacaoAtual() === 'Inutilizado') {
+          <div class="cadastro__campo cadastro__radio">
+            <span class="cadastro__radio-label">Motivo da inutilização</span>
+            <span>{{ motivoBaixaAtual() || '—' }}</span>
+          </div>
+        }
 
-          <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-            <mat-label>Motivo da inutilização</mat-label>
-            <textarea matInput formControlName="motivoBaixa" rows="4"></textarea>
-          </mat-form-field>
-        </div>
+        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--observacao">
+          <mat-label>Observação</mat-label>
+          <textarea matInput formControlName="observacao"></textarea>
+        </mat-form-field>
       </section>
     }
 
@@ -85,7 +125,7 @@
 
     <ng-container acoes>
       <app-cadastro-acoes voltarPara="/materiais" [salvando]="salvando()">
-        @if (modoEdicao && ativo() && form.controls.situacao.value !== 'Inutilizado') {
+        @if (modoEdicao && ativo() && situacaoAtual() !== 'Inutilizado') {
           <button
             extra
             mat-button

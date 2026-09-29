@@ -5,7 +5,12 @@
   [abas]="abas"
   [(abaAtiva)]="abaAtiva"
 >
-  <form id="emprestimo-form" [formGroup]="form" (ngSubmit)="salvar()">
+  <form
+    id="emprestimo-form"
+    [class.cadastro__form-cresce]="abaAtiva() === 'dados'"
+    [formGroup]="form"
+    (ngSubmit)="salvar()"
+  >
     @if (abaAtiva() === 'dados') {
       <div class="cadastro__grade">
         <div class="cadastro__campo cadastro__campo--largo">
@@ -24,7 +29,15 @@
         @if (modoEdicao) {
           <div class="cadastro__campo cadastro__radio">
             <span class="cadastro__radio-label">Situação</span>
-            <span>{{ situacaoAtual() }}</span>
+            <span>
+              <span
+                class="consulta__badge"
+                [class.consulta__badge--aviso]="situacaoAtual() === 'Renovado'"
+                [class.consulta__badge--neutro]="situacaoAtual() === 'Devolvido'"
+              >
+                {{ situacaoAtual() }}
+              </span>
+            </span>
           </div>
         }
 
@@ -49,12 +62,12 @@
             <span>{{ dataDevolucaoEfetivaAtual() | date: 'dd/MM/yyyy' }}</span>
           </div>
         }
-
-        <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--largo">
-          <mat-label>Observação</mat-label>
-          <textarea matInput formControlName="observacao" rows="3"></textarea>
-        </mat-form-field>
       </div>
+
+      <mat-form-field appearance="outline" class="cadastro__campo cadastro__campo--observacao">
+        <mat-label>Observação</mat-label>
+        <textarea matInput formControlName="observacao"></textarea>
+      </mat-form-field>
 
       @if (erro()) {
         <p class="cadastro__erro">{{ erro() }}</p>

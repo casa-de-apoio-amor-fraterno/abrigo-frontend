@@ -366,6 +366,28 @@ input[matInput][type='datetime-local'] {
     padding: 48px 0;
   }
 
+  // Aplicada (condicionalmente, só na aba/estado com conteúdo de verdade —
+  // ver emprestimo-cadastro.page.html) ao <form> raiz de dentro de
+  // `.cadastro-dialog__conteudo`, pra ele esticar e ocupar a altura que
+  // sobraria em branco, permitindo que `&__campo--observacao` dentro dele
+  // cresça de verdade (ver acima). Sem condicionar à aba ativa, um <form>
+  // vazio (fora da aba com conteúdo) também tomaria esse espaço e
+  // empurraria/encolheria as outras abas do mesmo popup.
+  //
+  // Define display:flex/flex-direction aqui em vez de confiar na regra
+  // `.cadastro-dialog__conteudo form` de cadastro-dialog-shell.component.scss
+  // — aquela é uma folha de estilo com encapsulamento de view (escopo por
+  // atributo `_ngcontent-*`), e o `<form>` projetado pertence ao componente
+  // de cada página (ex. EmprestimoCadastroPage), não ao do shell, então o
+  // atributo de escopo nunca bate e a regra não se aplica de verdade.
+  &__form-cresce {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+  }
+
   // Sub-formulário inline (novo/editar acompanhante, item de empréstimo,
   // contato) — continua com "cara de card" pra se destacar dentro do
   // popup de cadastro que já é uma card por si só. O formulário principal
@@ -407,6 +429,18 @@ input[matInput][type='datetime-local'] {
       font-size: 15px;
       font-weight: 600;
       color: var(--abrigo-ink);
+    }
+
+    // Estica a seção pra ocupar a altura que sobraria em branco dentro de
+    // `.cadastro-dialog__conteudo` (que só é de verdade um flex container
+    // quando a página não embrulha o shell inteiro num `<form>` sem
+    // `.cadastro-form-shell` — ver material-cadastro.page.html), permitindo
+    // que `&__campo--observacao` dentro cresça de verdade.
+    &--cresce {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     // Foto ao lado dos campos, não empilhada acima (ver
@@ -485,6 +519,38 @@ input[matInput][type='datetime-local'] {
       display: flex;
       align-items: flex-start;
       justify-content: center;
+    }
+
+    // Observação como último campo do formulário, esticando pra ocupar o
+    // resto da altura do popup em vez de sobrar espaço em branco abaixo
+    // dela (ver emprestimo-cadastro.page.html/material-cadastro.page.html)
+    // — precisa de `&__form-cresce` no <form> (ou de um container flex
+    // pai) pra ter altura sobrando de verdade pra ocupar.
+    &--observacao {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 96px;
+
+      // `!important` porque os próprios estilos do Angular Material MDC já
+      // fixam a altura de `&-flex`/`&-infix` (56-80px, pensada pra um
+      // input de uma linha) com a mesma especificidade — sem isso, só o
+      // wrapper mais externo cresce (100% de um pai com altura definida
+      // funciona normalmente) e o resto da cadeia fica preso na altura
+      // padrão, e o textarea de dentro nunca recebe espaço de verdade.
+      // Sem `::ng-deep` — desnecessário (e não funciona direito) numa
+      // folha de estilo GLOBAL, que já não tem encapsulamento nenhum pra
+      // furar; `::ng-deep` é só pra estilos de componente.
+      .mat-mdc-text-field-wrapper,
+      .mat-mdc-form-field-flex,
+      .mat-mdc-form-field-infix {
+        height: 100% !important;
+      }
+
+      textarea {
+        height: 100% !important;
+        resize: none;
+      }
     }
   }
 
@@ -651,6 +717,19 @@ input[matInput][type='datetime-local'] {
     border-radius: 0 !important;
     height: 100%;
   }
+}
+
+// Algumas páginas de cadastro (hospital, material — ver seus .page.html)
+// embrulham o `<app-cadastro-dialog-shell>` inteiro num `<form>`, em vez de
+// só a aba "dados" (padrão de empréstimo/estadia, onde o form fica DENTRO
+// do shell). Esse `<form>` extra quebra a cadeia de `display: contents`
+// (host do componente > form > host do shell) que faz cabeçalho/pills/
+// conteúdo/rodapé virarem itens diretos do flex column de
+// `.mdc-dialog__surface` abaixo — sem isso, o rodapé "flutua" logo depois
+// do conteúdo em vez de ficar fixo embaixo, sobrando altura em branco
+// depois dele. Aplicar esta classe no `<form>` resolve.
+.cadastro-form-shell {
+  display: contents;
 }
 
 .cadastro-dialog-panel {

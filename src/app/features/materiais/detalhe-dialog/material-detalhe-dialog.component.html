@@ -35,7 +35,7 @@
         </div>
         <div class="material-detalhe__campo">
           <dt>Local</dt>
-          <dd>{{ mat.local || '—' }}</dd>
+          <dd>{{ nomeLocal() || '—' }}</dd>
         </div>
         @if (mat.situacao === 'Inutilizado') {
           <div class="material-detalhe__campo material-detalhe__campo--largo">

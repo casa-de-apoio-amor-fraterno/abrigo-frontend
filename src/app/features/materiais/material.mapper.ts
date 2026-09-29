@@ -19,7 +19,7 @@ export function paraListaModel(dto: ListaMateriaisDto): ListaMateriais {
 export function paraModel(dto: MaterialDto): Material {
   return {
     ...paraResumoModel(dto),
-    local: dto.local,
+    idLocal: dto.id_local,
     observacao: dto.observacao,
     motivoBaixa: dto.motivo_baixa,
     ativo: dto.ativo

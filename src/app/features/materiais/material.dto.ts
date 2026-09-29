@@ -21,7 +21,7 @@ export interface MaterialDto {
   numero_patrimonio: string | null;
   disponivel_emprestimo: boolean;
   situacao: SituacaoMaterial;
-  local: string;
+  id_local: number;
   observacao: string | null;
   motivo_baixa: string | null;
   ativo: boolean | null;
@@ -33,9 +33,13 @@ export interface MaterialCreateDto {
   numero_patrimonio?: string | null;
   disponivel_emprestimo?: boolean;
   situacao: SituacaoMaterial;
-  local: string;
+  id_local: number;
   observacao?: string | null;
   motivo_baixa?: string | null;
 }
 
 export type MaterialUpdateDto = MaterialCreateDto;
+
+export interface MaterialAlocarDto {
+  id_local: number;
+}

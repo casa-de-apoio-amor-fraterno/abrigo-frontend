@@ -20,7 +20,10 @@ export interface ListaMateriais {
 
 export interface Material extends MaterialResumo {
   numeroPatrimonio: string | null;
-  local: string;
+  /** FK pra MaterialLocal — nunca digitado direto (ver
+   * material-cadastro.page.ts, `situacao`/`idLocal` só mudam via eventos:
+   * empréstimo, inutilizar ou o botão "Alocar"). */
+  idLocal: number;
   observacao: string | null;
   motivoBaixa: string | null;
   ativo: boolean | null;

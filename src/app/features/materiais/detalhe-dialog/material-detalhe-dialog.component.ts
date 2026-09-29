@@ -7,6 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { Material } from '../material.model';
 import { MaterialService } from '../material.service';
+import { MaterialLocalService } from '../../materiais-locais/material-local.service';
 
 export interface MaterialDetalheDialogData {
   materialId: number;
@@ -35,16 +36,21 @@ export class MaterialDetalheDialogComponent {
   protected readonly dialogRef = inject<MatDialogRef<MaterialDetalheDialogComponent>>(MatDialogRef);
   protected readonly data = inject<MaterialDetalheDialogData>(MAT_DIALOG_DATA);
   private readonly materialService = inject(MaterialService);
+  private readonly materialLocalService = inject(MaterialLocalService);
 
   protected readonly carregando = signal(true);
   protected readonly erro = signal<string | null>(null);
   protected readonly material = signal<Material | null>(null);
+  protected readonly nomeLocal = signal<string | null>(null);
 
   constructor() {
     this.materialService.buscar(this.data.materialId).subscribe({
       next: (material) => {
         this.material.set(material);
         this.carregando.set(false);
+        this.materialLocalService.listar(false).subscribe((locais) => {
+          this.nomeLocal.set(locais.find((l) => l.id === material.idLocal)?.nome ?? null);
+        });
       },
       error: () => {
         this.erro.set('Não foi possível carregar os dados do material.');

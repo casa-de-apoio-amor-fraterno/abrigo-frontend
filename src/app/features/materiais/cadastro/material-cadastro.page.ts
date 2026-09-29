@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,12 +10,16 @@ import { MatSelectModule } from '@angular/material/select';
 import { descreverErroHttp } from '../../../core/http/api-error';
 import { MaterialService } from '../material.service';
 import { SituacaoMaterial } from '../material.model';
+import { MaterialLocalService } from '../../materiais-locais/material-local.service';
+import { MaterialLocal } from '../../materiais-locais/material-local.model';
 import {
   CadastroDialogAba,
   CadastroDialogShellComponent
 } from '../../../shared/ui/cadastro-dialog-shell/cadastro-dialog-shell.component';
 import { CadastroAcoesComponent } from '../../../shared/ui/cadastro-acoes/cadastro-acoes.component';
 import { UploadFotoComponent } from '../../../shared/ui/upload-foto/upload-foto.component';
+
+const NOME_LOCAL_PADRAO = 'Casa';
 
 @Component({
   selector: 'app-material-cadastro-page',
@@ -30,11 +34,13 @@ import { UploadFotoComponent } from '../../../shared/ui/upload-foto/upload-foto.
     CadastroAcoesComponent,
     UploadFotoComponent
   ],
-  templateUrl: './material-cadastro.page.html'
+  templateUrl: './material-cadastro.page.html',
+  styleUrl: './material-cadastro.page.scss'
 })
 export class MaterialCadastroPage {
   private readonly fb = inject(FormBuilder);
   private readonly materialService = inject(MaterialService);
+  private readonly materialLocalService = inject(MaterialLocalService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -56,7 +62,24 @@ export class MaterialCadastroPage {
   protected readonly erro = signal<string | null>(null);
   protected readonly ativo = signal(true);
 
-  protected readonly situacoes: SituacaoMaterial[] = ['Disponível', 'Alocado', 'Emprestado', 'Inutilizado'];
+  // Situação nunca é escolhida livremente aqui — só reflete o que os
+  // eventos (empréstimo, inutilizar, alocar) já decidiram no backend (ver
+  // material.model.ts, `idLocal`, e materiais/service.py). Some default
+  // "Disponível" na criação, porque é a situação inicial de todo material
+  // novo (ninguém emprestou/alocou/inutilizou ainda).
+  protected readonly situacaoAtual = signal<SituacaoMaterial>('Disponível');
+  protected readonly motivoBaixaAtual = signal<string | null>(null);
+
+  protected readonly locais = signal<MaterialLocal[]>([]);
+  protected readonly idLocalAtual = signal<number | null>(null);
+  protected readonly nomeLocalAtual = computed(
+    () => this.locais().find((l) => l.id === this.idLocalAtual())?.nome ?? null
+  );
+
+  protected readonly alocando = signal(false);
+  protected readonly idLocalSelecionado = signal<number | null>(null);
+  protected readonly salvandoAlocacao = signal(false);
+  protected readonly erroAlocacao = signal<string | null>(null);
 
   // Foto: mesmo padrão de pessoa-cadastro.page.ts — na criação ainda não
   // existe `id_material` pra usar `PUT /materiais/{id}/foto`, então a foto
@@ -71,11 +94,8 @@ export class MaterialCadastroPage {
   protected readonly form = this.fb.nonNullable.group({
     descricao: ['', [Validators.required]],
     numeroPatrimonio: [''],
-    situacao: ['Disponível' as SituacaoMaterial, [Validators.required]],
-    local: ['', [Validators.required]],
     disponivelEmprestimo: [false],
-    observacao: [''],
-    motivoBaixa: ['']
+    observacao: ['']
   });
 
   constructor() {
@@ -86,18 +106,25 @@ export class MaterialCadastroPage {
       }
     });
 
+    this.materialLocalService.listar().subscribe((locais) => {
+      this.locais.set(locais);
+      if (!this.modoEdicao) {
+        this.idLocalAtual.set(locais.find((l) => l.nome === NOME_LOCAL_PADRAO)?.id ?? null);
+      }
+    });
+
     if (this.materialId !== null) {
       this.materialService.buscar(this.materialId).subscribe({
         next: (material) => {
           this.form.patchValue({
             descricao: material.descricao,
             numeroPatrimonio: material.numeroPatrimonio ?? '',
-            situacao: material.situacao,
-            local: material.local,
             disponivelEmprestimo: material.disponivelEmprestimo,
-            observacao: material.observacao ?? '',
-            motivoBaixa: material.motivoBaixa ?? ''
+            observacao: material.observacao ?? ''
           });
+          this.situacaoAtual.set(material.situacao);
+          this.motivoBaixaAtual.set(material.motivoBaixa);
+          this.idLocalAtual.set(material.idLocal);
           this.ativo.set(material.ativo ?? true);
           this.temFoto.set(material.tem_foto);
           this.carregando.set(false);
@@ -116,15 +143,21 @@ export class MaterialCadastroPage {
       return;
     }
 
+    const idLocal = this.idLocalAtual();
+    if (idLocal === null) {
+      this.erro.set('Não foi possível determinar o local do material — tente novamente.');
+      return;
+    }
+
     const valores = this.form.getRawValue();
     const dados = {
       descricao: valores.descricao,
       numero_patrimonio: valores.numeroPatrimonio || null,
-      situacao: valores.situacao,
-      local: valores.local,
+      situacao: this.situacaoAtual(),
+      id_local: idLocal,
       disponivel_emprestimo: valores.disponivelEmprestimo,
       observacao: valores.observacao || null,
-      motivo_baixa: valores.motivoBaixa || null
+      motivo_baixa: this.motivoBaixaAtual()
     };
 
     this.salvando.set(true);
@@ -201,11 +234,49 @@ export class MaterialCadastroPage {
     this.materialService.inutilizar(this.materialId, motivo.trim() || null).subscribe({
       next: (material) => {
         this.inutilizando.set(false);
-        this.form.patchValue({ situacao: material.situacao, motivoBaixa: material.motivoBaixa ?? '' });
+        this.situacaoAtual.set(material.situacao);
+        this.motivoBaixaAtual.set(material.motivoBaixa);
+        this.form.patchValue({ disponivelEmprestimo: material.disponivelEmprestimo });
       },
       error: (error) => {
         this.inutilizando.set(false);
         this.erro.set(descreverErroHttp(error.error));
+      }
+    });
+  }
+
+  protected abrirAlocar(): void {
+    this.erroAlocacao.set(null);
+    this.idLocalSelecionado.set(this.idLocalAtual());
+    this.alocando.set(true);
+  }
+
+  protected cancelarAlocar(): void {
+    this.alocando.set(false);
+    this.erroAlocacao.set(null);
+  }
+
+  protected confirmarAlocar(): void {
+    const idLocal = this.idLocalSelecionado();
+    if (this.materialId === null || idLocal === null) {
+      this.erroAlocacao.set('Selecione o local.');
+      return;
+    }
+
+    this.salvandoAlocacao.set(true);
+    this.erroAlocacao.set(null);
+
+    this.materialService.alocar(this.materialId, idLocal).subscribe({
+      next: (material) => {
+        this.salvandoAlocacao.set(false);
+        this.situacaoAtual.set(material.situacao);
+        this.idLocalAtual.set(material.idLocal);
+        this.form.patchValue({ disponivelEmprestimo: material.disponivelEmprestimo });
+        this.alocando.set(false);
+      },
+      error: (error) => {
+        this.salvandoAlocacao.set(false);
+        this.erroAlocacao.set(descreverErroHttp(error.error));
       }
     });
   }

@@ -1,4 +1,4 @@
-<form [formGroup]="form" (ngSubmit)="salvar()">
+<form class="cadastro-form-shell" [formGroup]="form" (ngSubmit)="salvar()">
   <app-cadastro-dialog-shell
     [titulo]="modoEdicao ? 'Editar hospital' : 'Novo hospital'"
     subtitulo="Cadastro de hospitais/origens usados no atendimento."
