@@ -58,11 +58,14 @@
             <div class="ocupacao__leitos">
               @for (ocupante of quarto.ocupantes; track ocupante.idEstadia + '_' + ocupante.idPessoa) {
                 @if (ocupante.acompanhante) {
-                  <!-- Acompanhante que também ocupa leito — navega pra
-                       editar a estadia do paciente (aba Acompanhantes),
-                       em vez de abrir o popover de finalizar: encerrar
-                       por ali finalizaria a estadia do PACIENTE, não a
-                       presença do acompanhante. -->
+                  <!-- Leito ocupado por alguém no papel de acompanhante
+                       (titular de estadia tipo_pessoa Acompanhante, ou
+                       EstadiaAcompanhante.ocupaLeito) — navega pra editar
+                       a estadia (`ocupante.idEstadia`) em vez de abrir o
+                       popover de finalizar: quando é EstadiaAcompanhante,
+                       `idEstadia` é a estadia do PACIENTE (aba
+                       Acompanhantes), e encerrar por ali finalizaria a
+                       estadia errada. -->
                   <a
                     [routerLink]="['/estadias', ocupante.idEstadia, 'editar']"
                     class="ocupacao__leito ocupacao__leito--acompanhante"
