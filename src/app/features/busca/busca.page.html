@@ -7,7 +7,7 @@
   <form class="busca__form" (ngSubmit)="buscar()">
     <input
       type="search"
-      placeholder="Buscar por nome, CPF ou descrição..."
+      placeholder="Buscar por nome, CPF, descrição ou nº patrimônio..."
       [value]="termo()"
       (input)="termo.set($any($event.target).value)"
     />

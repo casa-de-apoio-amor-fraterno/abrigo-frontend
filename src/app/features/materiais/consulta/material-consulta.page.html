@@ -26,7 +26,7 @@
   <form filtros class="consulta__busca" (ngSubmit)="buscar()">
     <input
       type="search"
-      placeholder="Buscar por descrição..."
+      placeholder="Buscar por descrição ou nº patrimônio..."
       [value]="termoBusca()"
       (input)="termoBusca.set($any($event.target).value)"
     />
