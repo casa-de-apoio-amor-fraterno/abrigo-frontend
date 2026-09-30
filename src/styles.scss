@@ -126,6 +126,24 @@ input[matInput][type='datetime-local'] {
     }
   }
 
+  // Busca com período de datas: sem o teto de 720px e com o par "de/até"
+  // agrupado, pra nunca quebrar de linha separado (o "até" ficava sozinho).
+  &__busca--com-periodo {
+    max-width: none;
+
+    > input[type='search'] {
+      flex: 1 1 260px;
+      min-width: 200px;
+    }
+  }
+
+  &__busca-periodo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: nowrap;
+  }
+
   &__busca-data {
     display: flex;
     align-items: center;
