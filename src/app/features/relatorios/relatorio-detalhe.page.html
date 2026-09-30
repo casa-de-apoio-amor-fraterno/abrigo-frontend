@@ -12,6 +12,16 @@
     </div>
   </div>
 
+  @if (relatorio.exigeMaterial) {
+    <div class="relatorio-detalhe__filtros">
+      <app-material-autocomplete
+        label="Item"
+        [apenasDisponiveis]="false"
+        (selecionado)="selecionarMaterial($event)"
+      />
+    </div>
+  }
+
   @if (relatorio.suportaPeriodo || relatorio.opcoesSituacao) {
     <div class="relatorio-detalhe__filtros">
       @if (relatorio.suportaPeriodo) {
@@ -51,7 +61,12 @@
   }
 
   <div class="relatorio-detalhe__acoes">
-    <button mat-flat-button type="button" [disabled]="gerando()" (click)="gerarPdf()">
+    <button
+      mat-flat-button
+      type="button"
+      [disabled]="gerando() || (relatorio.exigeMaterial && !materialSelecionado())"
+      (click)="gerarPdf()"
+    >
       @if (gerando()) {
         <mat-spinner diameter="18" />
         Gerando...

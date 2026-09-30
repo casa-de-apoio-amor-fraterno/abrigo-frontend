@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MaterialService } from '../../../features/materiais/material.service';
 import { MaterialResumo } from '../../../features/materiais/material.model';
 
-/** Campo de busca de Material por descrição — espelha "Consulta Rápida de
+/** Campo de busca de Material por descrição ou nº patrimônio — espelha "Consulta Rápida de
  * Material" do legado (`untFrmConsultaRapidaMaterial`), usado no picker de
  * item de Empréstimo. Só lista materiais disponíveis para empréstimo. */
 @Component({
@@ -20,6 +20,9 @@ import { MaterialResumo } from '../../../features/materiais/material.model';
 })
 export class MaterialAutocompleteComponent {
   readonly label = input('Material');
+  /** Padrão `true` (picker de empréstimo); `false` busca qualquer material,
+   * ex.: relatório de histórico por item. */
+  readonly apenasDisponiveis = input(true);
   readonly valorInicial = input<{ id: number; descricao: string } | null>(null);
   readonly selecionado = output<{ id: number; descricao: string; numeroPatrimonio: string | null } | null>();
 
@@ -41,7 +44,7 @@ export class MaterialAutocompleteComponent {
             return [[] as MaterialResumo[]];
           }
           return this.materialService
-            .listar({ busca, apenasDisponiveisEmprestimo: true, take: 10 })
+            .listar({ busca, apenasDisponiveisEmprestimo: this.apenasDisponiveis(), take: 10 })
             .pipe(switchMap((resultado) => [resultado.items]));
         }),
         takeUntilDestroyed()

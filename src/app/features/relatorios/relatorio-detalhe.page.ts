@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+import { MaterialAutocompleteComponent } from '../../shared/ui/material-autocomplete/material-autocomplete.component';
 import { FiltroPillsComponent } from '../../shared/ui/filtro-pills/filtro-pills.component';
 import { descreverErroHttp } from '../../core/http/api-error';
 import {
@@ -19,7 +20,7 @@ import {
 
 @Component({
   selector: 'app-relatorio-detalhe-page',
-  imports: [RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, FiltroPillsComponent],
+  imports: [RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, FiltroPillsComponent, MaterialAutocompleteComponent],
   templateUrl: './relatorio-detalhe.page.html',
   styleUrl: './relatorio-detalhe.page.scss'
 })
@@ -33,6 +34,8 @@ export class RelatorioDetalhePage {
   protected readonly opcoesPeriodo = OPCOES_PERIODO_RELATORIO;
   protected readonly periodo = signal<PeriodoRelatorio>('mensal');
   protected readonly situacao = signal<string>('todos');
+
+  protected readonly materialSelecionado = signal<{ id: number; descricao: string } | null>(null);
 
   protected readonly carregandoResumo = signal(true);
   protected readonly resumo = signal<RelatorioResumoItem[]>([]);
@@ -59,6 +62,12 @@ export class RelatorioDetalhePage {
     this.carregarResumo();
   }
 
+  protected selecionarMaterial(material: { id: number; descricao: string } | null): void {
+    this.materialSelecionado.set(material);
+    this.invalidarPdfGerado();
+    this.carregarResumo();
+  }
+
   protected alterarPeriodo(periodo: string): void {
     this.periodo.set(periodo as PeriodoRelatorio);
     this.invalidarPdfGerado();
@@ -80,13 +89,19 @@ export class RelatorioDetalhePage {
   }
 
   private carregarResumo(): void {
+    if (this.relatorio.exigeMaterial && !this.materialSelecionado()) {
+      this.resumo.set([]);
+      this.carregandoResumo.set(false);
+      return;
+    }
     this.carregandoResumo.set(true);
     this.erroResumo.set(null);
     this.relatorioService
       .buscarResumo(
         this.relatorio.tipo,
         this.relatorio.suportaPeriodo ? this.periodo() : undefined,
-        this.relatorio.opcoesSituacao ? this.situacao() : undefined
+        this.relatorio.opcoesSituacao ? this.situacao() : undefined,
+        this.materialSelecionado()?.id
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -110,7 +125,8 @@ export class RelatorioDetalhePage {
       .gerarPdf(
         this.relatorio.tipo,
         this.relatorio.suportaPeriodo ? this.periodo() : undefined,
-        this.relatorio.opcoesSituacao ? this.situacao() : undefined
+        this.relatorio.opcoesSituacao ? this.situacao() : undefined,
+        this.materialSelecionado()?.id
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

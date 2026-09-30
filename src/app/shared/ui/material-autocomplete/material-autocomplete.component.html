@@ -1,9 +1,9 @@
 <mat-form-field appearance="outline" class="material-autocomplete">
   <mat-label>{{ label() }}</mat-label>
-  <input matInput [formControl]="termo" [matAutocomplete]="auto" placeholder="Buscar por descrição..." />
+  <input matInput [formControl]="termo" [matAutocomplete]="auto" placeholder="Buscar por descrição ou nº patrimônio..." />
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selecionar($event)">
     @for (material of opcoes(); track material.id) {
-      <mat-option [value]="material">{{ material.descricao }}</mat-option>
+      <mat-option [value]="material">{{ material.descricao }}@if (material.numeroPatrimonio) { · Nº {{ material.numeroPatrimonio }} }</mat-option>
     }
   </mat-autocomplete>
 </mat-form-field>

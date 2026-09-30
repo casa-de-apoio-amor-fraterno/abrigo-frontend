@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-export type TipoRelatorio = 'pessoas' | 'estadias' | 'materiais' | 'emprestimos';
+export type TipoRelatorio = 'pessoas' | 'estadias' | 'materiais' | 'emprestimos' | 'historico-material';
 
 export type PeriodoRelatorio = 'semanal' | 'quinzenal' | 'mensal' | 'semestral' | 'anual';
 
@@ -27,6 +27,9 @@ export interface RelatorioDisponivel {
    * primeira opção é o valor padrão ao abrir a tela. `undefined` pra
    * relatórios sem esse filtro (Pessoas, Materiais). */
   opcoesSituacao?: OpcaoSituacaoRelatorio[];
+  /** Relatório de um item específico: precisa escolher um Material antes de
+   * mostrar o resumo/gerar o PDF (Histórico de empréstimos por item). */
+  exigeMaterial?: boolean;
 }
 
 export interface RelatorioResumoItem {
@@ -78,6 +81,14 @@ export const RELATORIOS_DISPONIVEIS: RelatorioDisponivel[] = [
     icone: 'inventory_2',
     suportaPeriodo: true,
     opcoesSituacao: OPCOES_SITUACAO_EMPRESTIMO
+  },
+  {
+    tipo: 'historico-material',
+    titulo: 'Pessoas atendidas por item',
+    descricao: 'Escolha um item e veja, por data, todas as pessoas que o receberam emprestado.',
+    icone: 'history',
+    suportaPeriodo: false,
+    exigeMaterial: true
   }
 ];
 
@@ -98,25 +109,29 @@ export class RelatorioService {
   private readonly http = inject(HttpClient);
   private readonly resource = `${environment.apiBaseUrl}/relatorios`;
 
-  gerarPdf(tipo: TipoRelatorio, periodo?: PeriodoRelatorio, situacao?: string): Observable<Blob> {
+  gerarPdf(tipo: TipoRelatorio, periodo?: PeriodoRelatorio, situacao?: string, idMaterial?: number): Observable<Blob> {
     return this.http.get(`${this.resource}/${tipo}/pdf`, {
       responseType: 'blob',
-      params: this.params(periodo, situacao)
+      params: this.params(periodo, situacao, idMaterial)
     });
   }
 
   buscarResumo(
     tipo: TipoRelatorio,
     periodo?: PeriodoRelatorio,
-    situacao?: string
+    situacao?: string,
+    idMaterial?: number
   ): Observable<{ itens: RelatorioResumoItem[] }> {
     return this.http.get<{ itens: RelatorioResumoItem[] }>(`${this.resource}/${tipo}/resumo`, {
-      params: this.params(periodo, situacao)
+      params: this.params(periodo, situacao, idMaterial)
     });
   }
 
-  private params(periodo?: PeriodoRelatorio, situacao?: string): HttpParams {
+  private params(periodo?: PeriodoRelatorio, situacao?: string, idMaterial?: number): HttpParams {
     let params = new HttpParams();
+    if (idMaterial !== undefined) {
+      params = params.set('id_material', String(idMaterial));
+    }
     if (periodo) {
       params = params.set('periodo', periodo);
     }
