@@ -96,6 +96,17 @@
               (input)="diasRenovacao.set($any($event.target).value)"
             />
           </mat-form-field>
+          @if (itensAtivos().length > 1) {
+            <p class="emprestimo-detalhe__subtitulo">Devolver algum item agora (os demais serão renovados):</p>
+            @for (item of itensAtivos(); track item.id) {
+              <mat-checkbox
+                [checked]="idsItensDevolver().has(item.id)"
+                (change)="alternarDevolucao(item, $event.checked)"
+              >
+                Devolver {{ item.descricaoMaterial }}
+              </mat-checkbox>
+            }
+          }
         } @else {
           <p class="emprestimo-detalhe__subtitulo">
             @if (temContratoOriginal()) {

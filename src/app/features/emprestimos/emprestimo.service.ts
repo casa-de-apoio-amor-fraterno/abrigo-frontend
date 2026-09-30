@@ -112,9 +112,10 @@ export class EmprestimoService {
   /** Soma `dias` à data prevista de devolução atual (ou a partir de hoje,
    * se o empréstimo ainda não tinha prazo) e marca os itens ainda não
    * devolvidos como "Renovado" — ação rápida pedida pelo time (2026-09-28)
-   * na tela Início e na listagem de empréstimos. */
-  renovar(id: number, idUsuario: number, dias: number): Observable<Emprestimo> {
-    const corpo: EmprestimoRenovarDto = { id_usuario: idUsuario, dias };
+   * na tela Início e na listagem de empréstimos. `idsItensDevolver` devolve
+   * parte dos itens na mesma renovação (2026-09-30). */
+  renovar(id: number, idUsuario: number, dias: number, idsItensDevolver: number[] = []): Observable<Emprestimo> {
+    const corpo: EmprestimoRenovarDto = { id_usuario: idUsuario, dias, ids_itens_devolver: idsItensDevolver };
     return this.http.post<EmprestimoDto>(`${this.resource}/${id}/renovar`, corpo).pipe(map(paraModel));
   }
 

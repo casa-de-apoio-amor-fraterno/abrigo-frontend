@@ -3,6 +3,7 @@ import { Component, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -51,6 +52,7 @@ export interface EmprestimoDetalheDialogData {
     RouterLink,
     AssinaturaCanvasComponent,
     MatButtonModule,
+    MatCheckboxModule,
     MatDialogModule,
     MatFormFieldModule,
     MatIconModule,
@@ -95,6 +97,9 @@ export class EmprestimoDetalheDialogComponent {
   protected readonly renovarAberto = signal(false);
   protected readonly etapaRenovar = signal<'dias' | 'assinar'>('dias');
   protected readonly diasRenovacao = signal('');
+  // Itens que voltam na renovação em vez de serem renovados (pedido do
+  // time, 2026-09-30) — por padrão todo item ativo é renovado.
+  protected readonly idsItensDevolver = signal<ReadonlySet<number>>(new Set());
   protected readonly erroAcao = signal<string | null>(null);
   protected readonly assinaturaCanvas = viewChild(AssinaturaCanvasComponent);
   protected readonly temContratoOriginal = signal(true);
@@ -167,6 +172,7 @@ export class EmprestimoDetalheDialogComponent {
   protected abrirRenovar(): void {
     this.erroAcao.set(null);
     this.diasRenovacao.set('');
+    this.idsItensDevolver.set(new Set());
     this.tipoContratoPendente = 'Renovação';
     this.etapaRenovar.set('dias');
     this.renovacaoAplicada = false;
@@ -184,6 +190,20 @@ export class EmprestimoDetalheDialogComponent {
     this.renovarAberto.set(true);
   }
 
+  protected itensAtivos(): EmprestimoItem[] {
+    return this.itens().filter((item) => item.situacao !== 'Devolvido');
+  }
+
+  protected alternarDevolucao(item: EmprestimoItem, devolver: boolean): void {
+    const ids = new Set(this.idsItensDevolver());
+    if (devolver) {
+      ids.add(item.id);
+    } else {
+      ids.delete(item.id);
+    }
+    this.idsItensDevolver.set(ids);
+  }
+
   protected cancelarRenovar(): void {
     this.renovarAberto.set(false);
     this.erroAcao.set(null);
@@ -196,6 +216,10 @@ export class EmprestimoDetalheDialogComponent {
     const dias = Number(this.diasRenovacao());
     if (!this.diasRenovacao() || !Number.isFinite(dias) || dias <= 0) {
       this.erroAcao.set('Informe um número de dias válido.');
+      return;
+    }
+    if (this.idsItensDevolver().size >= this.itensAtivos().length) {
+      this.erroAcao.set('Ao menos um item precisa ser renovado — para devolver todos, use "Finalizar".');
       return;
     }
     this.erroAcao.set(null);
@@ -225,7 +249,7 @@ export class EmprestimoDetalheDialogComponent {
     }
 
     const dias = Number(this.diasRenovacao());
-    this.emprestimoService.renovar(emp.id, idUsuario, dias).subscribe({
+    this.emprestimoService.renovar(emp.id, idUsuario, dias, [...this.idsItensDevolver()]).subscribe({
       next: (renovado) => {
         this.emprestimo.set(renovado);
         this.renovacaoAplicada = true;

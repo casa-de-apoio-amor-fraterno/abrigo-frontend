@@ -79,6 +79,8 @@ export interface EmprestimoItemDto {
 export interface EmprestimoRenovarDto {
   id_usuario: number;
   dias: number;
+  /** Itens devolvidos na própria renovação; os demais não devolvidos são renovados. */
+  ids_itens_devolver?: number[];
 }
 
 export interface EmprestimoItemCreateDto {
