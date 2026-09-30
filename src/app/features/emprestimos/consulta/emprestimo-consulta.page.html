@@ -56,6 +56,8 @@
     <thead>
       <tr>
         <th>Pessoa</th>
+        <th>Material</th>
+        <th>Nº patrimônio</th>
         <th>Nº contrato</th>
         <th>Situação</th>
         <th></th>
@@ -65,6 +67,20 @@
       @for (emprestimo of itens(); track emprestimo.id) {
         <tr>
           <td class="consulta__coluna-principal">{{ nomesPessoas()[emprestimo.idPessoa] || '—' }}</td>
+          <td>
+            @for (item of emprestimo.itens; track $index) {
+              <div>{{ item.descricaoMaterial }}</div>
+            } @empty {
+              —
+            }
+          </td>
+          <td>
+            @for (item of emprestimo.itens; track $index) {
+              <div>{{ item.numeroPatrimonioMaterial || '—' }}</div>
+            } @empty {
+              —
+            }
+          </td>
           <td>{{ emprestimo.numeroContrato || '—' }}</td>
           <td>
             <span class="consulta__badge" [class.consulta__badge--neutro]="emprestimo.situacao === 'Devolvido'">

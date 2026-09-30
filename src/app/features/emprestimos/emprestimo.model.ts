@@ -6,12 +6,20 @@
  */
 export type SituacaoEmprestimo = 'Pendente' | 'Renovado' | 'Devolvido';
 
+export interface EmprestimoItemResumo {
+  situacao: SituacaoEmprestimo | null;
+  descricaoMaterial: string;
+  numeroPatrimonioMaterial: string | null;
+}
+
 export interface EmprestimoResumo {
   id: number;
   idPessoa: number;
   situacao: SituacaoEmprestimo;
   numeroContrato: string | null;
   dataDevolucao: string | null;
+  /** Só vem preenchido na listagem (GET /emprestimos). */
+  itens?: EmprestimoItemResumo[];
 }
 
 export interface ListaEmprestimos {

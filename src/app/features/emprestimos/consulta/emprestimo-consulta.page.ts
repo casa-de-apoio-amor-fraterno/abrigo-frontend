@@ -128,8 +128,14 @@ export class EmprestimoConsultaPage {
   private gerarCsvEmprestimos(itens: EmprestimoResumo[], nomesPessoas: Record<number, string>): void {
     exportarCsv(
       'emprestimos.csv',
-      ['Pessoa', 'Nº contrato', 'Situação'],
-      itens.map((e) => [nomesPessoas[e.idPessoa] ?? `Pessoa #${e.idPessoa}`, e.numeroContrato, e.situacao])
+      ['Pessoa', 'Material', 'Nº patrimônio', 'Nº contrato', 'Situação'],
+      itens.map((e) => [
+        nomesPessoas[e.idPessoa] ?? `Pessoa #${e.idPessoa}`,
+        (e.itens ?? []).map((i) => i.descricaoMaterial).join(' / '),
+        (e.itens ?? []).map((i) => i.numeroPatrimonioMaterial ?? '-').join(' / '),
+        e.numeroContrato,
+        e.situacao
+      ])
     );
     this.exportando.set(false);
   }

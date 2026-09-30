@@ -23,7 +23,12 @@ export function paraResumoModel(dto: EmprestimoResumoDto): EmprestimoResumo {
     idPessoa: dto.id_pessoa,
     situacao: dto.situacao,
     numeroContrato: dto.numero_contrato,
-    dataDevolucao: dto.data_devolucao
+    dataDevolucao: dto.data_devolucao,
+    itens: dto.itens?.map((item) => ({
+      situacao: item.situacao,
+      descricaoMaterial: item.descricao_material,
+      numeroPatrimonioMaterial: item.numero_patrimonio_material
+    }))
   };
 }
 

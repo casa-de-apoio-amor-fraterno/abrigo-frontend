@@ -16,12 +16,19 @@ export type SituacaoEmprestimo = 'Pendente' | 'Renovado' | 'Devolvido';
  * por empréstimo. Ver EmprestimoContrato no backend. */
 export type TipoContrato = 'Comodato' | 'Renovação';
 
+export interface EmprestimoItemResumoDto {
+  situacao: SituacaoEmprestimo | null;
+  descricao_material: string;
+  numero_patrimonio_material: string | null;
+}
+
 export interface EmprestimoResumoDto {
   id: number;
   id_pessoa: number;
   situacao: SituacaoEmprestimo;
   numero_contrato: string | null;
   data_devolucao: string | null;
+  itens?: EmprestimoItemResumoDto[];
 }
 
 export interface ListaEmprestimosDto {
