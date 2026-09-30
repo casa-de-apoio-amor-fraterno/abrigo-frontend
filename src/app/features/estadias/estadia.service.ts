@@ -98,6 +98,14 @@ export class EstadiaService {
     return this.http.post<EstadiaDto>(`${this.resource}/${id}/encerrar`, corpo).pipe(map(paraModel));
   }
 
+  /** Registra só a saída do acompanhante — a estadia do paciente continua. */
+  encerrarAcompanhante(estadiaId: number, acompanhanteId: number, dataSaida?: string): Observable<EstadiaAcompanhante> {
+    const corpo = dataSaida ? { data_saida: dataSaida } : {};
+    return this.http
+      .post<EstadiaAcompanhanteDto>(`${this.resource}/${estadiaId}/acompanhantes/${acompanhanteId}/encerrar`, corpo)
+      .pipe(map(paraAcompanhanteModel));
+  }
+
   listarAcompanhantes(estadiaId: number): Observable<EstadiaAcompanhante[]> {
     return this.http
       .get<EstadiaAcompanhanteDto[]>(`${this.resource}/${estadiaId}/acompanhantes`)

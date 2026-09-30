@@ -1,7 +1,7 @@
 @if (idEstadiaAberta() !== null) {
   <app-acao-popover
     icone="event_available"
-    titulo="Finalizar estadia"
+    [titulo]="ehAcompanhante() ? 'Finalizar acompanhante' : 'Finalizar estadia'"
     [subtitulo]="nomePessoa() ? nomePessoa() + ' — informe a data de saída' : 'Informe a data de saída'"
     [erro]="erro()"
     [confirmando]="finalizando()"

@@ -16,6 +16,9 @@ export interface QuartoOcupante {
    * um EstadiaAcompanhante.ocupaLeito (acompanha a estadia de um paciente
    * e também ocupa leito). Usado pra colorir diferente. */
   acompanhante: boolean;
+  /** Preenchido só quando o leito é de um EstadiaAcompanhante (não titular) —
+   * finalizar registra a saída só dele, não da estadia do paciente. */
+  idEstadiaAcompanhante: number | null;
 }
 
 /**

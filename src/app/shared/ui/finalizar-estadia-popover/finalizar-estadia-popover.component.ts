@@ -31,6 +31,7 @@ export class FinalizarEstadiaPopoverComponent {
   private readonly estadiaService = inject(EstadiaService);
 
   readonly finalizado = output<Estadia>();
+  readonly finalizadoAcompanhante = output<void>();
 
   protected readonly idEstadiaAberta = signal<number | null>(null);
   protected readonly nomePessoa = signal('');
@@ -39,11 +40,17 @@ export class FinalizarEstadiaPopoverComponent {
   protected readonly erro = signal<string | null>(null);
 
   private dataEntrada = '';
+  // Preenchido quando o leito é de um acompanhante (EstadiaAcompanhante) —
+  // aí só a saída dele é registrada, sem finalizar a estadia do paciente.
+  private idAcompanhante: number | null = null;
+  protected readonly ehAcompanhante = signal(false);
 
   readonly aberta = this.idEstadiaAberta.asReadonly();
 
-  abrir(idEstadia: number, dataEntrada: string, nomePessoa = ''): void {
+  abrir(idEstadia: number, dataEntrada: string, nomePessoa = '', idAcompanhante: number | null = null): void {
     this.erro.set(null);
+    this.idAcompanhante = idAcompanhante;
+    this.ehAcompanhante.set(idAcompanhante !== null);
     this.nomePessoa.set(nomePessoa);
     this.dataEntrada = dataEntrada;
     this.dataSaida.set(agoraDatetimeLocal());
@@ -73,6 +80,21 @@ export class FinalizarEstadiaPopoverComponent {
 
     this.finalizando.set(true);
     this.erro.set(null);
+
+    if (this.idAcompanhante !== null) {
+      this.estadiaService.encerrarAcompanhante(idEstadia, this.idAcompanhante, dataSaida).subscribe({
+        next: () => {
+          this.finalizando.set(false);
+          this.idEstadiaAberta.set(null);
+          this.finalizadoAcompanhante.emit();
+        },
+        error: (error) => {
+          this.finalizando.set(false);
+          this.erro.set(descreverErroHttp(error.error));
+        }
+      });
+      return;
+    }
 
     const tempo = calcularTempoEstadia(this.dataEntrada, dataSaida);
     this.estadiaService.encerrar(idEstadia, dataSaida, tempo.valor, tempo.unidade).subscribe({

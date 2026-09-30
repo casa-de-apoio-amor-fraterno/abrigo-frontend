@@ -152,7 +152,7 @@ export class HomePage {
     event.preventDefault();
     event.stopPropagation();
     this.fecharCriarEstadia();
-    this.finalizarPopover().abrir(ocupante.idEstadia, ocupante.dataEntrada, ocupante.nomePessoa);
+    this.finalizarPopover().abrir(ocupante.idEstadia, ocupante.dataEntrada, ocupante.nomePessoa, ocupante.idEstadiaAcompanhante);
   }
 
   // A estadia finalizada libera o leito — a forma mais simples e correta

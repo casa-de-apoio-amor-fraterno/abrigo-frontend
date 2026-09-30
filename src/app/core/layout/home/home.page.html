@@ -57,32 +57,21 @@
 
             <div class="ocupacao__leitos">
               @for (ocupante of quarto.ocupantes; track ocupante.idEstadia + '_' + ocupante.idPessoa) {
-                @if (ocupante.acompanhante) {
-                  <!-- Leito ocupado por alguém no papel de acompanhante
-                       (titular de estadia tipo_pessoa Acompanhante, ou
-                       EstadiaAcompanhante.ocupaLeito) — navega pra editar
-                       a estadia (`ocupante.idEstadia`) em vez de abrir o
-                       popover de finalizar: quando é EstadiaAcompanhante,
-                       `idEstadia` é a estadia do PACIENTE (aba
-                       Acompanhantes), e encerrar por ali finalizaria a
-                       estadia errada. -->
-                  <a
-                    [routerLink]="['/estadias', ocupante.idEstadia, 'editar']"
-                    class="ocupacao__leito ocupacao__leito--acompanhante"
-                    [title]="ocupante.nomePessoa + ' — acompanhante, desde ' + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
-                  >
-                    <mat-icon>bed</mat-icon>
-                  </a>
-                } @else {
-                  <button
-                    type="button"
-                    class="ocupacao__leito ocupacao__leito--ocupado"
-                    [title]="ocupante.nomePessoa + ' — desde ' + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
-                    (click)="abrirFinalizar(ocupante, $event)"
-                  >
-                    <mat-icon>bed</mat-icon>
-                  </button>
-                }
+                <!-- Clicar abre o popover de finalizar. Acompanhante com
+                     leito próprio (estadia tipo Acompanhante) finaliza a
+                     própria estadia; `EstadiaAcompanhante.ocupaLeito`
+                     (`idEstadiaAcompanhante`) registra só a saída dele —
+                     `idEstadia` é a do PACIENTE e não deve ser finalizada. -->
+                <button
+                  type="button"
+                  class="ocupacao__leito"
+                  [class.ocupacao__leito--ocupado]="!ocupante.acompanhante"
+                  [class.ocupacao__leito--acompanhante]="ocupante.acompanhante"
+                  [title]="ocupante.nomePessoa + (ocupante.acompanhante ? ' — acompanhante, desde ' : ' — desde ') + (ocupante.dataEntrada | date: 'dd/MM/yyyy')"
+                  (click)="abrirFinalizar(ocupante, $event)"
+                >
+                  <mat-icon>bed</mat-icon>
+                </button>
               }
               @for (vaga of leitosVagos(quarto); track $index) {
                 <button
@@ -259,5 +248,5 @@
     }
   </section>
 
-  <app-finalizar-estadia-popover (finalizado)="aoFinalizarEstadia()" />
+  <app-finalizar-estadia-popover (finalizado)="aoFinalizarEstadia()" (finalizadoAcompanhante)="aoFinalizarEstadia()" />
 </div>

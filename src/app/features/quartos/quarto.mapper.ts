@@ -11,7 +11,8 @@ function paraOcupanteModel(dto: QuartoOcupanteDto): QuartoOcupante {
     idPessoa: dto.id_pessoa,
     nomePessoa: dto.nome_pessoa,
     dataEntrada: dto.data_entrada,
-    acompanhante: dto.acompanhante
+    acompanhante: dto.acompanhante,
+    idEstadiaAcompanhante: dto.id_estadia_acompanhante
   };
 }
 

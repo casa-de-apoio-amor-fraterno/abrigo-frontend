@@ -125,6 +125,7 @@ export class EstadiaCadastroPage {
   );
   protected readonly nomesAcompanhantes = signal<Record<number, string>>({});
   protected readonly formAcompanhanteAberto = signal(false);
+  protected readonly encerrandoAcompanhanteId = signal<number | null>(null);
   protected readonly salvandoAcompanhante = signal(false);
   protected readonly pessoaAcompanhante = signal<{ id: number; nome: string } | null>(null);
 
@@ -347,6 +348,26 @@ export class EstadiaCadastroPage {
       grau_parentesco: acompanhante.grauParentesco,
       ocupa_leito: acompanhante.ocupaLeito
     }));
+  }
+
+  /** Registra a saída do acompanhante agora (revezamento: ele pode sair
+   * antes do paciente) — a estadia do paciente continua em andamento. */
+  protected registrarSaidaAcompanhante(acompanhante: EstadiaAcompanhante): void {
+    if (this.estadiaId === null) {
+      return;
+    }
+    this.encerrandoAcompanhanteId.set(acompanhante.id);
+    this.erro.set(null);
+    this.estadiaService.encerrarAcompanhante(this.estadiaId, acompanhante.id, agoraDatetimeLocal()).subscribe({
+      next: () => {
+        this.encerrandoAcompanhanteId.set(null);
+        this.carregarAcompanhantes();
+      },
+      error: (error) => {
+        this.encerrandoAcompanhanteId.set(null);
+        this.erro.set(descreverErroHttp(error.error));
+      }
+    });
   }
 
   private carregarAcompanhantes(): void {

@@ -131,6 +131,16 @@
                   <span>{{ acompanhante.dataEntrada | date: 'dd/MM/yyyy' }}</span>
                   <span>—</span>
                   <span>{{ acompanhante.dataSaida ? (acompanhante.dataSaida | date: 'dd/MM/yyyy') : 'Presente' }}</span>
+                  @if (!acompanhante.dataSaida && estadiaId !== null) {
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      [disabled]="encerrandoAcompanhanteId() === acompanhante.id"
+                      (click)="registrarSaidaAcompanhante(acompanhante)"
+                    >
+                      Registrar saída
+                    </button>
+                  }
                 </div>
               </li>
             }
