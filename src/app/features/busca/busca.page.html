@@ -106,10 +106,13 @@
                   </button>
 
                   @if (emprestimoDevolverAberto() === emprestimo.id) {
-                    <app-acao-popover
+                    <app-acao-dialog
                       icone="assignment_return"
                       titulo="Devolver empréstimo"
-                      subtitulo="Informe a data de devolução"
+                      subtitulo="Confirme os detalhes e informe a data de devolução"
+                      descricao="Todos os itens ainda em posse da pessoa serão marcados como devolvidos na data informada e os materiais voltarão a ficar disponíveis para empréstimo. Para devolver só parte dos itens, edite o empréstimo."
+                      [detalhes]="detalhesDevolver()"
+                      textoConfirmar="Devolver itens"
                       [erro]="erroDevolver()"
                       [confirmando]="devolvendo()"
                       (cancelar)="fecharDevolver()"
@@ -140,7 +143,7 @@
                           (input)="dataDevolucao.set($any($event.target).value)"
                         />
                       </mat-form-field>
-                    </app-acao-popover>
+                    </app-acao-dialog>
                   }
                 </div>
               }
@@ -193,5 +196,5 @@
     </section>
   }
 
-  <app-finalizar-estadia-popover (finalizado)="aoFinalizarEstadia($event)" />
+  <app-finalizar-estadia-dialog (finalizado)="aoFinalizarEstadia($event)" />
 </div>

@@ -1,10 +1,13 @@
 @if (idEstadiaAberta() !== null) {
-  <app-acao-popover
+  <app-acao-dialog
     icone="event_available"
     [titulo]="ehAcompanhante() ? 'Finalizar acompanhante' : 'Finalizar estadia'"
-    [subtitulo]="nomePessoa() ? nomePessoa() + ' — informe a data de saída' : 'Informe a data de saída'"
+    [subtitulo]="'Confirme os detalhes e informe a data de saída'"
+    [descricao]="descricao()"
+    [detalhes]="detalhes()"
     [erro]="erro()"
     [confirmando]="finalizando()"
+    [textoConfirmar]="ehAcompanhante() ? 'Registrar saída' : 'Finalizar estadia'"
     (cancelar)="fechar()"
     (confirmar)="confirmar()"
   >
@@ -17,5 +20,5 @@
         (input)="alterarDataSaida($any($event.target).value)"
       />
     </mat-form-field>
-  </app-acao-popover>
+  </app-acao-dialog>
 }

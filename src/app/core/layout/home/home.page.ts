@@ -21,8 +21,8 @@ import {
   AlertaVencimentoEmprestimo,
   NivelUrgenciaVencimento
 } from '../../../features/emprestimos/emprestimo.model';
-import { AcaoPopoverComponent } from '../../../shared/ui/acao-popover/acao-popover.component';
-import { FinalizarEstadiaPopoverComponent } from '../../../shared/ui/finalizar-estadia-popover/finalizar-estadia-popover.component';
+import { AcaoDialogComponent, DetalheAcao } from '../../../shared/ui/acao-dialog/acao-dialog.component';
+import { FinalizarEstadiaDialogComponent } from '../../../shared/ui/finalizar-estadia-dialog/finalizar-estadia-dialog.component';
 import { PessoaAutocompleteComponent } from '../../../shared/ui/pessoa-autocomplete/pessoa-autocomplete.component';
 import { FiltroPillsComponent, OpcaoFiltroPill } from '../../../shared/ui/filtro-pills/filtro-pills.component';
 import { EmprestimoDetalheDialogComponent } from '../../../features/emprestimos/detalhe-dialog/emprestimo-detalhe-dialog.component';
@@ -51,8 +51,8 @@ type LeitoVago = { vago: true };
   imports: [
     DatePipe,
     RouterLink,
-    AcaoPopoverComponent,
-    FinalizarEstadiaPopoverComponent,
+    AcaoDialogComponent,
+    FinalizarEstadiaDialogComponent,
     PessoaAutocompleteComponent,
     FiltroPillsComponent,
     MatFormFieldModule,
@@ -114,13 +114,13 @@ export class HomePage {
     });
   });
 
-  // Clicar numa cama ocupada abre esse popover pra finalizar a estadia
+  // Clicar numa cama ocupada abre esse popup pra finalizar a estadia
   // direto da tela Início, sem precisar ir pra edição completa (mesmo
   // componente compartilhado do "Finalizar" da busca global, ver
-  // FinalizarEstadiaPopoverComponent).
-  protected readonly finalizarPopover = viewChild.required(FinalizarEstadiaPopoverComponent);
+  // FinalizarEstadiaDialogComponent).
+  protected readonly finalizarDialog = viewChild.required(FinalizarEstadiaDialogComponent);
 
-  // Clicar num leito livre abre esse popover pra criar a estadia ali
+  // Clicar num leito livre abre esse popup pra criar a estadia ali
   // mesmo — guarda o id do QUARTO (não do "leito", que é só um placeholder
   // visual sem identidade própria, ver `leitosVagos`).
   protected readonly estadiaCriarAberta = signal<number | null>(null);
@@ -132,6 +132,25 @@ export class HomePage {
   protected readonly observacaoNovaEstadia = signal('');
   protected readonly criandoEstadia = signal(false);
   protected readonly erroCriarEstadia = signal<string | null>(null);
+
+  // Detalhes mostrados no popup "Nova estadia" — dependem do quarto
+  // clicado (`estadiaCriarAberta`) e do que já foi preenchido; computed
+  // (não método no template) pra manter a mesma referência entre ciclos.
+  protected readonly detalhesNovaEstadia = computed<DetalheAcao[]>(() => {
+    const quarto = this.quartos().find((q) => q.id === this.estadiaCriarAberta());
+    if (!quarto) {
+      return [];
+    }
+    const livres = Math.max(quarto.leito - quarto.ocupantes.length, 0);
+    const hospital = this.hospitais().find((h) => h.id === this.idHospitalNovaEstadia());
+    return [
+      { rotulo: 'Quarto', valor: `Quarto ${quarto.numero}${quarto.descricao ? ' — ' + quarto.descricao : ''}` },
+      { rotulo: 'Leitos livres agora', valor: `${livres} de ${quarto.leito}` },
+      { rotulo: 'Pessoa', valor: this.pessoaNovaEstadia()?.nome ?? 'Não selecionada' },
+      { rotulo: 'Tipo', valor: this.tipoPessoaNovaEstadia() },
+      { rotulo: 'Hospital', valor: hospital?.nome ?? '—' }
+    ];
+  });
 
   constructor() {
     this.carregarOcupacao();
@@ -152,7 +171,7 @@ export class HomePage {
     event.preventDefault();
     event.stopPropagation();
     this.fecharCriarEstadia();
-    this.finalizarPopover().abrir(ocupante.idEstadia, ocupante.dataEntrada, ocupante.nomePessoa, ocupante.idEstadiaAcompanhante);
+    this.finalizarDialog().abrir(ocupante.idEstadia, ocupante.dataEntrada, ocupante.nomePessoa, ocupante.idEstadiaAcompanhante);
   }
 
   // A estadia finalizada libera o leito — a forma mais simples e correta
@@ -165,7 +184,7 @@ export class HomePage {
   protected abrirCriarEstadia(quarto: QuartoOcupacao, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.finalizarPopover().fechar();
+    this.finalizarDialog().fechar();
     this.erroCriarEstadia.set(null);
     this.pessoaNovaEstadia.set(null);
     this.dataEntradaNovaEstadia.set(agoraDatetimeLocal());
@@ -318,15 +337,15 @@ export class HomePage {
   @HostListener('document:click', ['$event'])
   protected aoClicarFora(event: MouseEvent): void {
     const alvo = event.target as HTMLElement;
-    // Painel do autocomplete de pessoa (dentro do popover de criar
+    // Painel do autocomplete de pessoa (dentro do popup de criar
     // estadia) é renderizado pelo CDK num overlay fora da árvore do
-    // popover — sem essa exceção, escolher uma opção fecharia o popover
+    // popover — sem essa exceção, escolher uma opção fecharia o popup
     // antes de processar a seleção.
     if (alvo.closest('.cdk-overlay-container')) {
       return;
     }
-    if (this.finalizarPopover().aberta() !== null && !alvo.closest('.ocupacao__leito--ocupado')) {
-      this.finalizarPopover().fechar();
+    if (this.finalizarDialog().aberta() !== null && !alvo.closest('.ocupacao__leito--ocupado')) {
+      this.finalizarDialog().fechar();
     }
     if (this.estadiaCriarAberta() !== null && !alvo.closest('.ocupacao__leito--livre')) {
       this.fecharCriarEstadia();

@@ -57,7 +57,7 @@
 
             <div class="ocupacao__leitos">
               @for (ocupante of quarto.ocupantes; track ocupante.idEstadia + '_' + ocupante.idPessoa) {
-                <!-- Clicar abre o popover de finalizar. Acompanhante com
+                <!-- Clicar abre o popup de finalizar. Acompanhante com
                      leito próprio (estadia tipo Acompanhante) finaliza a
                      própria estadia; `EstadiaAcompanhante.ocupaLeito`
                      (`idEstadiaAcompanhante`) registra só a saída dele —
@@ -86,10 +86,12 @@
             </div>
 
             @if (estadiaCriarAberta() === quarto.id) {
-              <app-acao-popover
+              <app-acao-dialog
                 icone="hotel"
                 titulo="Nova estadia"
-                [subtitulo]="'Quarto ' + quarto.numero + ' — informe a pessoa e a data de entrada'"
+                subtitulo="Informe a pessoa e a data de entrada"
+                descricao="Será registrada uma nova estadia em acompanhamento nesta vaga do quarto, com a data/hora de entrada informada. O leito passa a aparecer como ocupado no painel."
+                [detalhes]="detalhesNovaEstadia()"
                 [erro]="erroCriarEstadia()"
                 [confirmando]="criandoEstadia()"
                 textoConfirmar="Iniciar estadia"
@@ -136,7 +138,7 @@
                     (input)="observacaoNovaEstadia.set($any($event.target).value)"
                   ></textarea>
                 </mat-form-field>
-              </app-acao-popover>
+              </app-acao-dialog>
             }
 
             @if (quarto.pendentesRevisao.length > 0) {
@@ -248,5 +250,5 @@
     }
   </section>
 
-  <app-finalizar-estadia-popover (finalizado)="aoFinalizarEstadia()" (finalizadoAcompanhante)="aoFinalizarEstadia()" />
+  <app-finalizar-estadia-dialog (finalizado)="aoFinalizarEstadia()" (finalizadoAcompanhante)="aoFinalizarEstadia()" />
 </div>

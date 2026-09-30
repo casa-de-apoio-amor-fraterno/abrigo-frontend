@@ -1,0 +1,58 @@
+<div class="acao-dialog__fundo" (click)="aoClicarFundo()">
+  <div
+    class="acao-dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="titulo()"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="acao-dialog__cabecalho">
+      <mat-icon>{{ icone() }}</mat-icon>
+      <div>
+        <div class="acao-dialog__titulo">{{ titulo() }}</div>
+        @if (subtitulo()) {
+          <div class="acao-dialog__subtitulo">{{ subtitulo() }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="acao-dialog__conteudo">
+      @if (descricao()) {
+        <div class="acao-dialog__descricao">
+          <strong>O que será feito</strong>
+          <p>{{ descricao() }}</p>
+        </div>
+      }
+
+      @if (detalhes().length > 0) {
+        <dl class="acao-dialog__detalhes">
+          @for (detalhe of detalhes(); track detalhe.rotulo) {
+            <div>
+              <dt>{{ detalhe.rotulo }}</dt>
+              <dd>{{ detalhe.valor }}</dd>
+            </div>
+          }
+        </dl>
+      }
+
+      <ng-content></ng-content>
+
+      @if (erro()) {
+        <p class="acao-dialog__erro">{{ erro() }}</p>
+      }
+    </div>
+
+    <div class="acao-dialog__acoes">
+      <button mat-button type="button" [disabled]="confirmando()" (click)="cancelar.emit()">Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        class="acao-dialog__confirmar"
+        [disabled]="confirmando()"
+        (click)="confirmar.emit()"
+      >
+        {{ confirmando() ? 'Confirmando...' : textoConfirmar() }}
+      </button>
+    </div>
+  </div>
+</div>

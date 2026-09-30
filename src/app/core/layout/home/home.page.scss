@@ -184,7 +184,7 @@
     // Leito ocupado por acompanhante (EstadiaAcompanhante.ocupaLeito), não
     // pelo titular da estadia — ver home.page.ts `abrirFinalizar`, esse
     // leito navega pra editar a estadia do paciente em vez de abrir o
-    // popover de finalizar (encerrar ali finalizaria a estadia errada).
+    // popup de finalizar (encerrar ali finalizaria a estadia errada).
     &--acompanhante {
       background: #6d28d9;
       color: #fff;

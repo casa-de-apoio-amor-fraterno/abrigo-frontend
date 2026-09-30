@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal, viewChild } from '@angular/core';
+import { Component, HostListener, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
@@ -22,8 +22,8 @@ import { MaterialService } from '../materiais/material.service';
 import { MaterialResumo } from '../materiais/material.model';
 import { VoluntarioService } from '../voluntarios/voluntario.service';
 import { VoluntarioResumo } from '../voluntarios/voluntario.model';
-import { AcaoPopoverComponent } from '../../shared/ui/acao-popover/acao-popover.component';
-import { FinalizarEstadiaPopoverComponent } from '../../shared/ui/finalizar-estadia-popover/finalizar-estadia-popover.component';
+import { AcaoDialogComponent, DetalheAcao } from '../../shared/ui/acao-dialog/acao-dialog.component';
+import { FinalizarEstadiaDialogComponent } from '../../shared/ui/finalizar-estadia-dialog/finalizar-estadia-dialog.component';
 
 const LIMITE_RESULTADOS = 10;
 const LIMITE_PESSOAS_PARA_ESTADIAS = 5;
@@ -55,8 +55,8 @@ interface EmprestimoComPessoa extends EmprestimoResumo {
   imports: [
     FormsModule,
     RouterLink,
-    AcaoPopoverComponent,
-    FinalizarEstadiaPopoverComponent,
+    AcaoDialogComponent,
+    FinalizarEstadiaDialogComponent,
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
@@ -85,13 +85,29 @@ export class BuscaPage {
   protected readonly materiais = signal<MaterialResumo[]>([]);
   protected readonly voluntarios = signal<VoluntarioResumo[]>([]);
 
-  protected readonly finalizarPopover = viewChild.required(FinalizarEstadiaPopoverComponent);
+  protected readonly finalizarDialog = viewChild.required(FinalizarEstadiaDialogComponent);
 
   protected readonly emprestimoDevolverAberto = signal<number | null>(null);
   protected readonly dataDevolucao = signal('');
   protected readonly devolvendo = signal(false);
   protected readonly erroDevolver = signal<string | null>(null);
   protected readonly itensDevolver = signal<EmprestimoItem[]>([]);
+
+  protected readonly detalhesDevolver = computed<DetalheAcao[]>(() => {
+    const emprestimo = this.emprestimos().find((e) => e.id === this.emprestimoDevolverAberto());
+    if (!emprestimo) {
+      return [];
+    }
+    const prazo = emprestimo.dataDevolucao
+      ? new Date(emprestimo.dataDevolucao + 'T00:00:00').toLocaleDateString('pt-BR')
+      : '—';
+    return [
+      { rotulo: 'Pessoa', valor: emprestimo.nomePessoa },
+      { rotulo: 'Nº contrato', valor: emprestimo.numeroContrato || '—' },
+      { rotulo: 'Situação atual', valor: emprestimo.situacao },
+      { rotulo: 'Devolução prevista', valor: prazo }
+    ];
+  });
 
   constructor() {
     // Reage a novas buscas feitas pela barra do topo (mesma rota /busca,
@@ -237,7 +253,7 @@ export class BuscaPage {
     event.preventDefault();
     event.stopPropagation();
     this.fecharDevolver();
-    this.finalizarPopover().abrir(estadia.id, estadia.dataEntrada, estadia.nomePessoa);
+    this.finalizarDialog().abrir(estadia.id, estadia.dataEntrada, estadia.nomePessoa);
   }
 
   protected aoFinalizarEstadia(estadiaAtualizada: Estadia): void {
@@ -257,7 +273,7 @@ export class BuscaPage {
   protected abrirDevolver(emprestimo: EmprestimoComPessoa, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.finalizarPopover().fechar();
+    this.finalizarDialog().fechar();
     this.erroDevolver.set(null);
     this.dataDevolucao.set(new Date().toISOString().slice(0, 10));
     this.emprestimoDevolverAberto.set(emprestimo.id);
@@ -309,8 +325,8 @@ export class BuscaPage {
   @HostListener('document:click', ['$event'])
   protected aoClicarFora(event: MouseEvent): void {
     const alvo = event.target as HTMLElement;
-    if (this.finalizarPopover().aberta() !== null && !alvo.closest('.busca__acao-finalizar')) {
-      this.finalizarPopover().fechar();
+    if (this.finalizarDialog().aberta() !== null && !alvo.closest('.busca__acao-finalizar')) {
+      this.finalizarDialog().fechar();
     }
     if (this.emprestimoDevolverAberto() !== null && !alvo.closest('.busca__acao-devolver')) {
       this.fecharDevolver();

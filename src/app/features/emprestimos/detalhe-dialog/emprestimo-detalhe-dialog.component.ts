@@ -82,7 +82,7 @@ export class EmprestimoDetalheDialogComponent {
   // pelo time, 2026-09-28: "por quantos dias renovar") e, na sequência,
   // exige assinar o termo de renovação (pedido do time, 2026-09-28: "ao
   // confirmar renovação, precisamos assinar o contrato de renovação e
-  // gerá-lo") — duas etapas dentro do mesmo popover: `dias` (quantidade) e
+  // gerá-lo") — duas etapas dentro do mesmo popup: `dias` (quantidade) e
   // `assinar` (captura da assinatura via AssinaturaCanvasComponent, mesmo
   // componente usado na aba Contrato do cadastro completo).
   //
@@ -103,7 +103,7 @@ export class EmprestimoDetalheDialogComponent {
   protected readonly erroAcao = signal<string | null>(null);
   protected readonly assinaturaCanvas = viewChild(AssinaturaCanvasComponent);
   protected readonly temContratoOriginal = signal(true);
-  // Qual termo está sendo assinado nesta rodada do popover — decide se
+  // Qual termo está sendo assinado nesta rodada do popup — decide se
   // `confirmarRenovar` chama `renovar()` antes (só faz sentido pra
   // "Renovação") e qual `tipo` mandar em `assinarContrato`.
   private tipoContratoPendente: TipoContrato = 'Renovação';

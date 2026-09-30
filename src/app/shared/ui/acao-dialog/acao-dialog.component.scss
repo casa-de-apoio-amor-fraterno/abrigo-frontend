@@ -1,0 +1,140 @@
+.acao-dialog {
+  width: 480px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 48px);
+  background: var(--abrigo-surface);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px var(--abrigo-sombra), 0 0 0 1px var(--abrigo-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: acao-dialog-entrada 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &__fundo {
+    position: fixed;
+    inset: 0;
+    // Abaixo do overlay do CDK (z-index 1000): autocomplete/select abertos
+    // de dentro do popup precisam aparecer por cima.
+    z-index: 950;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  &__cabecalho {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+
+    mat-icon {
+      color: var(--abrigo-primary);
+    }
+  }
+
+  &__titulo {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--abrigo-ink);
+  }
+
+  &__subtitulo {
+    font-size: 13px;
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__conteudo {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+    min-height: 0;
+
+    // Campos projetados ocupam a largura toda.
+    ::ng-deep > mat-form-field,
+    ::ng-deep > app-pessoa-autocomplete,
+    ::ng-deep > app-filtro-pills {
+      width: 100%;
+    }
+  }
+
+  &__descricao {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--abrigo-border);
+    border-left: 3px solid var(--abrigo-primary);
+    font-size: 13px;
+    color: var(--abrigo-ink);
+
+    strong {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--abrigo-texto-secundario);
+    }
+
+    p {
+      margin: 4px 0 0;
+      line-height: 1.45;
+    }
+  }
+
+  &__detalhes {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+
+    dt {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--abrigo-texto-secundario);
+    }
+
+    dd {
+      margin: 2px 0 0;
+      font-size: 14px;
+      color: var(--abrigo-ink);
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__erro {
+    margin: 0;
+    color: var(--abrigo-erro, #c62828);
+    font-size: 13px;
+  }
+
+  &__acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 8px 24px 20px;
+  }
+
+  &__confirmar {
+    background: var(--abrigo-primary) !important;
+    color: #fff !important;
+  }
+}
+
+@keyframes acao-dialog-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
