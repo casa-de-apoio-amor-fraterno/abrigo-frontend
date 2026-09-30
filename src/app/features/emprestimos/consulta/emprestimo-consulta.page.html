@@ -27,7 +27,7 @@
   <form filtros class="consulta__busca consulta__busca--com-periodo" (ngSubmit)="buscar()">
     <input
       type="search"
-      placeholder="Buscar por nome da pessoa..."
+      placeholder="Buscar por pessoa, material ou nº patrimônio..."
       [value]="termoBusca()"
       (input)="termoBusca.set($any($event.target).value)"
     />
