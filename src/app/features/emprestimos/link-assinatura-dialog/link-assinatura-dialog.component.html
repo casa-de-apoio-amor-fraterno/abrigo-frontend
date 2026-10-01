@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>Link de assinatura</h2>
+
+<mat-dialog-content>
+  @if (gerando()) {
+    <div class="link-assinatura__estado"><mat-spinner diameter="28" /></div>
+  } @else if (link(); as url) {
+    <p>
+      Envie este link para <strong>{{ data.nomePessoa }}</strong>. Pelo próprio celular, a pessoa confirma os 4
+      últimos dígitos do CPF, lê o contrato de comodato e assina — sem precisar de login.
+    </p>
+
+    <input class="link-assinatura__campo" readonly [value]="url" (focus)="$any($event.target).select()" />
+
+    <div class="link-assinatura__acoes">
+      <button mat-stroked-button type="button" (click)="copiar()">
+        <mat-icon>{{ copiado() ? 'check' : 'content_copy' }}</mat-icon>
+        {{ copiado() ? 'Copiado' : 'Copiar link' }}
+      </button>
+      <a mat-stroked-button [href]="linkWhatsapp()" target="_blank" rel="noopener">
+        <mat-icon>chat</mat-icon>
+        Enviar por WhatsApp
+      </a>
+    </div>
+
+    @if (codigo(); as codigoCurto) {
+      <div class="link-assinatura__codigo">
+        <span>Ou passe o código para digitar em <strong>Assinar contrato</strong>, na tela de login:</span>
+        <strong class="link-assinatura__codigo-valor">{{ codigoCurto }}</strong>
+      </div>
+    }
+
+    <ul class="link-assinatura__regras">
+      <li>Vale até {{ expiraEm() | date: 'dd/MM/yyyy HH:mm' }} e só pode ser usado uma vez.</li>
+      <li>Depois de 5 erros nos dígitos do CPF o link (e o código) é bloqueado.</li>
+      <li>Gerar um novo link cancela este.</li>
+      <li>Link e código não aparecem de novo depois que você fechar esta janela.</li>
+    </ul>
+  }
+
+  @if (erro()) {
+    <p class="link-assinatura__erro">{{ erro() }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

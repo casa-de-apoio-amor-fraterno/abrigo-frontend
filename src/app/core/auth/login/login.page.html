@@ -112,6 +112,33 @@
           <a mat-flat-button class="login__submit" routerLink="/cadastro-paciente">
             Fazer meu cadastro
           </a>
+
+          <div class="login__contrato">
+            <p>Tem um contrato para assinar? Digite o código que a equipe do Abrigo te passou.</p>
+            <mat-form-field appearance="outline" class="login__field">
+              <mat-label>Código do contrato</mat-label>
+              <input
+                matInput
+                autocomplete="off"
+                autocapitalize="characters"
+                placeholder="K7M2-9PQX"
+                maxlength="9"
+                [value]="codigoContrato()"
+                (input)="digitarCodigoContrato($any($event.target).value)"
+                (keydown.enter)="assinarContrato()"
+              />
+            </mat-form-field>
+            <button
+              mat-stroked-button
+              type="button"
+              class="login__contrato-botao"
+              [disabled]="codigoContrato().length < 9"
+              (click)="assinarContrato()"
+            >
+              <mat-icon>draw</mat-icon>
+              Assinar contrato
+            </button>
+          </div>
         </div>
       }
     </div>

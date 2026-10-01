@@ -169,6 +169,16 @@ export class EmprestimoService {
    * empréstimo (assinar de novo retorna 409); "Renovação" pode ser
    * assinada quantas vezes for preciso, mas exige que o "Comodato" já
    * exista (senão também retorna 409). */
+  /** Gera um link de assinatura remota do contrato de comodato (pessoa
+   * assina pelo próprio celular, sem login, confirmando o CPF) — só pra
+   * contrato pendente. O token só vem nesta resposta. */
+  criarLinkAssinatura(emprestimoId: number): Observable<{ id: number; token: string; codigo: string; expira_em: string }> {
+    return this.http.post<{ id: number; token: string; codigo: string; expira_em: string }>(
+      `${this.resource}/${emprestimoId}/links-assinatura`,
+      {}
+    );
+  }
+
   assinarContrato(
     emprestimoId: number,
     assinaturaPngBase64: string,

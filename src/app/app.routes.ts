@@ -17,6 +17,16 @@ export const routes: Routes = [
       )
   },
   {
+    // Público, sem authGuard — a pessoa assina o contrato de comodato pelo
+    // próprio celular via link + confirmação de CPF (ver
+    // abrigo-backend, emprestimos/link_assinatura.py).
+    path: 'assinar/:token',
+    loadComponent: () =>
+      import('./features/emprestimos/assinatura-publica/assinatura-publica.page').then(
+        (m) => m.AssinaturaPublicaPage
+      )
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./core/layout/shell/shell.page').then((m) => m.ShellPage),

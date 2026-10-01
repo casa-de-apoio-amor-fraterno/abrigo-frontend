@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +20,7 @@ import { PessoaService } from '../../pessoas/pessoa.service';
 import { MaterialService } from '../../materiais/material.service';
 import { EmprestimoItemCreateDto, TipoContrato } from '../emprestimo.dto';
 import { EmprestimoService } from '../emprestimo.service';
+import { LinkAssinaturaDialogComponent } from '../link-assinatura-dialog/link-assinatura-dialog.component';
 import {
   EmprestimoContrato,
   EmprestimoHistorico,
@@ -69,6 +70,7 @@ export class EmprestimoCadastroPage {
   // lista (mesmo resultado de antes); no fluxo direto só fecha o popup,
   // sem sair da tela de quem abriu.
   private readonly dialogRef = inject(MatDialogRef<EmprestimoCadastroPage>);
+  private readonly dialog = inject(MatDialog);
   // Só presente quando aberto direto (fora da rota) — no fluxo roteado
   // normal o host não passa `data`, então isso fica `null` e o id vem do
   // parâmetro da rota mesmo (ver `emprestimoId` abaixo).
@@ -441,6 +443,18 @@ export class EmprestimoCadastroPage {
 
   protected podeAssinarContrato(): boolean {
     return !!this.assinaturaCanvas()?.obterAssinatura();
+  }
+
+  /** Contrato pendente: gera o link pra a pessoa assinar pelo próprio
+   * celular (sem login, confirmando o CPF). */
+  protected gerarLinkAssinatura(): void {
+    if (this.emprestimoId === null) {
+      return;
+    }
+    this.dialog.open(LinkAssinaturaDialogComponent, {
+      width: '480px',
+      data: { emprestimoId: this.emprestimoId, nomePessoa: this.pessoaSelecionada()?.nome ?? 'a pessoa' }
+    });
   }
 
   protected iniciarRenovacao(): void {

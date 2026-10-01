@@ -1,0 +1,128 @@
+<div class="assinatura-publica">
+  <div class="assinatura-publica__card">
+    <img class="assinatura-publica__logo" src="logo-casa-de-apoio.png" alt="Casa de Apoio Amor Fraterno" />
+
+    @switch (etapa()) {
+      @case ('carregando') {
+        <div class="assinatura-publica__centro"><mat-spinner diameter="32" /></div>
+      }
+
+      @case ('invalido') {
+        <div class="assinatura-publica__centro">
+          <mat-icon class="assinatura-publica__icone assinatura-publica__icone--erro">link_off</mat-icon>
+          <h2>Não foi possível abrir</h2>
+          <p>{{ mensagemInvalido() }}</p>
+        </div>
+      }
+
+      @case ('cpf') {
+        <h2>Assinatura do contrato</h2>
+        <p class="assinatura-publica__texto">
+          Para assinar o contrato de comodato (empréstimo solidário), confirme os 4 últimos dígitos do seu CPF.
+        </p>
+        <mat-form-field appearance="outline" class="assinatura-publica__campo">
+          <mat-label>4 últimos dígitos do CPF</mat-label>
+          <input
+            matInput
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="0000"
+            maxlength="4"
+            [value]="cpf()"
+            (input)="digitarCpf($any($event.target).value)"
+            (keydown.enter)="verificar()"
+          />
+        </mat-form-field>
+        @if (erro()) {
+          <p class="assinatura-publica__erro">{{ erro() }}</p>
+        }
+        <button
+          mat-flat-button
+          type="button"
+          class="assinatura-publica__botao"
+          [disabled]="ocupado() || !cpfCompleto()"
+          (click)="verificar()"
+        >
+          @if (ocupado()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            Continuar
+          }
+        </button>
+      }
+
+      @case ('assinar') {
+        @if (resumo(); as r) {
+          <h2>Olá, {{ r.nome_pessoa }}</h2>
+          <p class="assinatura-publica__texto">Confira os dados do empréstimo antes de assinar.</p>
+
+          <dl class="assinatura-publica__resumo">
+            @if (r.numero_contrato) {
+              <div>
+                <dt>Contrato</dt>
+                <dd>{{ r.numero_contrato }}</dd>
+              </div>
+            }
+            <div>
+              <dt>Itens emprestados</dt>
+              @for (item of r.itens; track $index) {
+                <dd>{{ item.descricao }}{{ item.numero_patrimonio ? ' — Nº ' + item.numero_patrimonio : '' }}</dd>
+              } @empty {
+                <dd>—</dd>
+              }
+            </div>
+            <div>
+              <dt>Prazo</dt>
+              <dd>
+                {{ r.data_inicio | date: 'dd/MM/yyyy' }} a {{ r.data_termino | date: 'dd/MM/yyyy' }} ({{ r.dias }} dias)
+              </dd>
+            </div>
+          </dl>
+
+          <button
+            mat-stroked-button
+            type="button"
+            class="assinatura-publica__ler"
+            [disabled]="abrindoPdf()"
+            (click)="lerContrato()"
+          >
+            <mat-icon>picture_as_pdf</mat-icon>
+            {{ abrindoPdf() ? 'Abrindo...' : 'Ler o contrato completo' }}
+          </button>
+
+          <mat-checkbox [checked]="concordo()" (change)="concordo.set($event.checked)">
+            Li e concordo com os termos do contrato de comodato.
+          </mat-checkbox>
+
+          <p class="assinatura-publica__texto">Assine no espaço abaixo com o dedo.</p>
+          <app-assinatura-canvas />
+
+          @if (erro()) {
+            <p class="assinatura-publica__erro">{{ erro() }}</p>
+          }
+          <button
+            mat-flat-button
+            type="button"
+            class="assinatura-publica__botao"
+            [disabled]="ocupado() || !podeAssinar()"
+            (click)="assinar()"
+          >
+            @if (ocupado()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Assinar contrato
+            }
+          </button>
+        }
+      }
+
+      @case ('concluido') {
+        <div class="assinatura-publica__centro">
+          <mat-icon class="assinatura-publica__icone">check_circle</mat-icon>
+          <h2>Contrato assinado!</h2>
+          <p>Recebemos sua assinatura. A equipe do Abrigo já tem o contrato em mãos. Obrigado!</p>
+        </div>
+      }
+    }
+  </div>
+</div>

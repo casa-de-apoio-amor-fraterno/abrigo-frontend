@@ -41,6 +41,7 @@ export class LoginPage {
 
   protected readonly senhaVisivel = signal(false);
   protected readonly carregando = signal(false);
+  protected readonly codigoContrato = signal('');
   protected readonly erro = signal<string | null>(null);
 
   protected readonly form = this.fb.nonNullable.group({
@@ -48,6 +49,20 @@ export class LoginPage {
     senha: ['', [Validators.required]],
     lembrar: [false]
   });
+
+  /** Código curto do contrato (ex.: K7M2-9PQX) — maiúsculas, com hífen
+   * automático depois do 4º caractere. */
+  protected digitarCodigoContrato(valor: string): void {
+    const limpo = valor.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+    this.codigoContrato.set(limpo.length > 4 ? `${limpo.slice(0, 4)}-${limpo.slice(4)}` : limpo);
+  }
+
+  protected assinarContrato(): void {
+    if (this.codigoContrato().length < 9) {
+      return;
+    }
+    void this.router.navigate(['/assinar', this.codigoContrato()]);
+  }
 
   protected alternarVisibilidadeSenha(): void {
     this.senhaVisivel.update((valor) => !valor);

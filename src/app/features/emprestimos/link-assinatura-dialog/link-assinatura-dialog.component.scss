@@ -1,0 +1,58 @@
+.link-assinatura {
+  &__estado {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  &__campo {
+    width: 100%;
+    box-sizing: border-box;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--abrigo-border-forte);
+    font-size: 13px;
+  }
+
+  &__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  &__codigo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px dashed var(--abrigo-border-forte);
+    font-size: 13px;
+    color: var(--abrigo-texto-secundario);
+  }
+
+  &__codigo-valor {
+    font-size: 22px;
+    letter-spacing: 0.15em;
+    color: var(--abrigo-ink);
+  }
+
+  &__regras {
+    margin: 16px 0 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: var(--abrigo-texto-secundario);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__erro {
+    margin: 12px 0 0;
+    color: var(--abrigo-erro, #c62828);
+    font-size: 13px;
+  }
+}

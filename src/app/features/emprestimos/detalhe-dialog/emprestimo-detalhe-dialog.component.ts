@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -18,6 +18,7 @@ import { Pessoa } from '../../pessoas/pessoa.model';
 import { mascararCpf } from '../../../shared/util/cpf';
 import { Emprestimo, EmprestimoItem, TipoContrato } from '../emprestimo.model';
 import { EmprestimoService } from '../emprestimo.service';
+import { LinkAssinaturaDialogComponent } from '../link-assinatura-dialog/link-assinatura-dialog.component';
 
 export interface EmprestimoDetalheDialogData {
   emprestimoId: number;
@@ -68,6 +69,7 @@ export class EmprestimoDetalheDialogComponent {
   private readonly emprestimoService = inject(EmprestimoService);
   private readonly pessoaService = inject(PessoaService);
   private readonly auth = inject(AuthService);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly carregando = signal(true);
   protected readonly erro = signal<string | null>(null);
@@ -202,6 +204,19 @@ export class EmprestimoDetalheDialogComponent {
       ids.delete(item.id);
     }
     this.idsItensDevolver.set(ids);
+  }
+
+  /** Contrato pendente: gera o link pra a pessoa assinar pelo próprio
+   * celular (sem login, confirmando o CPF). */
+  protected gerarLinkAssinatura(): void {
+    const emp = this.emprestimo();
+    if (!emp) {
+      return;
+    }
+    this.dialog.open(LinkAssinaturaDialogComponent, {
+      width: '480px',
+      data: { emprestimoId: emp.id, nomePessoa: this.pessoa()?.nome ?? 'a pessoa' }
+    });
   }
 
   protected cancelarRenovar(): void {
