@@ -5,6 +5,8 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -19,7 +21,11 @@ import { Estadia, EstadiaResumo } from '../estadias/estadia.model';
 import { EmprestimoService } from '../emprestimos/emprestimo.service';
 import { EmprestimoItem, EmprestimoResumo } from '../emprestimos/emprestimo.model';
 import { MaterialService } from '../materiais/material.service';
-import { MaterialResumo } from '../materiais/material.model';
+import { Material, MaterialResumo } from '../materiais/material.model';
+import { MaterialLocalService } from '../materiais-locais/material-local.service';
+import { MaterialLocal } from '../materiais-locais/material-local.model';
+import { EmprestimoDetalheDialogComponent } from '../emprestimos/detalhe-dialog/emprestimo-detalhe-dialog.component';
+import { ContratosDialogComponent } from '../emprestimos/contratos-dialog/contratos-dialog.component';
 import { VoluntarioService } from '../voluntarios/voluntario.service';
 import { VoluntarioResumo } from '../voluntarios/voluntario.model';
 import { AcaoDialogComponent, DetalheAcao } from '../../shared/ui/acao-dialog/acao-dialog.component';
@@ -42,6 +48,9 @@ interface EstadiaComPessoa extends EstadiaResumo {
   /** true quando a pessoa encontrada aparece como acompanhante
    * (`EstadiaAcompanhante`) de outro paciente, não como titular do leito. */
   viaAcompanhante: boolean;
+  /** Id da pessoa buscada — só usado quando `viaAcompanhante`, pra achar o
+   * registro dela em `EstadiaAcompanhante` (a `estadia.idPessoa` é o paciente). */
+  idPessoaBuscada: number;
   /** Nome do titular do leito — só preenchido quando `viaAcompanhante`. */
   nomePaciente?: string;
 }
@@ -61,6 +70,7 @@ interface EmprestimoComPessoa extends EmprestimoResumo {
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatProgressSpinnerModule
   ],
   templateUrl: './busca.page.html',
@@ -72,6 +82,8 @@ export class BuscaPage {
   private readonly emprestimoService = inject(EmprestimoService);
   private readonly materialService = inject(MaterialService);
   private readonly voluntarioService = inject(VoluntarioService);
+  private readonly materialLocalService = inject(MaterialLocalService);
+  private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
@@ -92,6 +104,39 @@ export class BuscaPage {
   protected readonly devolvendo = signal(false);
   protected readonly erroDevolver = signal<string | null>(null);
   protected readonly itensDevolver = signal<EmprestimoItem[]>([]);
+
+  // Aviso de ações que não puderam ser iniciadas (ex.: acompanhante já saiu).
+  protected readonly avisoAcao = signal<string | null>(null);
+  // Acompanhantes (estadia:pessoa) cuja saída já foi registrada nesta tela —
+  // a busca por acompanhante continua devolvendo a estadia do paciente, então
+  // esconde o botão em vez de recarregar.
+  protected readonly saidasRegistradas = signal<ReadonlySet<string>>(new Set());
+
+  // Alocar material (mudar local): mesmo fluxo da aba de cadastro do
+  // material, agora direto da busca.
+  protected readonly materialAlocarAberto = signal<number | null>(null);
+  protected readonly materialAlocarDetalhe = signal<Material | null>(null);
+  protected readonly locais = signal<MaterialLocal[]>([]);
+  protected readonly idLocalAlocar = signal<number | null>(null);
+  protected readonly alocando = signal(false);
+  protected readonly erroAlocar = signal<string | null>(null);
+
+  protected readonly detalhesAlocar = computed<DetalheAcao[]>(() => {
+    const resumo = this.materiais().find((m) => m.id === this.materialAlocarAberto());
+    if (!resumo) {
+      return [];
+    }
+    const detalhe = this.materialAlocarDetalhe();
+    const localAtual = this.locais().find((l) => l.id === detalhe?.idLocal)?.nome;
+    const destino = this.locais().find((l) => l.id === this.idLocalAlocar())?.nome;
+    return [
+      { rotulo: 'Material', valor: resumo.descricao },
+      { rotulo: 'Nº patrimônio', valor: resumo.numeroPatrimonio || '—' },
+      { rotulo: 'Situação atual', valor: resumo.situacao },
+      { rotulo: 'Local atual', valor: localAtual ?? '—' },
+      { rotulo: 'Novo local', valor: destino ?? 'Não selecionado' }
+    ];
+  });
 
   protected readonly detalhesDevolver = computed<DetalheAcao[]>(() => {
     const emprestimo = this.emprestimos().find((e) => e.id === this.emprestimoDevolverAberto());
@@ -181,14 +226,14 @@ export class BuscaPage {
             return;
           }
           idsVistos.add(estadia.id);
-          todas.push({ ...estadia, nomePessoa, viaAcompanhante: false });
+          todas.push({ ...estadia, nomePessoa, viaAcompanhante: false, idPessoaBuscada: candidatas[indice].id });
         });
         resultado.acompanhante.items.forEach((estadia) => {
           if (idsVistos.has(estadia.id)) {
             return;
           }
           idsVistos.add(estadia.id);
-          todas.push({ ...estadia, nomePessoa, viaAcompanhante: true });
+          todas.push({ ...estadia, nomePessoa, viaAcompanhante: true, idPessoaBuscada: candidatas[indice].id });
         });
       });
 
@@ -253,7 +298,118 @@ export class BuscaPage {
     event.preventDefault();
     event.stopPropagation();
     this.fecharDevolver();
-    this.finalizarDialog().abrir(estadia.id, estadia.dataEntrada, estadia.nomePessoa);
+    this.avisoAcao.set(null);
+
+    if (!estadia.viaAcompanhante) {
+      this.finalizarDialog().abrir(estadia.id, estadia.dataEntrada, estadia.nomePessoa);
+      return;
+    }
+
+    // Pessoa encontrada como acompanhante: `estadia.id` é a do PACIENTE —
+    // finalizar por ela encerraria a estadia errada. Registra só a saída
+    // do acompanhante (ver `FinalizarEstadiaDialogComponent`).
+    this.estadiaService
+      .listarAcompanhantes(estadia.id)
+      .pipe(catchError(() => of(null)))
+      .subscribe((acompanhantes) => {
+        const registro = acompanhantes?.find((a) => a.idPessoa === estadia.idPessoaBuscada && !a.dataSaida);
+        if (!registro) {
+          this.avisoAcao.set(
+            `Não foi possível localizar a presença ativa de ${estadia.nomePessoa} nesta estadia (talvez já tenha saído).`
+          );
+          return;
+        }
+        this.acompanhanteEmSaida = estadia;
+        this.finalizarDialog().abrir(estadia.id, registro.dataEntrada, estadia.nomePessoa, registro.id);
+      });
+  }
+
+  private acompanhanteEmSaida: EstadiaComPessoa | null = null;
+
+  protected aoFinalizarAcompanhante(): void {
+    const estadia = this.acompanhanteEmSaida;
+    if (estadia) {
+      this.saidasRegistradas.update((atual) => new Set(atual).add(this.chaveSaida(estadia)));
+    }
+    this.acompanhanteEmSaida = null;
+  }
+
+  protected chaveSaida(estadia: EstadiaComPessoa): string {
+    return `${estadia.id}:${estadia.idPessoaBuscada}`;
+  }
+
+  protected abrirRenovar(emprestimo: EmprestimoComPessoa): void {
+    this.dialog
+      .open(EmprestimoDetalheDialogComponent, {
+        width: '560px',
+        data: { emprestimoId: emprestimo.id, linkEditar: ['/emprestimos', emprestimo.id, 'editar'], acoesRapidas: true }
+      })
+      .afterClosed()
+      .subscribe((alterou) => {
+        if (alterou) {
+          this.buscarEmprestimosDasPessoas(this.pessoas());
+        }
+      });
+  }
+
+  protected verContratos(emprestimo: EmprestimoComPessoa): void {
+    this.dialog.open(ContratosDialogComponent, {
+      width: '480px',
+      data: { emprestimoId: emprestimo.id, nomePessoa: emprestimo.nomePessoa }
+    });
+  }
+
+  protected podeAlocar(material: MaterialResumo): boolean {
+    // Emprestado volta pelo fluxo de empréstimo; Inutilizado é baixa definitiva.
+    return material.situacao === 'Disponível' || material.situacao === 'Alocado';
+  }
+
+  protected abrirAlocar(material: MaterialResumo, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.erroAlocar.set(null);
+    this.idLocalAlocar.set(null);
+    this.materialAlocarDetalhe.set(null);
+    this.materialAlocarAberto.set(material.id);
+    this.materialLocalService.listar().subscribe((locais) => this.locais.set(locais));
+    this.materialService.buscar(material.id).subscribe((detalhe) => {
+      if (this.materialAlocarAberto() === material.id) {
+        this.materialAlocarDetalhe.set(detalhe);
+        this.idLocalAlocar.set(detalhe.idLocal);
+      }
+    });
+  }
+
+  protected fecharAlocar(): void {
+    this.materialAlocarAberto.set(null);
+    this.erroAlocar.set(null);
+  }
+
+  protected confirmarAlocar(material: MaterialResumo): void {
+    const idLocal = this.idLocalAlocar();
+    if (idLocal === null) {
+      this.erroAlocar.set('Selecione o local.');
+      return;
+    }
+    this.alocando.set(true);
+    this.erroAlocar.set(null);
+    this.materialService.alocar(material.id, idLocal).subscribe({
+      next: (atualizado) => {
+        this.alocando.set(false);
+        this.materialAlocarAberto.set(null);
+        this.materiais.update((lista) =>
+          lista.map((item) =>
+            item.id === material.id
+              ? { ...item, situacao: atualizado.situacao, disponivelEmprestimo: atualizado.disponivelEmprestimo }
+              : item
+          )
+        );
+      },
+      error: (error) => {
+        this.alocando.set(false);
+        this.erroAlocar.set(descreverErroHttp(error.error));
+      }
+    });
   }
 
   protected aoFinalizarEstadia(estadiaAtualizada: Estadia): void {

@@ -44,6 +44,9 @@
 
     <section class="busca__secao">
       <h2>Estadias</h2>
+      @if (avisoAcao()) {
+        <p class="busca__aviso">{{ avisoAcao() }}</p>
+      }
       @if (estadias().length === 0) {
         <p class="busca__vazio">Nenhuma estadia encontrada para as pessoas localizadas.</p>
       } @else {
@@ -61,7 +64,9 @@
                   }
                 </span>
               </a>
-              @if (estadia.situacao !== 'Finalizada') {
+              @if (estadia.viaAcompanhante && saidasRegistradas().has(chaveSaida(estadia))) {
+                <small class="busca__acao-registrada">Saída registrada</small>
+              } @else if (estadia.situacao !== 'Finalizada') {
                 <div class="busca__acao-finalizar">
                   <button
                     mat-stroked-button
@@ -69,7 +74,7 @@
                     class="busca__acao-botao"
                     (click)="abrirFinalizar(estadia, $event)"
                   >
-                    Finalizar
+                    {{ estadia.viaAcompanhante ? 'Registrar saída' : 'Finalizar' }}
                   </button>
                 </div>
               }
@@ -94,6 +99,25 @@
                   <small>{{ emprestimo.numeroContrato || 'Sem contrato' }} · {{ emprestimo.situacao }}</small>
                 </span>
               </a>
+              <div class="busca__acoes">
+                @if (!estaDevolvido(emprestimo)) {
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="busca__acao-botao"
+                    (click)="abrirRenovar(emprestimo)"
+                  >
+                    Renovar
+                  </button>
+                }
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="busca__acao-botao"
+                  (click)="verContratos(emprestimo)"
+                >
+                  Contratos
+                </button>
               @if (!estaDevolvido(emprestimo)) {
                 <div class="busca__acao-devolver">
                   <button
@@ -147,6 +171,7 @@
                   }
                 </div>
               }
+              </div>
             </li>
           }
         </ul>
@@ -160,14 +185,50 @@
       } @else {
         <ul class="busca__lista">
           @for (material of materiais(); track material.id) {
-            <li>
-              <a [routerLink]="['/materiais', material.id, 'editar']">
+            <li class="busca__item">
+              <a class="busca__item-link" [routerLink]="['/materiais', material.id, 'editar']">
                 <mat-icon>category</mat-icon>
                 <span>
                   <strong>{{ material.descricao }}</strong>
                   <small>{{ material.numeroPatrimonio || 'Sem patrimônio' }} · {{ material.situacao }}</small>
                 </span>
               </a>
+              @if (podeAlocar(material)) {
+                <div class="busca__acao-alocar">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="busca__acao-botao"
+                    (click)="abrirAlocar(material, $event)"
+                  >
+                    Alocar
+                  </button>
+
+                  @if (materialAlocarAberto() === material.id) {
+                    <app-acao-dialog
+                      icone="move_item"
+                      titulo="Alocar material"
+                      subtitulo="Escolha o novo local do material"
+                      descricao="O material será movido para o local escolhido e ficará como Alocado, deixando de estar disponível para empréstimo até voltar para a Casa."
+                      [detalhes]="detalhesAlocar()"
+                      [erro]="erroAlocar()"
+                      [confirmando]="alocando()"
+                      textoConfirmar="Alocar material"
+                      (cancelar)="fecharAlocar()"
+                      (confirmar)="confirmarAlocar(material)"
+                    >
+                      <mat-form-field appearance="outline">
+                        <mat-label>Novo local</mat-label>
+                        <mat-select [value]="idLocalAlocar()" (selectionChange)="idLocalAlocar.set($event.value)">
+                          @for (local of locais(); track local.id) {
+                            <mat-option [value]="local.id">{{ local.nome }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                    </app-acao-dialog>
+                  }
+                </div>
+              }
             </li>
           }
         </ul>
@@ -196,5 +257,8 @@
     </section>
   }
 
-  <app-finalizar-estadia-dialog (finalizado)="aoFinalizarEstadia($event)" />
+  <app-finalizar-estadia-dialog
+    (finalizado)="aoFinalizarEstadia($event)"
+    (finalizadoAcompanhante)="aoFinalizarAcompanhante()"
+  />
 </div>
